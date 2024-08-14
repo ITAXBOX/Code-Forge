@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Entities</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            padding: 10px;
+            margin: 20px 0;
+            border-radius: 4px;
+            background: #eaf0f7;
+            color: #333;
+        }
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+                width: 90%;
+            }
+            input[type="text"] {
+                width: calc(100% - 18px);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Add Entities</h1>
+    <form th:action="@{/generate-entities}" method="post">
+        <input type="hidden" id="projectName" name="projectName" th:value="${projectName}"/>
+
+        <label for="entities">Entities (comma-separated):</label>
+        <input type="text" id="entities" name="entities" placeholder="e.g., User, Product, Order" required/>
+
+        <button type="submit">Generate Entities</button>
+    </form>
+
+    <div class="message" th:if="${message}">
+        <p th:text="${message}"></p>
+    </div>
+</div>
+</body>
+</html>

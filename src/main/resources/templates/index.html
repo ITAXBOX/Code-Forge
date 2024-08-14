@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Project Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            width: 400px;
+            max-width: 100%;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+            text-align: left;
+        }
+        input[type="text"], select {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: calc(100% - 22px); /* Adjust width for padding and border */
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            margin-top: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #d9534f;
+        }
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .container {
+                width: 90%;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Project Generator</h1>
+    <form th:action="@{/generate}" method="post">
+        <label for="projectName">Project Name:</label>
+        <input type="text" id="projectName" name="projectName" required/>
+
+        <label for="frontendType">Frontend Type:</label>
+        <select id="frontendType" name="frontendType" required>
+            <option value="">Select Frontend Type</option>
+            <option value="Thymeleaf">Thymeleaf</option>
+            <option value="React">React</option>
+            <option value="Vue">Vue</option>
+            <option value="Angular">Angular</option>
+            <!-- Add other options as needed -->
+        </select>
+
+        <label for="backendType">Backend Type:</label>
+        <select id="backendType" name="backendType" required>
+            <option value="">Select Backend Type</option>
+            <option value="Spring Boot">Spring Boot</option>
+            <option value="Django">Django</option>
+            <option value="Express">Express</option>
+            <option value="Flask">Flask</option>
+            <!-- Add other options as needed -->
+        </select>
+
+        <label for="databaseType">Database Type:</label>
+        <select id="databaseType" name="databaseType" required>
+            <option value="">Select Database Type</option>
+            <option value="MySQL">MySQL</option>
+            <option value="PostgreSQL">PostgreSQL</option>
+            <option value="MongoDB">MongoDB</option>
+            <option value="SQLite">SQLite</option>
+            <!-- Add other options as needed -->
+        </select>
+
+        <button type="submit">Generate Project</button>
+    </form>
+
+    <div th:if="${message}" class="message">
+        <p th:text="${message}"></p>
+    </div>
+</div>
+</body>
+</html>
