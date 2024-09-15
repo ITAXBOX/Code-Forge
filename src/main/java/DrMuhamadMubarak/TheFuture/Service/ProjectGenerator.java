@@ -32,65 +32,70 @@ public class ProjectGenerator {
     }
 
     private String getApplicationPropertiesContent(String databaseType, String projectName) {
-        // Return the content of application.properties based on database type
         return "spring.datasource.url=jdbc:mysql://localhost:3306/" + projectName.toLowerCase() + "?createDatabaseIfNotExist=true\n" + "spring.datasource.username=root\n" + "spring.datasource.password=Sql01276084$\n" + "spring.jpa.hibernate.ddl-auto=update";
     }
 
     private String getPomXmlContent(String projectName, String frontendType, String backendType, String databaseType) {
         return String.format("""
-                <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-                    <modelVersion>4.0.0</modelVersion>
-                    <parent>
+            <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+                <modelVersion>4.0.0</modelVersion>
+                <parent>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-parent</artifactId>
+                    <version>3.2.3</version>
+                    <relativePath/>
+                    <!--  lookup parent from repository  -->
+                </parent>
+                <groupId>com.example</groupId>
+                <artifactId>%s</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+                <name>%s</name>
+                <description>Demo project for Spring Boot</description>
+                <properties>
+                    <java.version>17</java.version>
+                    <lombok.version>1.18.26</lombok.version> <!-- Update the version as needed -->
+                </properties>
+                <dependencies>
+                    <dependency>
                         <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-starter-parent</artifactId>
-                        <version>3.2.3</version>
-                        <relativePath/>
-                        <!--  lookup parent from repository  -->
-                    </parent>
-                    <groupId>com.example</groupId>
-                    <artifactId>%s</artifactId>
-                    <version>0.0.1-SNAPSHOT</version>
-                    <name>%s</name>
-                    <description>Demo project for Spring Boot</description>
-                    <properties>
-                        <java.version>17</java.version>
-                    </properties>
-                    <dependencies>
-                        <dependency>
+                        <artifactId>spring-boot-starter-data-jpa</artifactId>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-starter-web</artifactId>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.mysql</groupId>
+                        <artifactId>mysql-connector-j</artifactId>
+                        <scope>runtime</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-starter-test</artifactId>
+                        <scope>test</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.projectlombok</groupId>
+                        <artifactId>lombok</artifactId>
+                        <version>${lombok.version}</version>
+                        <scope>provided</scope>
+                    </dependency>
+                </dependencies>
+                <build>
+                    <plugins>
+                        <plugin>
                             <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-starter-data-jpa</artifactId>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-starter-web</artifactId>
-                        </dependency>
-                        <dependency>
-                            <groupId>com.mysql</groupId>
-                            <artifactId>mysql-connector-j</artifactId>
-                            <scope>runtime</scope>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-starter-test</artifactId>
-                            <scope>test</scope>
-                        </dependency>
-                    </dependencies>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.springframework.boot</groupId>
-                                <artifactId>spring-boot-maven-plugin</artifactId>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """, projectName.toLowerCase(), projectName);
+                            <artifactId>spring-boot-maven-plugin</artifactId>
+                        </plugin>
+                    </plugins>
+                </build>
+            </project>
+            """, projectName.toLowerCase(), projectName);
     }
 
 
     private String getMainClassContent(String projectName) {
-        // Return the content of the main application class
         String capitalizedProjectName = capitalize(projectName);
         return "package com.example." + projectName.toLowerCase() + ";\n\n" + "import org.springframework.boot.SpringApplication;\n" + "import org.springframework.boot.autoconfigure.SpringBootApplication;\n\n" + "@SpringBootApplication\n" + "public class " + capitalizedProjectName + "Application {\n\n" + "    public static void main(String[] args) {\n" + "        SpringApplication.run(" + capitalizedProjectName + "Application.class, args);\n" + "    }\n" + "}";
     }
