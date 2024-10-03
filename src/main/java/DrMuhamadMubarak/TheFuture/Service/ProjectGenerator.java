@@ -45,7 +45,6 @@ public class ProjectGenerator {
                     <artifactId>spring-boot-starter-parent</artifactId>
                     <version>3.2.3</version>
                     <relativePath/>
-                    <!--  lookup parent from repository  -->
                 </parent>
                 <groupId>com.example</groupId>
                 <artifactId>%s</artifactId>
@@ -53,35 +52,35 @@ public class ProjectGenerator {
                 <name>%s</name>
                 <description>Demo project for Spring Boot</description>
                 <properties>
-                    <java.version>17</java.version>
-                    <lombok.version>1.18.26</lombok.version> <!-- Update the version as needed -->
+                    <java.version>22</java.version>
+                    <lombok.version>1.18.34</lombok.version> <!-- Update the version as needed -->
                 </properties>
                 <dependencies>
-                    <dependency>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-starter-data-jpa</artifactId>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-starter-web</artifactId>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.mysql</groupId>
-                        <artifactId>mysql-connector-j</artifactId>
-                        <scope>runtime</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-starter-test</artifactId>
-                        <scope>test</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.projectlombok</groupId>
-                        <artifactId>lombok</artifactId>
-                        <version>${lombok.version}</version>
-                        <scope>provided</scope>
-                    </dependency>
-                </dependencies>
+                                           <dependency>
+                                               <groupId>org.springframework.boot</groupId>
+                                               <artifactId>spring-boot-starter-data-jpa</artifactId>
+                                           </dependency>
+                                           <dependency>
+                                               <groupId>org.springframework.boot</groupId>
+                                               <artifactId>spring-boot-starter-web</artifactId>
+                                           </dependency>
+                                           <dependency>
+                                               <groupId>org.springframework.boot</groupId>
+                                               <artifactId>spring-boot-starter-test</artifactId>
+                                               <scope>test</scope>
+                                           </dependency>
+                                           <dependency>
+                                               <groupId>org.projectlombok</groupId>
+                                               <artifactId>lombok</artifactId>
+                                               <version>${lombok.version}</version>
+                                               <scope>provided</scope>
+                                           </dependency>
+                                           <dependency>
+                                               <groupId>com.mysql</groupId>
+                                               <artifactId>mysql-connector-j</artifactId>
+                                               <scope>runtime</scope>
+                                           </dependency>
+                                       </dependencies>
                 <build>
                     <plugins>
                         <plugin>

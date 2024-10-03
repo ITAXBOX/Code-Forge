@@ -57,7 +57,7 @@ public class AttributeService {
         boolean hasDefaultValue = attribute.getDefaultValue() != null && !attribute.getDefaultValue().isEmpty();
         boolean hasAttributes = false;
 
-        if (hasLength) {
+        if ("String".equalsIgnoreCase(attribute.getDataType()) && hasLength) {
             columnAnnotation.append("length = ").append(attribute.getDataSize());
             hasAttributes = true;
         }
@@ -85,9 +85,17 @@ public class AttributeService {
             field.append("\n    ").append(columnAnnotation);
         }
 
+        if (!"String".equalsIgnoreCase(attribute.getDataType()) && hasLength)
+            field.append("\n    ").append("@Max(").append(attribute.getDataSize()).append(")");
+
         field.append("\n    private ").append(formatDataType(attribute)).append(" ").append(attribute.getAttributeName()).append(";");
 
         field.append("\n");
+
+        if (attribute.isDisplayInList()) {
+            field.append("\n    private boolean displayInList;").append("\n");
+        }
+
         return field.toString();
     }
 
