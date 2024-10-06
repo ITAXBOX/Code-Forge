@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Getter
@@ -45,5 +46,26 @@ public class EntitiesService {
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
+
+    public void generateRepositoryClass(String projectName, String entityName) throws IOException {
+        String baseDir = "./" + projectName + "/src/main/java/com/example/" + projectName.toLowerCase() + "/repositories";
+        Path repositoryFilePath = Paths.get(baseDir, entityName + "Repository.java");
+
+        // Create the directory if it doesn't exist
+        Files.createDirectories(Paths.get(baseDir));
+
+        // Define the repository content with @Repository annotation
+        String repositoryContent = "package com.example." + projectName.toLowerCase() + ".repositories;\n\n" +
+                                   "import org.springframework.data.jpa.repository.JpaRepository;\n" +
+                                   "import com.example." + projectName.toLowerCase() + ".models." + entityName + ";\n" +
+                                   "import org.springframework.stereotype.Repository;\n\n" +
+                                   "@Repository\n" +
+                                   "public interface " + entityName + "Repository extends JpaRepository<" + entityName + ", Long> {\n" +
+                                   "}\n";
+
+        // Write the repository file
+        Files.writeString(repositoryFilePath, repositoryContent);
+    }
+
 
 }

@@ -34,6 +34,10 @@ public class EntitiesController {
 
             entitiesService.generateEntityClasses(projectName, entities);
 
+            for (String entity : entities) {
+                entitiesService.generateRepositoryClass(projectName, entity);
+            }
+
             model.addAttribute("projectName", projectName);
             model.addAttribute("entityName", entities[0]);  // Start with the first entity
             return "redirect:/add-attributes?projectName=" + projectName + "&entityName=" + entities[0];
