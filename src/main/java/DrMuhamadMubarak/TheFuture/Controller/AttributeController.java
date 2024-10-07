@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 public class AttributeController {
@@ -17,6 +19,7 @@ public class AttributeController {
     private int index = 0;
     private final EntitiesService entitiesService;
     private final AttributeService attributeService;
+    private static List<AttributeDTO> attributes = new ArrayList<>();
 
     public AttributeController(EntitiesService entitiesService, AttributeService attributeService) {
         this.entitiesService = entitiesService;
@@ -68,8 +71,14 @@ public class AttributeController {
 
             attributeService.addAttributesToEntity(projectName, entityName, attribute);
 
+            attributes.add(attribute);
+
             model.addAttribute("projectName", projectName);
             if ("next".equals(action)) {
+                entitiesService.generateServiceClass(projectName, entityName, attributes);
+                entitiesService.generateControllerClass(projectName, entityName);
+                attributes = new ArrayList<>();
+
                 if (++index >= entitiesService.getEntities().length) {
                     model.addAttribute("message", "Project generated successfully");
                     return "result";
