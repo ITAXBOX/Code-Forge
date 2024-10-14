@@ -75,9 +75,12 @@ public class AttributeController {
 
             model.addAttribute("projectName", projectName);
             if ("next".equals(action)) {
+
                 entitiesService.generateServiceClass(projectName, entityName, attributes);
                 entitiesService.generateControllerClass(projectName, entityName);
                 entitiesService.generateEntityUI(projectName, entityName, attributes);
+                entitiesService.generateEntityGetByIdUI(projectName, entityName, attributes);
+
                 attributes = new ArrayList<>();
 
                 if (++index >= entitiesService.getEntities().length) {

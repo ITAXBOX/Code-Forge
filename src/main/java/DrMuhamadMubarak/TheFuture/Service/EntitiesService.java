@@ -227,50 +227,73 @@ public class EntitiesService {
             writer.write("    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n");
             writer.write("    <title>" + entityName + " List</title>\n");
 
-            // Add cool style for table and layout
+            // Add professional and modern styles
             writer.write("    <style>\n");
             writer.write("        body {\n");
-            writer.write("            font-family: Arial, sans-serif;\n");
-            writer.write("            background-color: #f4f4f9;\n");
+            writer.write("            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n");
+            writer.write("            background-color: #f0f4f8;\n");
             writer.write("            margin: 0;\n");
-            writer.write("            padding: 20px;\n");
+            writer.write("            padding: 0;\n");
             writer.write("            display: flex;\n");
             writer.write("            justify-content: center;\n");
             writer.write("            align-items: center;\n");
-            writer.write("            height: 100vh;\n");
+            writer.write("            min-height: 100vh;\n");
+            writer.write("        }\n");
+            writer.write("        .container {\n");
+            writer.write("            width: 90%;\n");
+            writer.write("            max-width: 1200px;\n");
+            writer.write("            padding: 20px;\n");
+            writer.write("            background-color: #fff;\n");
+            writer.write("            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);\n");
+            writer.write("            border-radius: 8px;\n");
             writer.write("        }\n");
             writer.write("        h1 {\n");
             writer.write("            text-align: center;\n");
             writer.write("            color: #333;\n");
-            writer.write("            margin-bottom: 20px;\n");
+            writer.write("            margin-bottom: 30px;\n");
+            writer.write("            font-size: 2.5rem;\n");
             writer.write("        }\n");
             writer.write("        table {\n");
-            writer.write("            width: 80%;\n");
+            writer.write("            width: 100%;\n");
             writer.write("            border-collapse: collapse;\n");
-            writer.write("            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);\n");
-            writer.write("            background-color: #fff;\n");
+            writer.write("            margin-bottom: 20px;\n");
+            writer.write("            font-size: 1rem;\n");
             writer.write("        }\n");
             writer.write("        th, td {\n");
-            writer.write("            padding: 12px 15px;\n");
+            writer.write("            padding: 15px 20px;\n");
             writer.write("            border: 1px solid #ddd;\n");
             writer.write("            text-align: left;\n");
             writer.write("        }\n");
             writer.write("        th {\n");
-            writer.write("            background-color: #4CAF50;\n");
+            writer.write("            background-color: #007BFF;\n");
             writer.write("            color: white;\n");
+            writer.write("            font-size: 1.2rem;\n");
+            writer.write("            text-transform: uppercase;\n");
             writer.write("        }\n");
-            writer.write("        tr:nth-child(even) {\n");
-            writer.write("            background-color: #f2f2f2;\n");
+            writer.write("        td {\n");
+            writer.write("            background-color: #f9f9f9;\n");
+            writer.write("            color: #333;\n");
             writer.write("        }\n");
-            writer.write("        tr:hover {\n");
-            writer.write("            background-color: #ddd;\n");
+            writer.write("        tr:nth-child(even) td {\n");
+            writer.write("            background-color: #e9ecef;\n");
+            writer.write("        }\n");
+            writer.write("        tr:hover td {\n");
+            writer.write("            background-color: #d6e3ff;\n");
+            writer.write("        }\n");
+            writer.write("        @media (max-width: 768px) {\n");
+            writer.write("            table, th, td {\n");
+            writer.write("                font-size: 0.9rem;\n");
+            writer.write("            }\n");
+            writer.write("            th, td {\n");
+            writer.write("                padding: 10px 12px;\n");
+            writer.write("            }\n");
             writer.write("        }\n");
             writer.write("    </style>\n");
 
             writer.write("</head>\n");
             writer.write("<body>\n");
 
-            writer.write("    <div>\n");
+            writer.write("    <div class=\"container\">\n");
             writer.write("    <h1>" + entityName + " List</h1>\n");
 
             // Table structure with a dynamic header
@@ -316,6 +339,108 @@ public class EntitiesService {
             writer.write("        });\n");
             writer.write("    </script>\n");
 
+            writer.write("</body>\n");
+            writer.write("</html>\n");
+        }
+    }
+
+    public void generateEntityGetByIdUI(String projectName, String entityName, List<AttributeDTO> attributes) throws IOException {
+        String baseDir = projectName + "/src/main/resources/static";
+        String fileName = baseDir + "/" + entityName.toLowerCase() + "-get-by-id.html";
+
+        // Create directories if they do not exist
+        Files.createDirectories(Paths.get(baseDir));
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            // Basic HTML structure
+            writer.write("<!DOCTYPE html>\n");
+            writer.write("<html lang=\"en\">\n");
+            writer.write("<head>\n");
+            writer.write("    <meta charset=\"UTF-8\">\n");
+            writer.write("    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n");
+            writer.write("    <title>Get " + entityName + " by ID</title>\n");
+            writer.write("    <style>\n");
+            writer.write("        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }\n");
+            writer.write("        .container { max-width: 600px; margin: auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }\n");
+            writer.write("        h1 { text-align: center; color: #333; }\n");
+            writer.write("        label { display: block; margin-bottom: 8px; color: #555; }\n");
+            writer.write("        input[type='number'] { width: calc(100% - 22px); padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }\n");
+            writer.write("        button { width: 100%; padding: 10px; background-color: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer; }\n");
+            writer.write("        button:hover { background-color: #0056b3; }\n");
+            writer.write("        table { width: 100%; border-collapse: collapse; margin-top: 20px; }\n");
+            writer.write("        table, th, td { border: 1px solid #ddd; }\n");
+            writer.write("        th, td { padding: 12px; text-align: left; }\n");
+            writer.write("        th { background-color: #f2f2f2; }\n");
+            writer.write("        tr:hover { background-color: #f1f1f1; }\n");
+            writer.write("        @media (max-width: 600px) { \n");
+            writer.write("            table, th, td { display: block; }\n");
+            writer.write("            tr { margin-bottom: 10px; }\n");
+            writer.write("        }\n");
+            writer.write("    </style>\n");
+            writer.write("</head>\n");
+            writer.write("<body>\n");
+
+            writer.write("    <div class=\"container\">\n");
+            writer.write("        <h1>Get " + entityName + " by ID</h1>\n");
+
+            // Input field for the ID
+            writer.write("        <label for=\"entity-id\">Enter " + entityName + " ID:</label>\n");
+            writer.write("        <input type=\"number\" id=\"entity-id\" placeholder=\"Enter ID\" />\n");
+            writer.write("        <button id=\"fetch-button\">Fetch " + entityName + "</button>\n");
+
+            // Table structure to display the entity data
+            writer.write("        <table id=\"entity-table\">\n");
+            writer.write("            <thead>\n");
+            writer.write("                <tr>\n");
+
+            // Dynamically create headers based on attributes
+            for (AttributeDTO attribute : attributes) {
+                writer.write("                    <th>" + capitalize(attribute.getAttributeName()) + "</th>\n");
+            }
+
+            writer.write("                </tr>\n");
+            writer.write("            </thead>\n");
+            writer.write("            <tbody>\n");
+            writer.write("                <!-- Rows will be dynamically inserted here -->\n");
+            writer.write("            </tbody>\n");
+            writer.write("        </table>\n");
+
+            // JavaScript to fetch entity by ID
+            writer.write("        <script>\n");
+            writer.write("            document.getElementById('fetch-button').addEventListener('click', function() {\n");
+            writer.write("                const id = document.getElementById('entity-id').value;\n");
+            writer.write("                if (!id) {\n");
+            writer.write("                    alert('Please enter an ID.');\n");
+            writer.write("                    return;\n");
+            writer.write("                }\n");
+            writer.write("                fetch('/api/" + entityName.toLowerCase() + "s/' + id)\n");
+            writer.write("                    .then(response => {\n");
+            writer.write("                        if (!response.ok) {\n");
+            writer.write("                            throw new Error('Entity not found');\n");
+            writer.write("                        }\n");
+            writer.write("                        return response.json();\n");
+            writer.write("                    })\n");
+            writer.write("                    .then(data => {\n");
+            writer.write("                        const tableBody = document.querySelector('#entity-table tbody');\n");
+            writer.write("                        tableBody.innerHTML = '';\n");
+            writer.write("                        const row = document.createElement('tr');\n");
+
+            // Dynamically populate the table rows with entity data
+            for (AttributeDTO attribute : attributes) {
+                writer.write("                        const " + attribute.getAttributeName() + "Cell = document.createElement('td');\n");
+                writer.write("                        " + attribute.getAttributeName() + "Cell.textContent = data." + attribute.getAttributeName() + " !== undefined ? data." + attribute.getAttributeName() + " : 'N/A';\n");
+                writer.write("                        row.appendChild(" + attribute.getAttributeName() + "Cell);\n");
+            }
+
+            writer.write("                        tableBody.appendChild(row);\n");
+            writer.write("                    })\n");
+            writer.write("                    .catch(error => {\n");
+            writer.write("                        alert('Error: ' + error.message);\n");
+            writer.write("                    });\n");
+            writer.write("            });\n");
+            writer.write("        </script>\n");
+
+            writer.write("    </div>\n");
             writer.write("</body>\n");
             writer.write("</html>\n");
         }
