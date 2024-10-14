@@ -211,4 +211,114 @@ public class EntitiesService {
         }
     }
 
+    public void generateEntityUI(String projectName, String entityName, List<AttributeDTO> attributes) throws IOException {
+        String baseDir = projectName + "/src/main/resources/static";
+        String fileName = baseDir + "/" + entityName.toLowerCase() + ".html";
+
+        // Create directories if they do not exist
+        Files.createDirectories(Paths.get(baseDir));
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            // Basic HTML structure with enhanced styles
+            writer.write("<!DOCTYPE html>\n");
+            writer.write("<html lang=\"en\">\n");
+            writer.write("<head>\n");
+            writer.write("    <meta charset=\"UTF-8\">\n");
+            writer.write("    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n");
+            writer.write("    <title>" + entityName + " List</title>\n");
+
+            // Add cool style for table and layout
+            writer.write("    <style>\n");
+            writer.write("        body {\n");
+            writer.write("            font-family: Arial, sans-serif;\n");
+            writer.write("            background-color: #f4f4f9;\n");
+            writer.write("            margin: 0;\n");
+            writer.write("            padding: 20px;\n");
+            writer.write("            display: flex;\n");
+            writer.write("            justify-content: center;\n");
+            writer.write("            align-items: center;\n");
+            writer.write("            height: 100vh;\n");
+            writer.write("        }\n");
+            writer.write("        h1 {\n");
+            writer.write("            text-align: center;\n");
+            writer.write("            color: #333;\n");
+            writer.write("            margin-bottom: 20px;\n");
+            writer.write("        }\n");
+            writer.write("        table {\n");
+            writer.write("            width: 80%;\n");
+            writer.write("            border-collapse: collapse;\n");
+            writer.write("            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);\n");
+            writer.write("            background-color: #fff;\n");
+            writer.write("        }\n");
+            writer.write("        th, td {\n");
+            writer.write("            padding: 12px 15px;\n");
+            writer.write("            border: 1px solid #ddd;\n");
+            writer.write("            text-align: left;\n");
+            writer.write("        }\n");
+            writer.write("        th {\n");
+            writer.write("            background-color: #4CAF50;\n");
+            writer.write("            color: white;\n");
+            writer.write("        }\n");
+            writer.write("        tr:nth-child(even) {\n");
+            writer.write("            background-color: #f2f2f2;\n");
+            writer.write("        }\n");
+            writer.write("        tr:hover {\n");
+            writer.write("            background-color: #ddd;\n");
+            writer.write("        }\n");
+            writer.write("    </style>\n");
+
+            writer.write("</head>\n");
+            writer.write("<body>\n");
+
+            writer.write("    <div>\n");
+            writer.write("    <h1>" + entityName + " List</h1>\n");
+
+            // Table structure with a dynamic header
+            writer.write("    <table id=\"entity-table\">\n");
+            writer.write("        <thead>\n");
+            writer.write("            <tr>\n");
+
+            // Dynamically create headers based on attributes
+            for (AttributeDTO attribute : attributes) {
+                writer.write("                <th>" + capitalize(attribute.getAttributeName()) + "</th>\n");
+            }
+
+            writer.write("            </tr>\n");
+            writer.write("        </thead>\n");
+            writer.write("        <tbody>\n");
+            writer.write("            <!-- Rows will be dynamically inserted here -->\n");
+            writer.write("        </tbody>\n");
+            writer.write("    </table>\n");
+            writer.write("    </div>\n");
+
+            // JavaScript to fetch entities where displayInList = true
+            writer.write("    <script>\n");
+            writer.write("        document.addEventListener('DOMContentLoaded', function() {\n");
+            writer.write("            fetch('/api/" + entityName.toLowerCase() + "s/display-in-list-true')\n");
+            writer.write("                .then(response => response.json())\n");
+            writer.write("                .then(data => {\n");
+            writer.write("                    const tableBody = document.querySelector('#entity-table tbody');\n");
+            writer.write("                    tableBody.innerHTML = '';\n");
+            writer.write("                    data.forEach(entity => {\n");
+            writer.write("                        const row = document.createElement('tr');\n");
+
+            // Dynamically populate the table rows with entity data
+            for (AttributeDTO attribute : attributes) {
+                writer.write("                        const cell_" + attribute.getAttributeName() + " = document.createElement('td');\n");
+                writer.write("                        cell_" + attribute.getAttributeName() + ".textContent = entity." + attribute.getAttributeName() + ";\n");
+                writer.write("                        row.appendChild(cell_" + attribute.getAttributeName() + ");\n");
+            }
+
+            writer.write("                        tableBody.appendChild(row);\n");
+            writer.write("                    });\n");
+            writer.write("                })\n");
+            writer.write("                .catch(error => console.error('Error:', error));\n");
+            writer.write("        });\n");
+            writer.write("    </script>\n");
+
+            writer.write("</body>\n");
+            writer.write("</html>\n");
+        }
+    }
+
 }
