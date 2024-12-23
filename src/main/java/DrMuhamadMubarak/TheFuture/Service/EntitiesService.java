@@ -66,7 +66,6 @@ public class EntitiesService {
                                    "import java.util.List;\n\n" +
                                    "@Repository\n" +
                                    "public interface " + entityName + "Repository extends JpaRepository<" + entityName + ", Long> {\n" +
-                                   "    List<" + entityName + "> findByDisplayInListTrue();\n" +
                                    "}\n";
 
         // Write the repository file
@@ -100,11 +99,6 @@ public class EntitiesService {
             // Get All Method
             writer.write("    public List<" + entityName + "> getAll" + entityName + "s() {\n");
             writer.write("        return " + entityName.toLowerCase() + "Repository.findAll();\n");
-            writer.write("    }\n\n");
-
-            // Get All DisplayInList = true Method
-            writer.write("    public List<" + entityName + "> getAllDisplayInListTrue() {\n");
-            writer.write("        return " + entityName.toLowerCase() + "Repository.findByDisplayInListTrue();\n");
             writer.write("    }\n\n");
 
             // Create Method
@@ -168,12 +162,6 @@ public class EntitiesService {
             writer.write("    @GetMapping\n");
             writer.write("    public List<" + entityName + "> getAll" + entityName + "s() {\n");
             writer.write("        return " + entityName.toLowerCase() + "Service.getAll" + entityName + "s();\n");
-            writer.write("    }\n\n");
-
-            // Get All DisplayInList = true Method
-            writer.write("    @GetMapping(\"/display-in-list-true\")\n");
-            writer.write("    public List<" + entityName + "> getAllDisplayInListTrue() {\n");
-            writer.write("        return " + entityName.toLowerCase() + "Service.getAllDisplayInListTrue();\n");
             writer.write("    }\n\n");
 
             // Create Method
@@ -314,10 +302,10 @@ public class EntitiesService {
             writer.write("    </table>\n");
             writer.write("    </div>\n");
 
-            // JavaScript to fetch entities where displayInList = true
+            // JavaScript to fetch entity and get all instances
             writer.write("    <script>\n");
             writer.write("        document.addEventListener('DOMContentLoaded', function() {\n");
-            writer.write("            fetch('/api/" + entityName.toLowerCase() + "s/display-in-list-true')\n");
+            writer.write("            fetch('/api/" + entityName.toLowerCase() + "s')\n");
             writer.write("                .then(response => response.json())\n");
             writer.write("                .then(data => {\n");
             writer.write("                    const tableBody = document.querySelector('#entity-table tbody');\n");

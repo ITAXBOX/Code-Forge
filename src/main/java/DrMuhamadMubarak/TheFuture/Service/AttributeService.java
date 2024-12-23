@@ -92,10 +92,6 @@ public class AttributeService {
 
         field.append("\n");
 
-        if (attribute.isDisplayInList()) {
-            field.append("\n    private boolean displayInList;").append("\n");
-        }
-
         return field.toString();
     }
 
