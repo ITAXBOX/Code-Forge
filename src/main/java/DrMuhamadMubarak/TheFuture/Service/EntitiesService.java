@@ -207,7 +207,7 @@ public class EntitiesService {
         Files.createDirectories(Paths.get(baseDir));
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            // Basic HTML structure with enhanced styles
+            // Basic HTML structure with DataTables styles and scripts
             writer.write("<!DOCTYPE html>\n");
             writer.write("<html lang=\"en\">\n");
             writer.write("<head>\n");
@@ -215,7 +215,10 @@ public class EntitiesService {
             writer.write("    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n");
             writer.write("    <title>" + entityName + " List</title>\n");
 
-            // Add professional and modern styles
+            // Include DataTables CSS
+            writer.write("    <link rel=\"stylesheet\" href=\"https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css\">\n");
+
+            // Add custom styles
             writer.write("    <style>\n");
             writer.write("        body {\n");
             writer.write("            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n");
@@ -241,59 +244,44 @@ public class EntitiesService {
             writer.write("            margin-bottom: 30px;\n");
             writer.write("            font-size: 2.5rem;\n");
             writer.write("        }\n");
-            writer.write("        table {\n");
-            writer.write("            width: 100%;\n");
-            writer.write("            border-collapse: collapse;\n");
+            writer.write("        .controls {\n");
             writer.write("            margin-bottom: 20px;\n");
-            writer.write("            font-size: 1rem;\n");
+            writer.write("            text-align: center;\n");
             writer.write("        }\n");
-            writer.write("        th, td {\n");
-            writer.write("            padding: 15px 20px;\n");
-            writer.write("            border: 1px solid #ddd;\n");
-            writer.write("            text-align: left;\n");
+            writer.write("        .controls label {\n");
+            writer.write("            margin-right: 10px;\n");
             writer.write("        }\n");
-            writer.write("        th {\n");
-            writer.write("            background-color: #007BFF;\n");
-            writer.write("            color: white;\n");
-            writer.write("            font-size: 1.2rem;\n");
-            writer.write("            text-transform: uppercase;\n");
+            writer.write("        td.clickable-id {\n");
+            writer.write("            cursor: pointer;\n");
+            writer.write("            color: #007bff;\n");
+            writer.write("            text-decoration: underline;\n");
             writer.write("        }\n");
-            writer.write("        td {\n");
-            writer.write("            background-color: #f9f9f9;\n");
-            writer.write("            color: #333;\n");
-            writer.write("        }\n");
-            writer.write("        tr:nth-child(even) td {\n");
-            writer.write("            background-color: #e9ecef;\n");
-            writer.write("        }\n");
-            writer.write("        tr:hover td {\n");
-            writer.write("            background-color: #d6e3ff;\n");
-            writer.write("        }\n");
-            writer.write("        @media (max-width: 768px) {\n");
-            writer.write("            table, th, td {\n");
-            writer.write("                font-size: 0.9rem;\n");
-            writer.write("            }\n");
-            writer.write("            th, td {\n");
-            writer.write("                padding: 10px 12px;\n");
-            writer.write("            }\n");
+            writer.write("        td.clickable-id:hover {\n");
+            writer.write("            color: #0056b3;\n");
             writer.write("        }\n");
             writer.write("    </style>\n");
-
             writer.write("</head>\n");
+
             writer.write("<body>\n");
 
             writer.write("    <div class=\"container\">\n");
             writer.write("    <h1>" + entityName + " List</h1>\n");
 
-            // Table structure with a dynamic header
-            writer.write("    <table id=\"entity-table\">\n");
+            // Add checkboxes for column visibility control
+            writer.write("    <div class=\"controls\">\n");
+            for (int i = 0; i < attributes.size(); i++) {
+                writer.write("        <label><input type=\"checkbox\" class=\"toggle-column\" data-column=\"" + i + "\" checked> "
+                             + capitalize(attributes.get(i).getAttributeName()) + "</label>\n");
+            }
+            writer.write("    </div>\n");
+
+            // Table structure
+            writer.write("    <table id=\"entity-table\" class=\"display\">\n");
             writer.write("        <thead>\n");
             writer.write("            <tr>\n");
-
-            // Dynamically create headers based on attributes
             for (AttributeDTO attribute : attributes) {
                 writer.write("                <th>" + capitalize(attribute.getAttributeName()) + "</th>\n");
             }
-
             writer.write("            </tr>\n");
             writer.write("        </thead>\n");
             writer.write("        <tbody>\n");
@@ -302,7 +290,11 @@ public class EntitiesService {
             writer.write("    </table>\n");
             writer.write("    </div>\n");
 
-            // JavaScript to fetch entity and get all instances
+            // Include jQuery and DataTables scripts
+            writer.write("    <script src=\"https://code.jquery.com/jquery-3.6.0.min.js\"></script>\n");
+            writer.write("    <script src=\"https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js\"></script>\n");
+
+            // JavaScript for fetching data and initializing DataTables
             writer.write("    <script>\n");
             writer.write("        document.addEventListener('DOMContentLoaded', function() {\n");
             writer.write("            fetch('/api/" + entityName.toLowerCase() + "s')\n");
@@ -312,16 +304,34 @@ public class EntitiesService {
             writer.write("                    tableBody.innerHTML = '';\n");
             writer.write("                    data.forEach(entity => {\n");
             writer.write("                        const row = document.createElement('tr');\n");
-
-            // Dynamically populate the table rows with entity data
             for (AttributeDTO attribute : attributes) {
-                writer.write("                        const cell_" + attribute.getAttributeName() + " = document.createElement('td');\n");
-                writer.write("                        cell_" + attribute.getAttributeName() + ".textContent = entity." + attribute.getAttributeName() + ";\n");
-                writer.write("                        row.appendChild(cell_" + attribute.getAttributeName() + ");\n");
+                if ("id".equalsIgnoreCase(attribute.getAttributeName())) {
+                    writer.write("                        const cell_id = document.createElement('td');\n");
+                    writer.write("                        const link = document.createElement('a');\n");
+                    writer.write("                        link.textContent = entity." + attribute.getAttributeName() + ";\n");
+                    writer.write("                        link.href = '" + entityName.toLowerCase() + "-get-by-id.html?id=' + entity." + attribute.getAttributeName() + ";\n");
+                    writer.write("                        cell_id.appendChild(link);\n");
+                    writer.write("                        row.appendChild(cell_id);\n");
+                } else {
+                    writer.write("                        const cell_" + attribute.getAttributeName() + " = document.createElement('td');\n");
+                    writer.write("                        cell_" + attribute.getAttributeName() + ".textContent = entity." + attribute.getAttributeName() + ";\n");
+                    writer.write("                        row.appendChild(cell_" + attribute.getAttributeName() + ");\n");
+                }
             }
-
             writer.write("                        tableBody.appendChild(row);\n");
             writer.write("                    });\n");
+
+            // Initialize DataTables
+            writer.write("                    const table = $('#entity-table').DataTable();\n");
+
+            // Add event listeners for column visibility toggling
+            writer.write("                    document.querySelectorAll('.toggle-column').forEach(checkbox => {\n");
+            writer.write("                        checkbox.addEventListener('change', function() {\n");
+            writer.write("                            const column = table.column($(this).data('column'));\n");
+            writer.write("                            column.visible(this.checked);\n");
+            writer.write("                        });\n");
+            writer.write("                    });\n");
+
             writer.write("                })\n");
             writer.write("                .catch(error => console.error('Error:', error));\n");
             writer.write("        });\n");
@@ -395,12 +405,25 @@ public class EntitiesService {
 
             // JavaScript to fetch entity by ID
             writer.write("        <script>\n");
+            writer.write("            document.addEventListener('DOMContentLoaded', function() {\n");
+            writer.write("                const params = new URLSearchParams(window.location.search);\n");
+            writer.write("                const id = params.get('id');\n");
+            writer.write("                if (id) {\n");
+            writer.write("                    document.getElementById('entity-id').value = id;\n");
+            writer.write("                    fetchEntityById(id);\n");
+            writer.write("                }\n");
+            writer.write("            });\n");
+
             writer.write("            document.getElementById('fetch-button').addEventListener('click', function() {\n");
             writer.write("                const id = document.getElementById('entity-id').value;\n");
             writer.write("                if (!id) {\n");
             writer.write("                    alert('Please enter an ID.');\n");
             writer.write("                    return;\n");
             writer.write("                }\n");
+            writer.write("                fetchEntityById(id);\n");
+            writer.write("            });\n");
+
+            writer.write("            function fetchEntityById(id) {\n");
             writer.write("                fetch('/api/" + entityName.toLowerCase() + "s/' + id)\n");
             writer.write("                    .then(response => {\n");
             writer.write("                        if (!response.ok) {\n");
@@ -425,7 +448,7 @@ public class EntitiesService {
             writer.write("                    .catch(error => {\n");
             writer.write("                        alert('Error: ' + error.message);\n");
             writer.write("                    });\n");
-            writer.write("            });\n");
+            writer.write("            }\n");
             writer.write("        </script>\n");
 
             writer.write("    </div>\n");
@@ -433,5 +456,4 @@ public class EntitiesService {
             writer.write("</html>\n");
         }
     }
-
 }
