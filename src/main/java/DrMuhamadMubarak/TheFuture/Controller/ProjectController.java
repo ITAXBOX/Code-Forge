@@ -1,7 +1,7 @@
 package DrMuhamadMubarak.TheFuture.Controller;
 
+import DrMuhamadMubarak.TheFuture.ProjectType;
 import DrMuhamadMubarak.TheFuture.Service.ProjectGenerator;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,9 +27,15 @@ public class ProjectController {
             @RequestParam("backendType") String backendType,
             @RequestParam("databaseType") String databaseType,
             Model model) {
+        if (!ProjectType.isValidFrontendType(frontendType) ||
+            !ProjectType.isValidBackendType(backendType) ||
+            !ProjectType.isValidDatabaseType(databaseType)) {
+            model.addAttribute("message", "Invalid project type provided.");
+            return "error";
+        }
+
         try {
             projectGenerator.generateProjectStructure(projectName, frontendType, backendType, databaseType);
-
             model.addAttribute("projectName", projectName);
         } catch (IOException e) {
             model.addAttribute("message", "An error occurred: " + e.getMessage());
@@ -39,6 +45,4 @@ public class ProjectController {
         attributeController.resetIndex();
         return "entities";
     }
-
-
 }
