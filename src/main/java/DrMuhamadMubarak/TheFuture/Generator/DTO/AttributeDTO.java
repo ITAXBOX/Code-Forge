@@ -1,4 +1,4 @@
-package DrMuhamadMubarak.TheFuture.DTO;
+package DrMuhamadMubarak.TheFuture.Generator.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,7 +1,8 @@
-package DrMuhamadMubarak.TheFuture.Controller;
+package DrMuhamadMubarak.TheFuture.Generator.Controller;
 
-import DrMuhamadMubarak.TheFuture.ProjectType;
-import DrMuhamadMubarak.TheFuture.Service.ProjectGenerator;
+import DrMuhamadMubarak.TheFuture.Generator.Enum.ProjectType;
+import DrMuhamadMubarak.TheFuture.Generator.Service.ProjectGenerator;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,15 +11,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.io.IOException;
 
 @Controller
+@AllArgsConstructor
 public class ProjectController {
 
     private final ProjectGenerator projectGenerator;
-    private final AttributeController attributeController;
-
-    public ProjectController(ProjectGenerator projectGenerator, AttributeController attributeController) {
-        this.projectGenerator = projectGenerator;
-        this.attributeController = attributeController;
-    }
+    private final ProjectAttributeController projectAttributeController;
 
     @PostMapping("/generate")
     public String generateProjectStructure(
@@ -42,7 +39,7 @@ public class ProjectController {
             return "error";
         }
 
-        attributeController.resetIndex();
+        projectAttributeController.resetIndex();
         return "entities";
     }
 }

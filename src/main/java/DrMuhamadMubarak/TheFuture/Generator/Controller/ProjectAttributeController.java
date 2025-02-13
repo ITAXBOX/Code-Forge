@@ -1,8 +1,8 @@
-package DrMuhamadMubarak.TheFuture.Controller;
+package DrMuhamadMubarak.TheFuture.Generator.Controller;
 
-import DrMuhamadMubarak.TheFuture.DTO.AttributeDTO;
-import DrMuhamadMubarak.TheFuture.Service.AttributeService;
-import DrMuhamadMubarak.TheFuture.Service.EntitiesService;
+import DrMuhamadMubarak.TheFuture.Generator.DTO.AttributeDTO;
+import DrMuhamadMubarak.TheFuture.Generator.Service.ProjectAttributeService;
+import DrMuhamadMubarak.TheFuture.Generator.Service.ProjectEntitiesService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,16 +14,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-public class AttributeController {
+public class ProjectAttributeController {
 
     private int index = 0;
-    private final EntitiesService entitiesService;
-    private final AttributeService attributeService;
+    private final ProjectEntitiesService projectEntitiesService;
+    private final ProjectAttributeService projectAttributeService;
     private static List<AttributeDTO> attributes = new ArrayList<>();
 
-    public AttributeController(EntitiesService entitiesService, AttributeService attributeService) {
-        this.entitiesService = entitiesService;
-        this.attributeService = attributeService;
+    public ProjectAttributeController(ProjectEntitiesService projectEntitiesService, ProjectAttributeService projectAttributeService) {
+        this.projectEntitiesService = projectEntitiesService;
+        this.projectAttributeService = projectAttributeService;
     }
 
     @GetMapping("/add-attributes")
@@ -66,25 +66,24 @@ public class AttributeController {
                     relationshipTypeStr
             );
 
-            attributeService.addAttributesToEntity(projectName, entityName, attribute);
+            projectAttributeService.addAttributesToEntity(projectName, entityName, attribute);
 
             attributes.add(attribute);
 
             model.addAttribute("projectName", projectName);
             if ("next".equals(action)) {
 
-                entitiesService.generateServiceClass(projectName, entityName, attributes);
-                entitiesService.generateControllerClass(projectName, entityName);
-                entitiesService.generateEntityUI(projectName, entityName, attributes);
-                entitiesService.generateEntityGetByIdUI(projectName, entityName, attributes);
+                projectEntitiesService.generateServiceClass(projectName, entityName, attributes);
+                projectEntitiesService.generateControllerClass(projectName, entityName);
+                projectEntitiesService.generateUI(projectName, entityName, attributes);
 
                 attributes = new ArrayList<>();
 
-                if (++index >= entitiesService.getEntities().length) {
+                if (++index >= projectEntitiesService.getEntities().length) {
                     model.addAttribute("message", "Project generated successfully");
                     return "result";
                 }
-                model.addAttribute("entityName", entitiesService.getEntities()[index]);
+                model.addAttribute("entityName", projectEntitiesService.getEntities()[index]);
             } else {
                 model.addAttribute("entityName", entityName);
             }
@@ -95,7 +94,7 @@ public class AttributeController {
         }
     }
 
-    void resetIndex() {
+    public void resetIndex() {
         index = 0;
     }
 }

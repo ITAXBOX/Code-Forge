@@ -1,6 +1,7 @@
-package DrMuhamadMubarak.TheFuture.Controller;
+package DrMuhamadMubarak.TheFuture.Generator.Controller;
 
-import DrMuhamadMubarak.TheFuture.Service.EntitiesService;
+import DrMuhamadMubarak.TheFuture.Generator.Service.ProjectEntitiesService;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,12 +10,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.io.IOException;
 
 @Controller
-public class EntitiesController {
-    private final EntitiesService entitiesService;
-
-    public EntitiesController(EntitiesService entitiesService) {
-        this.entitiesService = entitiesService;
-    }
+@AllArgsConstructor
+public class ProjectEntitiesController {
+    private final ProjectEntitiesService projectEntitiesService;
 
     @PostMapping("/generate-entities")
     public String generateEntities(@RequestParam("projectName") String projectName,
@@ -25,17 +23,13 @@ public class EntitiesController {
                 model.addAttribute("message", "No entities provided.");
                 return "error";
             }
-            entitiesService.setEntities(entitiesParam.split("\\s*,\\s*")); // Trim whitespace around commas
-            String[] entities = entitiesService.getEntities();
-            if (entities.length == 0) {
-                model.addAttribute("message", "Invalid entity list.");
-                return "error";
-            }
+            projectEntitiesService.setEntities(entitiesParam.split("\\s*,\\s*")); // Trim whitespace around commas
+            String[] entities = projectEntitiesService.getEntities();
 
-            entitiesService.generateEntityClasses(projectName, entities);
+            projectEntitiesService.generateEntityClasses(projectName, entities);
 
             for (String entity : entities) {
-                entitiesService.generateRepositoryClass(projectName, entity);
+                projectEntitiesService.generateRepositoryClass(projectName, entity);
             }
 
             model.addAttribute("projectName", projectName);

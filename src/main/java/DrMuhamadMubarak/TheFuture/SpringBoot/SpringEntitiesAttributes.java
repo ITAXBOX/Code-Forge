@@ -1,21 +1,14 @@
-package DrMuhamadMubarak.TheFuture.Service;
+package DrMuhamadMubarak.TheFuture.SpringBoot;
 
-import DrMuhamadMubarak.TheFuture.DTO.AttributeDTO;
-import org.springframework.stereotype.Service;
+import DrMuhamadMubarak.TheFuture.Generator.DTO.AttributeDTO;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-@Service
-public class AttributeService {
-
-    public void addAttributesToEntity(String projectName, String entityName, AttributeDTO attribute) throws IOException {
-        generateOrUpdateEntityClass(projectName, entityName, attribute);
-    }
-
-    private void generateOrUpdateEntityClass(String projectName, String entityName, AttributeDTO attribute) throws IOException {
+public class SpringEntitiesAttributes {
+    public static void generateOrUpdateSpringEntityClass(String projectName, String entityName, AttributeDTO attribute) throws IOException {
         String baseDir = "./" + projectName + "/src/main/java/com/example/" + projectName.toLowerCase() + "/models";
         Path entityFilePath = Paths.get(baseDir, entityName + ".java");
 
@@ -37,7 +30,7 @@ public class AttributeService {
         Files.writeString(entityFilePath, updatedContent.toString());
     }
 
-    private String generateFieldForAttribute(AttributeDTO attribute) {
+    private static String generateFieldForAttribute(AttributeDTO attribute) {
         StringBuilder field = new StringBuilder();
 
         if (attribute.getRelationshipType() != null && !attribute.getRelationshipType().equalsIgnoreCase("NONE")) {
@@ -95,7 +88,7 @@ public class AttributeService {
         return field.toString();
     }
 
-    private String formatDataType(AttributeDTO attribute) {
+    private static String formatDataType(AttributeDTO attribute) {
         String dataType = attribute.getDataType();
         if (dataType == null || dataType.isEmpty()) {
             throw new IllegalArgumentException("DataType cannot be null or empty for attribute: " + attribute.getAttributeName());
@@ -112,7 +105,7 @@ public class AttributeService {
         };
     }
 
-    private String generateRelationshipAnnotation(AttributeDTO attribute) {
+    private static String generateRelationshipAnnotation(AttributeDTO attribute) {
         String relationshipType = attribute.getRelationshipType();
         boolean isNullable = attribute.isNullable();
         StringBuilder annotation = new StringBuilder();
@@ -142,5 +135,4 @@ public class AttributeService {
 
         return annotation.toString();
     }
-
 }
