@@ -44,4 +44,21 @@ public class ProjectEntitiesService {
     public void generateUI(String projectName, String entityName, List<AttributeDTO> attributes) throws IOException {
         SpringUI.generateSpringUI(projectName, entityName, attributes);
     }
+
+    public boolean isLastEntity(String entityName) {
+        String[] entities = getEntities();
+        return entities != null && entities.length > 0 && entityName.equals(entities[entities.length - 1]);
+    }
+
+    public String getNextEntityName(String currentEntityName) {
+        String[] entities = getEntities();
+        if (entities != null && entities.length > 0) {
+            for (int i = 0; i < entities.length - 1; i++) {
+                if (entities[i].equals(currentEntityName)) {
+                    return entities[i + 1];
+                }
+            }
+        }
+        return null;
+    }
 }

@@ -15,7 +15,6 @@ import java.io.IOException;
 public class ProjectController {
 
     private final ProjectGenerator projectGenerator;
-    private final ProjectAttributeController projectAttributeController;
 
     @PostMapping("/generate")
     public String generateProjectStructure(
@@ -39,7 +38,6 @@ public class ProjectController {
             return "error";
         }
 
-        projectAttributeController.resetIndex();
         return "entities";
     }
 }
