@@ -15,12 +15,22 @@ import java.util.List;
 public class ProjectEntitiesService {
     private String[] entities;
 
+    public String[] processEntities(String entitiesParam) throws IllegalArgumentException {
+        if (entitiesParam == null || entitiesParam.trim().isEmpty()) {
+            throw new IllegalArgumentException("No entities provided.");
+        }
+        this.entities = entitiesParam.split("\\s*,\\s*"); // Trim whitespace around commas
+        return this.entities;
+    }
+
     public void generateEntityClasses(String projectName, String[] entities) throws IOException {
         SpringEntities.generateSpringEntityClasses(projectName, entities);
     }
 
-    public void generateRepositoryClass(String projectName, String entityName) throws IOException {
-        SpringRepository.generateSpringRepositoryClass(projectName, entityName);
+    public void generateRepositoryClasses(String projectName, String[] entities) throws IOException {
+        for (String entity : entities) {
+            SpringRepository.generateSpringRepositoryClass(projectName, entity);
+        }
     }
 
     public void generateServiceClass(String projectName, String entityName, List<AttributeDTO> attributes) throws IOException {
