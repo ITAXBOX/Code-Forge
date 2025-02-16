@@ -1,6 +1,7 @@
 package DrMuhamadMubarak.TheFuture.Generator.Service;
 
 import DrMuhamadMubarak.TheFuture.Generator.DTO.AttributeDTO;
+import DrMuhamadMubarak.TheFuture.Generator.UI.ProjectUI;
 import DrMuhamadMubarak.TheFuture.SpringBoot.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,7 +43,7 @@ public class ProjectEntitiesService {
     }
 
     public void generateUI(String projectName, String entityName, List<AttributeDTO> attributes) throws IOException {
-        SpringUI.generateSpringUI(projectName, entityName, attributes);
+        ProjectUI.generateProjectUI(projectName, entityName, attributes);
     }
 
     public boolean isLastEntity(String entityName) {

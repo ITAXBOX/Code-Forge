@@ -1,4 +1,4 @@
-package DrMuhamadMubarak.TheFuture.SpringBoot;
+package DrMuhamadMubarak.TheFuture.Generator.UI;
 
 import DrMuhamadMubarak.TheFuture.Generator.DTO.AttributeDTO;
 
@@ -11,8 +11,8 @@ import java.util.List;
 
 import static DrMuhamadMubarak.TheFuture.utils.Utils.capitalize;
 
-public class SpringUI {
-    public static void generateSpringUI(String projectName, String entityName, List<AttributeDTO> attributes) throws IOException {
+public class ProjectUI {
+    public static void generateProjectUI(String projectName, String entityName, List<AttributeDTO> attributes) throws IOException {
         generateEntityUI(projectName, entityName, attributes);
         generateEntityGetByIdUI(projectName, entityName, attributes);
     }
