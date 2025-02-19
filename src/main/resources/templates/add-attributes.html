@@ -175,6 +175,17 @@
             </select>
         </div>
 
+        <div class="form-group hidden" id="relatedEntityGroup">
+            <label for="relatedEntity">Related Entity</label>
+            <input type="text" id="relatedEntity" name="relatedEntity" placeholder="Enter related entity name">
+        </div>
+
+        <div class="form-group hidden" id="mappedByGroup">
+            <label for="mappedBy">Mapped By</label>
+            <input type="text" id="mappedBy" name="mappedBy" placeholder="Enter mappedBy property">
+        </div>
+
+
         <div class="form-actions">
             <button type="submit" name="action" value="save" class="save">Save Attribute</button>
             <button type="submit" name="action" value="next" class="next">Next Entity</button>
@@ -229,22 +240,32 @@
         const customDataTypeInput = document.getElementById("customDataType");
 
         if (dataTypeSelect.value === "Custom" && customDataTypeInput.value.trim() !== "") {
-            // Create a hidden input field for the custom data type
             const hiddenCustomDataTypeField = document.createElement("input");
             hiddenCustomDataTypeField.type = "hidden";
             hiddenCustomDataTypeField.name = "dataType";
-            hiddenCustomDataTypeField.value = customDataTypeInput.value.trim(); // Use only the custom data type value
+            hiddenCustomDataTypeField.value = customDataTypeInput.value.trim();
 
-            // Remove the original dataTypeSelect so it doesn't get submitted
             dataTypeSelect.name = "";
 
-            // Append the hidden input field to the form
             this.appendChild(hiddenCustomDataTypeField);
         } else if (dataTypeSelect.value === "Custom" && customDataTypeInput.value.trim() === "") {
-            // Prevent form submission if "Custom" is selected but the custom input is empty
             event.preventDefault();
             alert("Please enter a custom data type.");
         }
+    });
+
+    document.getElementById('relationshipType').addEventListener('change', function() {
+        const relationshipType = this.value;
+        const relatedEntityGroup = document.getElementById('relatedEntityGroup');
+        const mappedByGroup = document.getElementById('mappedByGroup');
+
+        // Show relatedEntityGroup for Many-to-One, One-to-One, and Many-to-Many
+        relatedEntityGroup.classList.toggle('hidden',
+            relationshipType === 'NONE' || relationshipType === 'ONE_TO_MANY');
+
+        // Show mappedByGroup for One-to-Many, Many-to-Many, and One-to-One
+        mappedByGroup.classList.toggle('hidden',
+            !['ONE_TO_MANY', 'MANY_TO_MANY', 'ONE_TO_ONE'].includes(relationshipType));
     });
 
 

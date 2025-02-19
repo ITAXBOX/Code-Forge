@@ -1,6 +1,7 @@
 package DrMuhamadMubarak.TheFuture.SpringBoot;
 
 import DrMuhamadMubarak.TheFuture.Generator.DTO.AttributeDTO;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,17 +25,17 @@ public class SpringEntitiesAttributes {
             throw new IllegalStateException("Class end not found in file: " + entityFilePath);
         }
 
-        String attributeField = generateFieldForAttribute(attribute);
+        String attributeField = generateFieldForAttribute(attribute, entityName);
         updatedContent.insert(classEndIndex, attributeField);
 
         Files.writeString(entityFilePath, updatedContent.toString());
     }
 
-    private static String generateFieldForAttribute(AttributeDTO attribute) {
+    private static String generateFieldForAttribute(AttributeDTO attribute, String entityName) {
         StringBuilder field = new StringBuilder();
 
         if (attribute.getRelationshipType() != null && !attribute.getRelationshipType().equalsIgnoreCase("NONE")) {
-            field.append(generateRelationshipAnnotation(attribute)).append("\n");
+            field.append(generateRelationshipAnnotations(attribute, entityName)).append("\n");
         }
 
         if (attribute.isPrimaryKey()) {
@@ -105,34 +106,62 @@ public class SpringEntitiesAttributes {
         };
     }
 
-    private static String generateRelationshipAnnotation(AttributeDTO attribute) {
-        String relationshipType = attribute.getRelationshipType();
-        boolean isNullable = attribute.isNullable();
+    private static String generateRelationshipAnnotations(AttributeDTO attribute, String entityName) {
         StringBuilder annotation = new StringBuilder();
+        String relationshipType = attribute.getRelationshipType().toUpperCase();
 
-        switch (relationshipType.toUpperCase()) {
+        switch (relationshipType) {
             case "MANY_TO_ONE":
-                annotation.append("@ManyToOne(fetch = FetchType.LAZY)");
-                if (!isNullable) {
-                    annotation.append("\n    @JoinColumn(nullable = false)");
-                }
+                annotation.append("@ManyToOne\n")
+                        .append("    @JoinColumn(name = \"")
+                        .append(StringUtils.uncapitalize(attribute.getRelatedEntity()))
+                        .append("_id\")");
                 break;
+
             case "ONE_TO_MANY":
-                annotation.append("@OneToMany(fetch = FetchType.LAZY)");
+                if (attribute.getMappedBy() == null || attribute.getMappedBy().isEmpty()) {
+                    throw new IllegalArgumentException("One-to-Many relationship requires 'mappedBy' field");
+                }
+                annotation.append("@OneToMany(mappedBy = \"")
+                        .append(attribute.getMappedBy()).append("\")");
                 break;
+
             case "ONE_TO_ONE":
-                annotation.append("@OneToOne(fetch = FetchType.LAZY)");
-                if (!isNullable) {
-                    annotation.append("\n    @JoinColumn(nullable = false)");
+                if (attribute.getMappedBy() != null && !attribute.getMappedBy().isEmpty()) {
+                    annotation.append("@OneToOne(mappedBy = \"")
+                            .append(attribute.getMappedBy()).append("\")");
+                } else {
+                    annotation.append("@OneToOne\n")
+                            .append("    @JoinColumn(name = \"")
+                            .append(StringUtils.uncapitalize(attribute.getRelatedEntity()))
+                            .append("_id\")");
                 }
                 break;
+
             case "MANY_TO_MANY":
-                annotation.append("@ManyToMany(fetch = FetchType.LAZY)");
+                if (attribute.getMappedBy() != null && !attribute.getMappedBy().isEmpty()) {
+                    annotation.append("@ManyToMany(mappedBy = \"")
+                            .append(attribute.getMappedBy()).append("\")");
+                } else {
+                    annotation.append("@ManyToMany\n")
+                            .append("    @JoinTable(name = \"")
+                            .append(StringUtils.uncapitalize(attribute.getRelatedEntity()))
+                            .append("_relation\",\n")
+                            .append("        joinColumns = @JoinColumn(name = \"")
+                            .append(StringUtils.uncapitalize(entityName.substring(0, entityName.length() - 1)))
+                            .append("_id\"),\n")
+                            .append("        inverseJoinColumns = @JoinColumn(name = \"")
+                            .append(StringUtils.uncapitalize(attribute.getRelatedEntity()))
+                            .append("_id\"))");
+                }
                 break;
+
             default:
-                break;
+                throw new IllegalArgumentException("Invalid relationship type: " + relationshipType);
         }
 
         return annotation.toString();
     }
+
+
 }
