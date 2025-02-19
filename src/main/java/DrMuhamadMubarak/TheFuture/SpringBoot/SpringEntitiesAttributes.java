@@ -50,6 +50,7 @@ public class SpringEntitiesAttributes {
         boolean isNullable = attribute.isNullable();
         boolean hasDefaultValue = attribute.getDefaultValue() != null && !attribute.getDefaultValue().isEmpty();
         boolean hasAttributes = false;
+        String dataType = formatDataType(attribute);
 
         if ("String".equalsIgnoreCase(attribute.getDataType()) && hasLength) {
             columnAnnotation.append("length = ").append(attribute.getDataSize());
@@ -68,8 +69,13 @@ public class SpringEntitiesAttributes {
             if (hasAttributes) {
                 columnAnnotation.append(", ");
             }
-            columnAnnotation.append("columnDefinition = \"").append(formatDataType(attribute))
-                    .append(" default '").append(attribute.getDefaultValue()).append("'\"");
+            if (dataType.contains("=")) {
+                columnAnnotation.append("columnDefinition = \"").append(dataType.split("=")[0])
+                        .append(" default '").append(attribute.getDefaultValue()).append("'\"");
+            } else {
+                columnAnnotation.append("columnDefinition = \"").append(dataType)
+                        .append(" default '").append(attribute.getDefaultValue()).append("'\"");
+            }
             hasAttributes = true;
         }
 
@@ -82,7 +88,15 @@ public class SpringEntitiesAttributes {
         if (!"String".equalsIgnoreCase(attribute.getDataType()) && hasLength)
             field.append("\n    ").append("@Max(").append(attribute.getDataSize()).append(")");
 
-        field.append("\n    private ").append(formatDataType(attribute)).append(" ").append(attribute.getAttributeName()).append(";");
+
+        if (dataType.contains("=")) {
+            field.append("\n    private ").append(dataType.split("=")[0]).append(" ").append(attribute.getAttributeName());
+            field.append("=").append(dataType.split("=")[1]);
+        } else {
+            field.append("\n    private ").append(dataType).append(" ").append(attribute.getAttributeName());
+        }
+
+        field.append(";");
 
         field.append("\n");
 
@@ -148,10 +162,10 @@ public class SpringEntitiesAttributes {
                             .append(StringUtils.uncapitalize(attribute.getRelatedEntity()))
                             .append("_relation\",\n")
                             .append("        joinColumns = @JoinColumn(name = \"")
-                            .append(StringUtils.uncapitalize(entityName.substring(0, entityName.length() - 1)))
+                            .append(StringUtils.uncapitalize(entityName))
                             .append("_id\"),\n")
                             .append("        inverseJoinColumns = @JoinColumn(name = \"")
-                            .append(StringUtils.uncapitalize(attribute.getRelatedEntity()))
+                            .append(StringUtils.uncapitalize(attribute.getRelatedEntity().substring(0, entityName.length() - 1)))
                             .append("_id\"))");
                 }
                 break;
