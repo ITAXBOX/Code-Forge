@@ -4,63 +4,112 @@
     <meta charset="UTF-8">
     <title>Add Entities</title>
     <style>
+        /* General Styles */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
             margin: 0;
             padding: 20px;
+            color: #333;
         }
+
         .container {
             max-width: 800px;
             margin: 0 auto;
             background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
         }
+
         h1 {
-            color: #333;
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-align: center;
         }
+
+        h2 {
+            color: #34495e;
+            font-size: 22px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #007BFF;
+            padding-bottom: 10px;
+        }
+
         label {
             display: block;
-            margin: 10px 0 5px;
-            font-weight: bold;
+            margin: 15px 0 8px;
+            font-weight: 600;
+            color: #495057;
         }
-        input[type="text"] {
-            width: calc(100% - 22px);
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
             box-sizing: border-box;
             margin-bottom: 20px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
         }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 150px;
+            font-family: 'Arial', sans-serif;
+        }
+
         button {
             background-color: #007BFF;
             color: #fff;
             border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
+            padding: 12px 24px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
         }
+
         button:hover {
             background-color: #0056b3;
         }
-        .message {
-            padding: 10px;
-            margin: 20px 0;
-            border-radius: 4px;
-            background: #eaf0f7;
-            color: #333;
-        }
+
         /* Responsive Design */
         @media (max-width: 600px) {
             .container {
-                padding: 15px;
-                width: 90%;
+                padding: 20px;
+                width: 95%;
             }
-            input[type="text"] {
-                width: calc(100% - 18px);
+
+            h1 {
+                font-size: 24px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            input[type="text"],
+            textarea {
+                font-size: 14px;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-size: 14px;
             }
         }
     </style>
@@ -76,7 +125,17 @@
 
         <button type="submit">Generate Entities</button>
     </form>
-    
+
+    <!-- New JSON Input Section -->
+    <h2>Or Add Entities via JSON</h2>
+    <form th:action="@{/generate-entities-from-json}" method="post">
+        <input type="hidden" id="projectNameJson" name="projectName" th:value="${projectName}"/>
+
+        <label for="entitiesJson">Entities JSON:</label>
+        <textarea id="entitiesJson" name="entitiesJson" placeholder='Paste your JSON here' required></textarea>
+
+        <button type="submit">Generate Entities from JSON</button>
+    </form>
 </div>
 </body>
 </html>

@@ -25,13 +25,23 @@ public class ProjectEntitiesService {
     }
 
     public void generateEntityClasses(String projectName, String[] entities) throws IOException {
-        SpringEntities.generateSpringEntityClasses(projectName, entities);
+        for(String entity : entities) {
+            generateEntityClass(projectName, entity);
+        }
+    }
+
+    public void generateEntityClass(String projectName, String entityName) throws IOException {
+        SpringEntities.generateSpringEntityClass(projectName, entityName);
     }
 
     public void generateRepositoryClasses(String projectName, String[] entities) throws IOException {
         for (String entity : entities) {
             SpringRepository.generateSpringRepositoryClass(projectName, entity);
         }
+    }
+
+    public void generateRepositoryClass(String projectName, String entityName) throws IOException {
+        SpringRepository.generateSpringRepositoryClass(projectName, entityName);
     }
 
     public void generateServiceClass(String projectName, String entityName, List<AttributeDTO> attributes) throws IOException {
