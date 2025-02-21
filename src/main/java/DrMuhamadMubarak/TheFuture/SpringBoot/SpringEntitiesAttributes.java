@@ -165,7 +165,7 @@ public class SpringEntitiesAttributes {
                             .append(StringUtils.uncapitalize(entityName))
                             .append("_id\"),\n")
                             .append("        inverseJoinColumns = @JoinColumn(name = \"")
-                            .append(StringUtils.uncapitalize(attribute.getRelatedEntity().substring(0, entityName.length() - 1)))
+                            .append(StringUtils.uncapitalize(attribute.getRelatedEntity().substring(0, entityName.length())))
                             .append("_id\"))");
                 }
                 break;
