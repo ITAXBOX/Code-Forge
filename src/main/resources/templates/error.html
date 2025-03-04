@@ -5,34 +5,124 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Error</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --background: #f8fafc;
+            --card: #ffffff;
+            --text: #1f2937;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --error: #dc3545;
+            --error-bg: #f8d7da;
+            --error-border: #f5c6cb;
+        }
+
+        * {
             margin: 0;
             padding: 0;
-            background-color: #f8d7da;
-            color: #721c24;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
         }
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            border: 1px solid #f5c6cb;
-            border-radius: 5px;
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            color: #721c24;
-        }
-        p {
+
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
+
+        .container {
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-2px);
+        }
+
+        h1 {
+            color: var(--error);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
         a {
-            color: #004085;
             text-decoration: none;
+            color: white;
+            background-color: var(--primary);
+            padding: 0.875rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
         }
+
+        a::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s ease;
+        }
+
         a:hover {
-            text-decoration: underline;
+            background-color: var(--primary-hover);
+        }
+
+        a:hover::after {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        a:active {
+            transform: translateY(1px);
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 1.5rem;
+                border-radius: 12px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            p {
+                font-size: 0.875rem;
+            }
+
+            a {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.875rem;
+            }
         }
     </style>
 </head>
