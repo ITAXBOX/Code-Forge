@@ -4,101 +4,281 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Attributes</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --success: #10b981;
+            --success-hover: #059669;
+            --background: #f8fafc;
+            --card: #ffffff;
+            --text: #1f2937;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --focus-ring: rgba(79, 70, 229, 0.1);
+        }
+
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text);
         }
 
         header {
-            background-color: #333;
+            background: linear-gradient(to right, var(--primary), #818cf8);
             color: white;
-            padding: 15px;
+            padding: 1.5rem;
             text-align: center;
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 1.5rem;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         .container {
             max-width: 800px;
-            margin: 30px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--card);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         h2 {
-            font-size: 20px;
-            color: #333;
-            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: var(--text);
+            margin-bottom: 2rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border);
+            position: relative;
         }
 
-        form {
-            display: flex;
-            flex-direction: column;
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(to right, var(--primary), #818cf8);
         }
 
         .form-group {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
+            margin-bottom: 1.5rem;
+            animation: fadeIn 0.3s ease-out forwards;
+            opacity: 0;
+        }
+
+        .form-group:nth-child(n) {
+            animation-delay: calc(var(--delay) * 0.1s);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         label {
-            font-weight: bold;
-            margin-bottom: 5px;
             display: block;
-            width: 200px;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            font-size: 0.875rem;
         }
 
-        input, select {
-            width: calc(100% - 210px); /* Adjusting width for alignment */
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-            margin-left: 10px; /* Add margin to separate from the label */
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text);
+            background-color: white;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--focus-ring);
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .checkbox-wrapper:hover {
+            background-color: var(--focus-ring);
+        }
+
+        .custom-checkbox {
+            position: relative;
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 2px solid var(--border);
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+            background-color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .custom-checkbox::after {
+            content: '';
+            position: absolute;
+            width: 0.875rem;
+            height: 0.875rem;
+            background-color: var(--primary);
+            border-radius: 0.25rem;
+            transform: scale(0);
+            transition: transform 0.15s ease;
+        }
+
+        input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        input[type="checkbox"]:checked + .custom-checkbox {
+            border-color: var(--primary);
+        }
+
+        input[type="checkbox"]:checked + .custom-checkbox::after {
+            transform: scale(1);
+        }
+
+        input[type="checkbox"]:focus + .custom-checkbox {
+            box-shadow: 0 0 0 3px var(--focus-ring);
+        }
+
+        .checkbox-label {
+            font-size: 0.875rem;
+            color: var(--text);
+            user-select: none;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        button {
+            flex: 1;
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s ease;
+        }
+
+        button:hover::after {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        button.save {
+            background-color: var(--success);
+            color: white;
+        }
+
+        button.save:hover {
+            background-color: var(--success-hover);
+        }
+
+        button.next {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        button.next:hover {
+            background-color: var(--primary-hover);
         }
 
         .hidden {
             display: none;
         }
 
-        .form-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.25rem;
+            padding-right: 2.5rem;
         }
 
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+        @media (max-width: 640px) {
+            .container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
         }
 
-        button.save {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        button.save:hover {
-            background-color: #45a049;
-        }
-
-        button.next {
-            background-color: #007BFF;
-            color: white;
-        }
-
-        button.next:hover {
-            background-color: #0056b3;
+        .disabled-field {
+            background-color: #f3f4f6;
+            cursor: not-allowed;
+            color: var(--text-secondary);
         }
     </style>
 </head>
@@ -110,12 +290,12 @@
         <input type="hidden" name="projectName" th:value="${projectName}">
         <input type="hidden" name="entityName" th:value="${entityName}">
 
-        <div class="form-group">
+        <div class="form-group" style="--delay: 1">
             <label for="attributeName">Attribute Name</label>
             <input type="text" id="attributeName" name="attributeName" required>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" style="--delay: 2">
             <label for="dataType">Data Type</label>
             <select name="dataType" id="dataType" onchange="updateDataType()" required>
                 <option value="String">String</option>
@@ -128,27 +308,32 @@
             </select>
         </div>
 
-        <div class="form-group">
+        <div class="form-group hidden" style="--delay: 3" id="customDataTypeGroup">
             <label for="customDataType">Custom Data Type</label>
-            <input type="text" id="customDataType" name="customDataType" class="hidden" placeholder="e.g., User | You can add =New HashSet<>() for example for initialization ">
+            <input type="text" id="customDataType" name="customDataType"
+                   placeholder="e.g., User | You can add =New HashSet<>() for example for initialization">
         </div>
 
-        <div class="form-group">
+        <div class="form-group" style="--delay: 4">
             <label for="dataSize">Data Size (Optional)</label>
             <input type="number" id="dataSize" name="dataSize" placeholder="e.g., 255">
         </div>
 
-        <div class="form-group">
+        <div class="form-group" style="--delay: 5">
             <label for="defaultValue">Default Value (Optional)</label>
             <input type="text" id="defaultValue" name="defaultValue" placeholder="e.g., 'N/A' or 0">
         </div>
 
-        <div class="form-group">
-            <label for="isAutoGenerated">Is Auto-Generated?</label>
-            <input type="checkbox" id="isAutoGenerated" name="isAutoGenerated" onchange="toggleAutoGeneration(this)">
+        <div class="form-group" style="--delay: 6">
+            <label class="checkbox-wrapper">
+                <input type="checkbox" id="isAutoGenerated" name="isAutoGenerated"
+                       onchange="toggleAutoGeneration(this)">
+                <div class="custom-checkbox"></div>
+                <span class="checkbox-label">Is Auto-Generated?</span>
+            </label>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" style="--delay: 7">
             <label for="isPrimaryKey">Is Primary Key?</label>
             <select name="isPrimaryKey" id="isPrimaryKey" onchange="updateNullable()">
                 <option value="false">No</option>
@@ -156,7 +341,7 @@
             </select>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" style="--delay: 8">
             <label for="isNullable">Is Nullable?</label>
             <select name="isNullable" id="isNullable">
                 <option value="true">Yes</option>
@@ -164,7 +349,7 @@
             </select>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" style="--delay: 9">
             <label for="relationshipType">Relationship Type (Optional)</label>
             <select name="relationshipType" id="relationshipType">
                 <option value="NONE">None</option>
@@ -175,16 +360,15 @@
             </select>
         </div>
 
-        <div class="form-group hidden" id="relatedEntityGroup">
+        <div class="form-group hidden" style="--delay: 10" id="relatedEntityGroup">
             <label for="relatedEntity">Related Entity</label>
             <input type="text" id="relatedEntity" name="relatedEntity" placeholder="Enter related entity name">
         </div>
 
-        <div class="form-group hidden" id="mappedByGroup">
+        <div class="form-group hidden" style="--delay: 11" id="mappedByGroup">
             <label for="mappedBy">Mapped By</label>
             <input type="text" id="mappedBy" name="mappedBy" placeholder="Enter mappedBy property">
         </div>
-
 
         <div class="form-actions">
             <button type="submit" name="action" value="save" class="save">Save Attribute</button>
@@ -201,25 +385,29 @@
         if (checkbox.checked) {
             defaultValueField.disabled = true;
             defaultValueField.placeholder = "Auto-generated";
+            defaultValueField.classList.add("disabled-field");
             dataSizeField.disabled = true;
             dataSizeField.placeholder = "Auto-generated";
+            dataSizeField.classList.add("disabled-field");
         } else {
             defaultValueField.disabled = false;
             defaultValueField.placeholder = "e.g., 'N/A' or 0";
+            defaultValueField.classList.remove("disabled-field");
             dataSizeField.disabled = false;
             dataSizeField.placeholder = "e.g., 255";
+            dataSizeField.classList.remove("disabled-field");
         }
     }
 
     function updateDataType() {
         const dataTypeSelect = document.getElementById("dataType");
-        const customDataTypeInput = document.getElementById("customDataType");
+        const customDataTypeGroup = document.getElementById("customDataTypeGroup");
 
         if (dataTypeSelect.value === "Custom") {
-            customDataTypeInput.classList.remove("hidden");
+            customDataTypeGroup.classList.remove("hidden");
         } else {
-            customDataTypeInput.classList.add("hidden");
-            customDataTypeInput.value = "";
+            customDataTypeGroup.classList.add("hidden");
+            customDataTypeGroup.querySelector("input").value = "";
         }
     }
 
@@ -230,8 +418,10 @@
         if (isPrimaryKey) {
             isNullableSelect.value = "false";
             isNullableSelect.disabled = true;
+            isNullableSelect.classList.add("disabled-field");
         } else {
             isNullableSelect.disabled = false;
+            isNullableSelect.classList.remove("disabled-field");
         }
     }
 
@@ -246,7 +436,6 @@
             hiddenCustomDataTypeField.value = customDataTypeInput.value.trim();
 
             dataTypeSelect.name = "";
-
             this.appendChild(hiddenCustomDataTypeField);
         } else if (dataTypeSelect.value === "Custom" && customDataTypeInput.value.trim() === "") {
             event.preventDefault();
@@ -254,22 +443,17 @@
         }
     });
 
-    document.getElementById('relationshipType').addEventListener('change', function() {
+    document.getElementById('relationshipType').addEventListener('change', function () {
         const relationshipType = this.value;
         const relatedEntityGroup = document.getElementById('relatedEntityGroup');
         const mappedByGroup = document.getElementById('mappedByGroup');
 
-        // Show relatedEntityGroup for Many-to-One, One-to-One, and Many-to-Many
         relatedEntityGroup.classList.toggle('hidden',
             relationshipType === 'NONE' || relationshipType === 'ONE_TO_MANY');
 
-        // Show mappedByGroup for One-to-Many, Many-to-Many, and One-to-One
         mappedByGroup.classList.toggle('hidden',
             !['ONE_TO_MANY', 'MANY_TO_MANY', 'ONE_TO_ONE'].includes(relationshipType));
     });
-
-
 </script>
-
 </body>
 </html>

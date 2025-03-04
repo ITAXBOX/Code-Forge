@@ -4,112 +4,229 @@
     <meta charset="UTF-8">
     <title>Add Entities</title>
     <style>
-        /* General Styles */
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f8f9fa;
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --background: #f8fafc;
+            --card: #ffffff;
+            --text: #1f2937;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --focus-ring: rgba(79, 70, 229, 0.1);
+        }
+
+        * {
             margin: 0;
-            padding: 20px;
-            color: #333;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+            color: var(--text);
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            background: var(--card);
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         h1 {
-            color: #2c3e50;
-            font-size: 28px;
-            margin-bottom: 20px;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
             text-align: center;
+            background: linear-gradient(to right, var(--primary), #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         h2 {
-            color: #34495e;
-            font-size: 22px;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #007BFF;
-            padding-bottom: 10px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.75rem;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(to right, var(--primary), #818cf8);
+        }
+
+        form {
+            margin-bottom: 2rem;
         }
 
         label {
             display: block;
-            margin: 15px 0 8px;
-            font-weight: 600;
-            color: #495057;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+            font-size: 0.875rem;
         }
 
         input[type="text"],
         textarea {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            box-sizing: border-box;
-            margin-bottom: 20px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            background-color: white;
+            color: var(--text);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+            line-height: 1.5;
         }
 
         input[type="text"]:focus,
         textarea:focus {
-            border-color: #007BFF;
             outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--focus-ring);
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 150px;
-            font-family: 'Arial', sans-serif;
+        input[type="text"]::placeholder,
+        textarea::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
         }
 
         button {
-            background-color: #007BFF;
-            color: #fff;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
             width: 100%;
-            margin-top: 10px;
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            background-color: var(--primary);
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s ease;
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: var(--primary-hover);
         }
 
-        /* Responsive Design */
-        @media (max-width: 600px) {
+        button:hover::after {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        /* Form sections with subtle separators */
+        .form-section {
+            position: relative;
+            padding: 1.5rem;
+            background: rgba(248, 250, 252, 0.5);
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
+            }
+
             .container {
-                padding: 20px;
-                width: 95%;
+                padding: 1.5rem;
             }
 
             h1 {
-                font-size: 24px;
+                font-size: 1.5rem;
             }
 
             h2 {
-                font-size: 20px;
+                font-size: 1.25rem;
             }
 
-            input[type="text"],
-            textarea {
-                font-size: 14px;
+            .form-section {
+                padding: 1rem;
             }
+        }
 
-            button {
-                padding: 10px 20px;
-                font-size: 14px;
+        /* Loading state for buttons */
+        button.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        button.loading::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
             }
         }
     </style>
@@ -117,25 +234,51 @@
 <body>
 <div class="container">
     <h1>Add Entities</h1>
-    <form th:action="@{/generate-entities}" method="post">
-        <input type="hidden" id="projectName" name="projectName" th:value="${projectName}"/>
 
-        <label for="entities">Entities (comma-separated):</label>
-        <input type="text" id="entities" name="entities" placeholder="e.g., User, Product, Order" required/>
+    <div class="form-section">
+        <form th:action="@{/generate-entities}" method="post">
+            <input type="hidden" id="projectName" name="projectName" th:value="${projectName}"/>
 
-        <button type="submit">Generate Entities</button>
-    </form>
+            <label for="entities">Entities (comma-separated):</label>
+            <input
+                    type="text"
+                    id="entities"
+                    name="entities"
+                    placeholder="e.g., User, Product, Order"
+                    required
+            />
 
-    <!-- New JSON Input Section -->
+            <button type="submit">Generate Entities</button>
+        </form>
+    </div>
+
     <h2>Or Add Entities via JSON</h2>
-    <form th:action="@{/generate-entities-from-json}" method="post">
-        <input type="hidden" id="projectNameJson" name="projectName" th:value="${projectName}"/>
+    <div class="form-section">
+        <form th:action="@{/generate-entities-from-json}" method="post">
+            <input type="hidden" id="projectNameJson" name="projectName" th:value="${projectName}"/>
 
-        <label for="entitiesJson">Entities JSON:</label>
-        <textarea id="entitiesJson" name="entitiesJson" placeholder='Paste your JSON here' required></textarea>
+            <label for="entitiesJson">Entities JSON:</label>
+            <textarea
+                    id="entitiesJson"
+                    name="entitiesJson"
+                    placeholder='{
+  "User": {
+    "id": "Long",
+    "name": "String",
+    "email": "String"
+  },
+  "Product": {
+    "id": "Long",
+    "name": "String",
+    "price": "Double"
+  }
+}'
+                    required
+            ></textarea>
 
-        <button type="submit">Generate Entities from JSON</button>
-    </form>
+            <button type="submit">Generate Entities from JSON</button>
+        </form>
+    </div>
 </div>
 </body>
 </html>

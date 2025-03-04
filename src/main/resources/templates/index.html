@@ -4,107 +4,265 @@
     <meta charset="UTF-8">
     <title>Project Generator</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --background: #f8fafc;
+            --card: #ffffff;
+            --text: #1f2937;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
         }
+
         .container {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            padding: 20px;
-            width: 400px;
-            max-width: 100%;
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 500px;
             text-align: center;
+            transition: transform 0.2s ease;
         }
+
+        .container:hover {
+            transform: translateY(-2px);
+        }
+
+        .header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px; /* Space between the text */
+        }
+
         h1 {
-            margin-bottom: 20px;
-            color: #333;
+            color: var(--text);
+            font-size: 2.5rem; /* Increased font size */
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
+
         form {
             display: flex;
             flex-direction: column;
+            gap: 1.25rem;
         }
+
         label {
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
             text-align: left;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
         }
-        input[type="text"], select {
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            width: calc(100% - 22px); /* Adjust width for padding and border */
-            box-sizing: border-box;
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            background-color: white;
+            color: var(--text);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            outline: none;
         }
+
+        input[type="text"]:focus,
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.25rem;
+            padding-right: 2.5rem;
+        }
+
         button {
-            padding: 10px 20px;
+            margin-top: 0.5rem;
+            padding: 0.875rem 1.5rem;
             border: none;
-            border-radius: 4px;
-            background-color: #007bff;
-            color: #fff;
-            font-size: 16px;
+            border-radius: 0.5rem;
+            background-color: var(--primary);
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
         }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s ease;
+        }
+
         button:hover {
-            background-color: #0056b3;
+            background-color: var(--primary-hover);
         }
-        /* Responsive Design */
-        @media (max-width: 600px) {
-            .container {
-                width: 90%;
-                padding: 15px;
+
+        button:hover::after {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
             }
+
+            .container {
+                padding: 1.5rem;
+                border-radius: 12px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Field groups with subtle separators */
+        form > div {
+            position: relative;
+            padding-bottom: 1.25rem;
+        }
+
+        form > div:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--border), transparent);
+        }
+
+        /* Enhance focus states with animation */
+        input:focus ~ label,
+        select:focus ~ label {
+            color: var(--primary);
+        }
+
+        /* Add subtle animation to form elements */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container > * {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        form > * {
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: calc(var(--index) * 0.1s);
+        }
+
+        /* Style placeholder text */
+        ::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        /* Style select options */
+        option {
+            padding: 0.5rem;
+            color: var(--text);
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>Project Generator</h1>
+    <div class="header">
+        <h1>Code Forge: Automated Project Generator</h1>
+    </div>
     <form th:action="@{/generate}" method="post">
-        <label for="projectName">Project Name:</label>
-        <input type="text" id="projectName" name="projectName" required/>
+        <div style="--index: 1">
+            <label for="projectName">Project Name:</label>
+            <input type="text" id="projectName" name="projectName" required placeholder="Enter your project name"/>
+        </div>
 
-        <label for="frontendType">Frontend Type:</label>
-        <select id="frontendType" name="frontendType" required>
-            <option value="">Select Frontend Type</option>
-            <option value="Thymeleaf">Thymeleaf</option>
-            <option value="React">React</option>
-            <option value="Vue">Vue</option>
-            <option value="Angular">Angular</option>
-            <!-- Add other options as needed -->
-        </select>
+        <div style="--index: 2">
+            <label for="frontendType">Frontend Type:</label>
+            <select id="frontendType" name="frontendType" required>
+                <option value="">Select Frontend Type</option>
+                <option value="Thymeleaf">Thymeleaf</option>
+                <option value="React">React</option>
+                <option value="Vue">Vue</option>
+                <option value="Angular">Angular</option>
+            </select>
+        </div>
 
-        <label for="backendType">Backend Type:</label>
-        <select id="backendType" name="backendType" required>
-            <option value="">Select Backend Type</option>
-            <option value="Spring_Boot">Spring Boot</option>
-            <option value="Django">Django</option>
-            <option value="Express">Express</option>
-            <option value="Flask">Flask</option>
-            <!-- Add other options as needed -->
-        </select>
+        <div style="--index: 3">
+            <label for="backendType">Backend Type:</label>
+            <select id="backendType" name="backendType" required>
+                <option value="">Select Backend Type</option>
+                <option value="Spring_Boot">Spring Boot</option>
+                <option value="Django">Django</option>
+                <option value="Express">Express</option>
+                <option value="Flask">Flask</option>
+            </select>
+        </div>
 
-        <label for="databaseType">Database Type:</label>
-        <select id="databaseType" name="databaseType" required>
-            <option value="">Select Database Type</option>
-            <option value="MySQL">MySQL</option>
-            <option value="PostgreSQL">PostgreSQL</option>
-            <option value="MongoDB">MongoDB</option>
-            <option value="SQLite">SQLite</option>
-            <!-- Add other options as needed -->
-        </select>
+        <div style="--index: 4">
+            <label for="databaseType">Database Type:</label>
+            <select id="databaseType" name="databaseType" required>
+                <option value="">Select Database Type</option>
+                <option value="MySQL">MySQL</option>
+                <option value="PostgreSQL">PostgreSQL</option>
+                <option value="MongoDB">MongoDB</option>
+                <option value="SQLite">SQLite</option>
+            </select>
+        </div>
 
-        <button type="submit">Generate Project</button>
+        <button type="submit" style="--index: 5">Generate Project</button>
     </form>
 </div>
 </body>
