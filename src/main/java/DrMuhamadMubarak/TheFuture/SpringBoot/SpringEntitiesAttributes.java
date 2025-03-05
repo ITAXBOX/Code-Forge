@@ -111,11 +111,11 @@ public class SpringEntitiesAttributes {
 
         return switch (dataType.toUpperCase()) {
             case "STRING" -> "String";
-            case "INTEGER" -> "int";
-            case "LONG" -> "long";
-            case "DATE" -> "Instant";
-            case "BOOLEAN" -> "boolean";
-            case "DOUBLE" -> "double";
+            case "INTEGER" -> attribute.isNullable() ? "Integer" : "int";
+            case "LONG" -> attribute.isNullable() ? "Long" : "long";
+            case "DATE" -> "LocalDateTime";
+            case "BOOLEAN" -> attribute.isNullable() ? "Boolean" : "boolean";
+            case "DOUBLE" -> attribute.isNullable() ? "Double" : "double";
             default -> dataType;
         };
     }
@@ -159,13 +159,15 @@ public class SpringEntitiesAttributes {
                 } else {
                     annotation.append("@ManyToMany\n")
                             .append("    @JoinTable(name = \"")
+                            .append(StringUtils.uncapitalize(entityName))
+                            .append("_")
                             .append(StringUtils.uncapitalize(attribute.getRelatedEntity()))
-                            .append("_relation\",\n")
+                            .append("\",\n")
                             .append("        joinColumns = @JoinColumn(name = \"")
                             .append(StringUtils.uncapitalize(entityName))
                             .append("_id\"),\n")
                             .append("        inverseJoinColumns = @JoinColumn(name = \"")
-                            .append(StringUtils.uncapitalize(attribute.getRelatedEntity().substring(0, entityName.length())))
+                            .append(StringUtils.uncapitalize(attribute.getRelatedEntity()))
                             .append("_id\"))");
                 }
                 break;
