@@ -1,6 +1,6 @@
-package DrMuhamadMubarak.TheFuture.SpringBoot;
+package DrMuhamadMubarak.TheFuture.springboot;
 
-import DrMuhamadMubarak.TheFuture.Generator.DTO.AttributeDTO;
+import DrMuhamadMubarak.TheFuture.generator.dto.AttributeDTO;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;

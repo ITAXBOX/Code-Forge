@@ -1,6 +1,6 @@
-package DrMuhamadMubarak.TheFuture.SpringBoot;
+package DrMuhamadMubarak.TheFuture.springboot;
 
-import DrMuhamadMubarak.TheFuture.Generator.DTO.AttributeDTO;
+import DrMuhamadMubarak.TheFuture.generator.dto.AttributeDTO;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

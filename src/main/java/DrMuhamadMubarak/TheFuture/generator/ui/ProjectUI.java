@@ -1,6 +1,6 @@
-package DrMuhamadMubarak.TheFuture.Generator.UI;
+package DrMuhamadMubarak.TheFuture.generator.ui;
 
-import DrMuhamadMubarak.TheFuture.Generator.DTO.AttributeDTO;
+import DrMuhamadMubarak.TheFuture.generator.dto.AttributeDTO;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

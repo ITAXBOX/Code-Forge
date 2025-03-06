@@ -1,6 +1,6 @@
-package DrMuhamadMubarak.TheFuture.Generator.Builder;
+package DrMuhamadMubarak.TheFuture.generator.builder;
 
-import DrMuhamadMubarak.TheFuture.Generator.DTO.AttributeDTO;
+import DrMuhamadMubarak.TheFuture.generator.dto.AttributeDTO;
 
 public class AttributeBuilder {
     public static AttributeDTO createAttributeDTO(

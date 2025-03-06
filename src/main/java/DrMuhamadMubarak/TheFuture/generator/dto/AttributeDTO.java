@@ -1,4 +1,4 @@
-package DrMuhamadMubarak.TheFuture.Generator.DTO;
+package DrMuhamadMubarak.TheFuture.generator.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;

@@ -1,4 +1,4 @@
-package DrMuhamadMubarak.TheFuture.SpringBoot;
+package DrMuhamadMubarak.TheFuture.springboot;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,7 +8,7 @@ import static DrMuhamadMubarak.TheFuture.utils.Utils.capitalize;
 import static DrMuhamadMubarak.TheFuture.utils.Utils.createDirectory;
 
 public class SpringStructure {
-    public static void generateSpringBootProjectStructure(String projectName, String frontendType,String databaseType) throws IOException {
+    public static void generateSpringBootProjectStructure(String projectName, String frontendType, String databaseType) throws IOException {
         String baseDir = "./" + projectName;
         createDirectory(baseDir);
 
@@ -32,7 +32,11 @@ public class SpringStructure {
     }
 
     public static String getSpringApplicationPropertiesContent(String databaseType, String projectName) {
-        return "spring.datasource.url=jdbc:mysql://localhost:3306/" + projectName.toLowerCase() + "?createDatabaseIfNotExist=true\n" + "spring.datasource.username=root\n" + "spring.datasource.password=Sql01276084$\n" + "spring.jpa.hibernate.ddl-auto=update";
+        return "server.port=8081\n" +
+               "spring.datasource.url=jdbc:mysql://localhost:3306/" + projectName.toLowerCase() + "?createDatabaseIfNotExist=true\n" +
+               "spring.datasource.username=root\n" +
+               "spring.datasource.password=Sql01276084$\n" +
+               "spring.jpa.hibernate.ddl-auto=update";
     }
 
     public static String getSpringPomXmlContent(String projectName, String frontendType, String databaseType) {

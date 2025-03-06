@@ -1,4 +1,4 @@
-package DrMuhamadMubarak.TheFuture.Generator.Enum;
+package DrMuhamadMubarak.TheFuture.generator.enums;
 
 public enum ProjectType {
     THYMELEAF, REACT, VUE, ANGULAR,

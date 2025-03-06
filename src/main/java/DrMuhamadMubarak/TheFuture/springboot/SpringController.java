@@ -1,4 +1,4 @@
-package DrMuhamadMubarak.TheFuture.SpringBoot;
+package DrMuhamadMubarak.TheFuture.springboot;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

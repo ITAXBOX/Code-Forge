@@ -1,8 +1,8 @@
-package DrMuhamadMubarak.TheFuture.Generator.Service;
+package DrMuhamadMubarak.TheFuture.generator.service;
 
-import DrMuhamadMubarak.TheFuture.Generator.DTO.AttributeDTO;
-import DrMuhamadMubarak.TheFuture.Generator.UI.ProjectUI;
-import DrMuhamadMubarak.TheFuture.SpringBoot.*;
+import DrMuhamadMubarak.TheFuture.generator.dto.AttributeDTO;
+import DrMuhamadMubarak.TheFuture.generator.ui.ProjectUI;
+import DrMuhamadMubarak.TheFuture.springboot.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Service;

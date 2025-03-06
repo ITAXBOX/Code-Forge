@@ -1,8 +1,8 @@
-package DrMuhamadMubarak.TheFuture.Generator.Controller;
+package DrMuhamadMubarak.TheFuture.generator.controller;
 
-import DrMuhamadMubarak.TheFuture.Generator.DTO.AttributeDTO;
-import DrMuhamadMubarak.TheFuture.Generator.Service.ProjectAttributeService;
-import DrMuhamadMubarak.TheFuture.Generator.Service.ProjectEntitiesService;
+import DrMuhamadMubarak.TheFuture.generator.dto.AttributeDTO;
+import DrMuhamadMubarak.TheFuture.generator.service.ProjectAttributeService;
+import DrMuhamadMubarak.TheFuture.generator.service.ProjectEntitiesService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;

@@ -1,7 +1,7 @@
-package DrMuhamadMubarak.TheFuture.Generator.Controller;
+package DrMuhamadMubarak.TheFuture.generator.controller;
 
-import DrMuhamadMubarak.TheFuture.Generator.Enum.ProjectType;
-import DrMuhamadMubarak.TheFuture.Generator.Service.ProjectGenerator;
+import DrMuhamadMubarak.TheFuture.generator.enums.ProjectType;
+import DrMuhamadMubarak.TheFuture.generator.service.ProjectGenerator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
