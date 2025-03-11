@@ -1,7 +1,9 @@
 package DrMuhamadMubarak.TheFuture.generator.controller;
 
-import DrMuhamadMubarak.TheFuture.generator.enums.ProjectType;
-import DrMuhamadMubarak.TheFuture.generator.service.ProjectGenerator;
+import DrMuhamadMubarak.TheFuture.generator.enums.BackendType;
+import DrMuhamadMubarak.TheFuture.generator.enums.DatabaseType;
+import DrMuhamadMubarak.TheFuture.generator.enums.FrontendType;
+import DrMuhamadMubarak.TheFuture.generator.service.ProjectGeneratorService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,7 +16,7 @@ import java.io.IOException;
 @AllArgsConstructor
 public class ProjectController {
 
-    private final ProjectGenerator projectGenerator;
+    private final ProjectGeneratorService projectGeneratorService;
 
     @PostMapping("/generate")
     public String generateProjectStructure(
@@ -23,15 +25,15 @@ public class ProjectController {
             @RequestParam("backendType") String backendType,
             @RequestParam("databaseType") String databaseType,
             Model model) {
-        if (!ProjectType.isValidFrontendType(frontendType) ||
-            !ProjectType.isValidBackendType(backendType) ||
-            !ProjectType.isValidDatabaseType(databaseType)) {
+        if (!FrontendType.isValid(frontendType) ||
+            !BackendType.isValid(backendType) ||
+            !DatabaseType.isValid(databaseType)) {
             model.addAttribute("message", "Invalid project type provided.");
             return "error";
         }
 
         try {
-            projectGenerator.generateProjectStructure(projectName, frontendType, backendType, databaseType);
+            projectGeneratorService.generateProjectStructure(projectName, frontendType, backendType, databaseType);
             model.addAttribute("projectName", projectName);
         } catch (IOException e) {
             model.addAttribute("message", "An error occurred: " + e.getMessage());

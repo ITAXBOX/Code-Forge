@@ -15,7 +15,7 @@ import java.io.IOException;
 
 @Controller
 @AllArgsConstructor
-public class ProjectJSON {
+public class ProjectJSONController {
     private final ProjectEntitiesService projectEntitiesService;
     private final ProjectAttributeService projectAttributeService;
 
