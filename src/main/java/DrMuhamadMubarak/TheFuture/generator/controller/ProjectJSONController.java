@@ -62,6 +62,7 @@ public class ProjectJSONController {
 
             projectEntitiesService.generateSecurityClass(projectName);
             projectEntitiesService.generateDataInitializerClass(projectName);
+            projectEntitiesService.generateAuthenticationControllerClass(projectName);
 
             model.addAttribute("message", "Entities generated successfully from JSON.");
             return "result";

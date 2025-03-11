@@ -78,6 +78,7 @@ public class ProjectAttributeController {
         if (projectEntitiesService.isLastEntity(entityName)) {
             projectEntitiesService.generateSecurityClass(projectName);
             projectEntitiesService.generateDataInitializerClass(projectName);
+            projectEntitiesService.generateAuthenticationControllerClass(projectName);
 
             model.addAttribute("message", "Project generated successfully");
             return "result";

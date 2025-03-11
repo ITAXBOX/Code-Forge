@@ -52,6 +52,10 @@ public class ProjectEntitiesService {
         SpringController.generateControllerClass(projectName, entityName);
     }
 
+    public void generateAuthenticationControllerClass(String projectName) throws IOException {
+        SpringController.generateAuthenticationControllerClass(projectName);
+    }
+
     public void generateSecurityClass(String projectName) {
         SpringSecurity.generateSecurityClass(projectName);
     }

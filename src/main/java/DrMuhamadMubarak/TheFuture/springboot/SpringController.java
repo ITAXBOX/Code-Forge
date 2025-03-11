@@ -3,6 +3,8 @@ package DrMuhamadMubarak.TheFuture.springboot;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class SpringController {
     public static void generateControllerClass(String projectName, String entityName) throws IOException {
@@ -69,5 +71,93 @@ public class SpringController {
 
             writer.write("}\n");
         }
+    }
+
+    public static void generateAuthenticationControllerClass(String projectName) throws IOException {
+        String baseDir = "./" + projectName + "/src/main/java/com/example/" + projectName.toLowerCase() + "/controllers";
+        String className = "AuthenticationController";
+        String classContent = String.format("""
+                package com.example.%s.controllers;
+                
+                import com.example.%s.models.User;
+                import com.example.%s.repositories.UserRepository;
+                import com.example.%s.models.Role;
+                import com.example.%s.repositories.RoleRepository;
+                import org.springframework.security.crypto.password.PasswordEncoder;
+                import org.springframework.web.bind.annotation.*;
+                import org.springframework.http.ResponseEntity;
+                import org.springframework.security.authentication.AuthenticationManager;
+                import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+                import org.springframework.security.core.Authentication;
+                import org.springframework.security.core.context.SecurityContextHolder;
+                import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+                import jakarta.servlet.http.HttpServletRequest;
+                import jakarta.servlet.http.HttpServletResponse;
+                import java.util.Collections;
+                
+                @RestController
+                @RequestMapping("/api/auth")
+                public class AuthenticationController {
+                
+                    private final UserRepository userRepository;
+                    private final RoleRepository roleRepository;
+                    private final PasswordEncoder passwordEncoder;
+                    private final AuthenticationManager authenticationManager;
+                
+                    public AuthenticationController(UserRepository userRepository,
+                                                    RoleRepository roleRepository,
+                                                    PasswordEncoder passwordEncoder,
+                                                    AuthenticationManager authenticationManager) {
+                        this.userRepository = userRepository;
+                        this.roleRepository = roleRepository;
+                        this.passwordEncoder = passwordEncoder;
+                        this.authenticationManager = authenticationManager;
+                    }
+                
+                    @PostMapping("/register")
+                    public ResponseEntity<String> registerUser(@RequestBody User user) {
+                        if (userRepository.existsByUsername(user.getUsername())) {
+                            return ResponseEntity.badRequest().body("Username is already taken!");
+                        }
+                
+                        // Assign USER role by default
+                        Role userRole = roleRepository.findByName("USER")
+                                .orElseThrow(() -> new RuntimeException("Role USER not found"));
+                        user.setRoles(Collections.singleton(userRole));
+                
+                        // Encode the password
+                        user.setPassword(passwordEncoder.encode(user.getPassword()));
+                
+                        // Save the user
+                        userRepository.save(user);
+                
+                        return ResponseEntity.ok("User registered successfully!");
+                    }
+                
+                    @PostMapping("/login")
+                    public ResponseEntity<String> loginUser(@RequestBody User user) {
+                        try {
+                            Authentication authentication = authenticationManager.authenticate(
+                                    new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
+                            );
+                            SecurityContextHolder.getContext().setAuthentication(authentication);
+                            return ResponseEntity.ok("User logged in successfully!");
+                        } catch (Exception e) {
+                            return ResponseEntity.status(401).body("Invalid username or password");
+                        }
+                    }
+                
+                    @PostMapping("/logout")
+                    public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpServletResponse response) {
+                        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                        if (authentication != null) {
+                            new SecurityContextLogoutHandler().logout(request, response, authentication);
+                        }
+                        return ResponseEntity.ok("User logged out successfully!");
+                    }
+                }
+                """, projectName.toLowerCase(), projectName.toLowerCase(), projectName.toLowerCase(), projectName.toLowerCase(), projectName.toLowerCase());
+
+        Files.write(Paths.get(baseDir + "/" + className + ".java"), classContent.getBytes());
     }
 }
