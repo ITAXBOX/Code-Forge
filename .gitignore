@@ -1,4 +1,10 @@
+# .env file
+.env
+
+# HELP.md
 HELP.md
+
+# Target directories
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

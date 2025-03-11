@@ -204,26 +204,6 @@
             }
         }
 
-        /* Loading state for buttons */
-        button.loading {
-            position: relative;
-            color: transparent;
-        }
-
-        button.loading::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 20px;
-            height: 20px;
-            margin: -10px 0 0 -10px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
         @keyframes spin {
             to {
                 transform: rotate(360deg);
@@ -277,6 +257,15 @@
             ></textarea>
 
             <button type="submit">Generate Entities from JSON</button>
+        </form>
+    </div>
+
+    <h2>Or Generate Entities Automatically</h2>
+    <div class="form-section">
+        <form th:action="@{/generate-entities-from-prompt}" method="post">
+            <input type="hidden" id="projectNamePrompt" name="projectName" th:value="${projectName}"/>
+
+            <button type="submit">Generate Entities Automatically</button>
         </form>
     </div>
 </div>
