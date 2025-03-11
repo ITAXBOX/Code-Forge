@@ -25,7 +25,7 @@ public class ProjectEntitiesService {
     }
 
     public void generateEntityClasses(String projectName, String[] entities) throws IOException {
-        for(String entity : entities) {
+        for (String entity : entities) {
             generateEntityClass(projectName, entity);
         }
     }
@@ -50,6 +50,14 @@ public class ProjectEntitiesService {
 
     public void generateControllerClass(String projectName, String entityName) throws IOException {
         SpringController.generateControllerClass(projectName, entityName);
+    }
+
+    public void generateSecurityClass(String projectName) {
+        SpringSecurity.generateSecurityClass(projectName);
+    }
+
+    public void generateDataInitializerClass(String projectName) {
+        SpringDataInitializer.generateDataInitializerClass(projectName);
     }
 
     public void generateUI(String projectName, String entityName, List<AttributeDTO> attributes) throws IOException {

@@ -60,6 +60,9 @@ public class ProjectJSONController {
                 projectAttributeService.clearAttributes();
             }
 
+            projectEntitiesService.generateSecurityClass(projectName);
+            projectEntitiesService.generateDataInitializerClass(projectName);
+
             model.addAttribute("message", "Entities generated successfully from JSON.");
             return "result";
         } catch (IOException e) {
