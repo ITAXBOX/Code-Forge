@@ -16,6 +16,10 @@ public class SpringStructure {
         createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/models");
         createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/repositories");
         createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/services");
+        createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/security");
+        createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/config");
+        createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/init");
+
         createDirectory(baseDir + "/src/main/resources/templates");
         createDirectory(baseDir + "/src/main/resources/static");
         createDirectory(baseDir + "/src/test/java/com/example/" + projectName.toLowerCase());
@@ -57,33 +61,37 @@ public class SpringStructure {
                     <description>Demo project for Spring Boot</description>
                     <properties>
                         <java.version>22</java.version>
-                        <lombok.version>1.18.34</lombok.version> <!-- Update the version as needed -->
+                        <lombok.version>1.18.34</lombok.version>
                     </properties>
                     <dependencies>
-                                               <dependency>
-                                                   <groupId>org.springframework.boot</groupId>
-                                                   <artifactId>spring-boot-starter-data-jpa</artifactId>
-                                               </dependency>
-                                               <dependency>
-                                                   <groupId>org.springframework.boot</groupId>
-                                                   <artifactId>spring-boot-starter-web</artifactId>
-                                               </dependency>
-                                               <dependency>
-                                                   <groupId>org.springframework.boot</groupId>
-                                                   <artifactId>spring-boot-starter-test</artifactId>
-                                                   <scope>test</scope>
-                                               </dependency>
-                                               <dependency>
-                                                   <groupId>org.projectlombok</groupId>
-                                                   <artifactId>lombok</artifactId>
-                                                   <scope>provided</scope>
-                                               </dependency>
-                                               <dependency>
-                                                   <groupId>com.mysql</groupId>
-                                                   <artifactId>mysql-connector-j</artifactId>
-                                                   <scope>runtime</scope>
-                                               </dependency>
-                                           </dependencies>
+                        <dependency>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-data-jpa</artifactId>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-web</artifactId>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-security</artifactId>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-test</artifactId>
+                            <scope>test</scope>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <scope>provided</scope>
+                        </dependency>
+                        <dependency>
+                            <groupId>com.mysql</groupId>
+                            <artifactId>mysql-connector-j</artifactId>
+                            <scope>runtime</scope>
+                        </dependency>
+                    </dependencies>
                     <build>
                         <plugins>
                             <plugin>
