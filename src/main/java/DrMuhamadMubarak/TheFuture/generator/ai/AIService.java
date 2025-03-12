@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -21,10 +21,15 @@ public class AIService {
     private String apiUrl;
 
     private WebClient webClient;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @PostConstruct
     public void init() {
-        this.webClient = WebClient.builder().baseUrl(apiUrl).build();
+        this.webClient = WebClient.builder()
+                .baseUrl(apiUrl)
+                .defaultHeader("Authorization", "Bearer " + apiKey)
+                .defaultHeader("Content-Type", "application/json")
+                .build();
     }
 
     public Mono<String> generateJsonFromPrompt(String prompt) {
@@ -32,35 +37,30 @@ public class AIService {
         System.out.println("API URL: " + apiUrl);
         System.out.println("Prompt: " + prompt);
 
-        Map<String, Object> requestBodyMap = new HashMap<>();
-        requestBodyMap.put("model", "gpt-3.5-turbo-instruct");
-        requestBodyMap.put("prompt", prompt);
-        requestBodyMap.put("max_tokens", 500);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String requestBody;
-        try {
-            requestBody = objectMapper.writeValueAsString(requestBodyMap);
-        } catch (Exception e) {
-            return Mono.error(new RuntimeException("Failed to create request body", e));
-        }
+        Map<String, Object> requestBodyMap = Map.of(
+                "model", "gpt-3.5-turbo",
+                "messages", List.of(
+                        Map.of("role", "system", "content", "You are a helpful AI that generates structured JSON."),
+                        Map.of("role", "user", "content", prompt)
+                ),
+                "temperature", 0.7,
+                "max_tokens", 1000
+        );
 
         return webClient.post()
-                .header("Authorization", "Bearer " + apiKey)
-                .header("Content-Type", "application/json")
-                .bodyValue(requestBody)
+                .bodyValue(requestBodyMap)
                 .retrieve()
                 .bodyToMono(String.class)
                 .flatMap(response -> {
                     try {
                         JsonNode rootNode = objectMapper.readTree(response);
-                        JsonNode textNode = rootNode.path("choices").path(0).path("text");
+                        JsonNode contentNode = rootNode.path("choices").path(0).path("message").path("content");
 
-                        if (textNode.isMissingNode()) {
-                            return Mono.error(new RuntimeException("'text' field is missing in the API response"));
+                        if (contentNode.isMissingNode()) {
+                            return Mono.error(new RuntimeException("'content' field is missing in the API response"));
                         }
 
-                        return Mono.just(textNode.asText());
+                        return Mono.just(contentNode.asText());
                     } catch (Exception e) {
                         return Mono.error(new RuntimeException("Failed to parse API response", e));
                     }

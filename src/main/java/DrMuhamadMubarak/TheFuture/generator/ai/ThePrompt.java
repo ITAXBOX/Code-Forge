@@ -10,7 +10,7 @@ public class ThePrompt {
                  Ensure all relationship attributes are marked as isNullable: true to avoid @Column(nullable = false) annotations.
                  For @ManyToOne and @OneToOne relationships, use @JoinColumn instead of @Column.
                  For @ManyToMany relationships, specify the owning side (without mappedBy) and the inverse side (with mappedBy).
-                 All classes and attribute names must be a single word.
+                 All classes and attribute names must be a single word(This is very important).
             \s
              Additionally, the JSON must always include two predefined entities:
             \s
@@ -159,7 +159,7 @@ public class ThePrompt {
              Ensure that every generated JSON follows these rules and always includes the User and Role entities without modification while allowing additional entities to be dynamically defined according to\s
              the same principles.
             \s
-             The project will be about: %s
+             The project will be about: %s and the project should be realistic and not simple.
             \s
              IMPORTANT: Return only the JSON and nothing else. Do not include any explanations, comments, or additional text.
             \s""";
