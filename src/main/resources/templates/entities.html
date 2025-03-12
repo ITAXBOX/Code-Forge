@@ -262,12 +262,30 @@
 
     <h2>Or Generate Entities Automatically</h2>
     <div class="form-section">
-        <form th:action="@{/generate-entities-from-prompt}" method="post">
+        <form id="auto-generate-form" th:action="@{/generate-entities-from-prompt}" method="post">
             <input type="hidden" id="projectNamePrompt" name="projectName" th:value="${projectName}"/>
-
             <button type="submit">Generate Entities Automatically</button>
         </form>
     </div>
 </div>
+
+<
+<div id="loadingContainer"
+     style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000;">
+    <iframe th:src="@{/loading-page}" style="width: 100%; height: 100%; border: none;"></iframe>
+</div>
+
+<script>
+    document.getElementById('auto-generate-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        document.getElementById('loadingContainer').style.display = 'block';
+
+        setTimeout(() => {
+            this.submit();
+        }, 10000);
+    });
+</script>
+
 </body>
 </html>

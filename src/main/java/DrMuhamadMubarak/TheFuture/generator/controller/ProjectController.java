@@ -7,6 +7,7 @@ import DrMuhamadMubarak.TheFuture.generator.service.ProjectGeneratorService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -41,5 +42,10 @@ public class ProjectController {
         }
 
         return "entities";
+    }
+
+    @GetMapping("/loading-page")
+    public String loadingPage() {
+        return "loading-page";
     }
 }
