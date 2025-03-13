@@ -2,7 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Project Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Forge: Home Page</title>
     <style>
         :root {
             --primary: #4f46e5;
@@ -18,76 +19,107 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, -apple-system, sans-serif;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         }
 
         body {
             background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .container {
-            background: var(--card);
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            padding: 2.5rem;
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-            transition: transform 0.2s ease;
-        }
-
-        .container:hover {
-            transform: translateY(-2px);
+            flex-direction: column;
         }
 
         .header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px; /* Space between the text */
+            background: linear-gradient(90deg, var(--primary), #818cf8);
+            padding: 2.5rem;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        h1 {
-            color: var(--text);
-            font-size: 2.5rem; /* Increased font size */
-            font-weight: 700;
-            background: linear-gradient(to right, var(--primary), #818cf8);
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.2);
             -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
             background-clip: text;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header p {
+            font-size: 1.125rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            flex-grow: 1;
+        }
+
+        .form-container {
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 1000px;
+            padding: 2rem;
+            transform: translateY(-1.5rem); /* Reduced from -3rem to -1.5rem */
+            margin-top: 2rem; /* Added margin to push it down further */
         }
 
         form {
             display: flex;
             flex-direction: column;
-            gap: 1.25rem;
+            gap: 2rem;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group.wide {
+            flex: 100%;
         }
 
         label {
             display: block;
             margin-bottom: 0.5rem;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text);
-            text-align: left;
             font-size: 0.875rem;
-            transition: color 0.2s ease;
+        }
+
+        .input-container {
+            position: relative;
         }
 
         input[type="text"],
         select {
             width: 100%;
-            padding: 0.75rem 1rem;
+            padding: 0.875rem 1rem;
             border: 1px solid var(--border);
             border-radius: 0.5rem;
             background-color: white;
             color: var(--text);
-            font-size: 0.875rem;
+            font-size: 0.95rem;
             transition: all 0.2s ease;
             outline: none;
         }
@@ -103,167 +135,294 @@
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 1rem center;
-            background-size: 1.25rem;
+            background-size: 1rem;
             padding-right: 2.5rem;
         }
 
+        .icon-input {
+            padding-left: 2.5rem;
+        }
+
+        .hint {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.375rem;
+        }
+
+        .tech-info {
+            display: flex;
+            gap: 1.5rem;
+            background: linear-gradient(to right, #f9fafb, #f3f4f6);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tech-column {
+            flex: 1;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .tech-column h3 {
+            color: var(--primary);
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .tech-column p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.5;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tech-column.active p {
+            opacity: 1;
+        }
+
+        .action-row {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
         button {
-            margin-top: 0.5rem;
-            padding: 0.875rem 1.5rem;
-            border: none;
-            border-radius: 0.5rem;
             background-color: var(--primary);
             color: white;
-            font-size: 0.875rem;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.875rem 1.75rem;
+            font-size: 0.95rem;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        button::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 300%;
-            height: 300%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
-            transform: translate(-50%, -50%) scale(0);
-            transition: transform 0.5s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
         }
 
         button:hover {
             background-color: var(--primary-hover);
-        }
-
-        button:hover::after {
-            transform: translate(-50%, -50%) scale(1);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 10px -1px rgba(79, 70, 229, 0.25);
         }
 
         button:active {
-            transform: translateY(1px);
+            transform: translateY(0);
+            box-shadow: 0 2px 4px -1px rgba(79, 70, 229, 0.2);
         }
 
-        @media (max-width: 640px) {
-            body {
-                padding: 1rem;
+        button svg {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
             }
 
-            .container {
+            .header p {
+                font-size: 1rem;
+            }
+
+            .form-container {
                 padding: 1.5rem;
-                border-radius: 12px;
             }
 
-            h1 {
-                font-size: 1.5rem;
+            .form-row {
+                flex-direction: column;
             }
-        }
 
-        /* Field groups with subtle separators */
-        form > div {
-            position: relative;
-            padding-bottom: 1.25rem;
-        }
-
-        form > div:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50%;
-            height: 1px;
-            background: linear-gradient(to right, transparent, var(--border), transparent);
-        }
-
-        /* Enhance focus states with animation */
-        input:focus ~ label,
-        select:focus ~ label {
-            color: var(--primary);
-        }
-
-        /* Add subtle animation to form elements */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
+            .form-group {
+                width: 100%;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+
+            .tech-info {
+                flex-direction: column;
             }
-        }
-
-        .container > * {
-            animation: fadeIn 0.5s ease forwards;
-        }
-
-        form > * {
-            animation: fadeIn 0.5s ease forwards;
-            animation-delay: calc(var(--index) * 0.1s);
-        }
-
-        /* Style placeholder text */
-        ::placeholder {
-            color: var(--text-secondary);
-            opacity: 0.7;
-        }
-
-        /* Style select options */
-        option {
-            padding: 0.5rem;
-            color: var(--text);
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1>Code Forge: Automated Project Generator</h1>
-    </div>
-    <form th:action="@{/generate}" method="post">
-        <div style="--index: 1">
-            <label for="projectName">Project Name:</label>
-            <input type="text" id="projectName" name="projectName" required placeholder="Enter your project name"/>
-        </div>
-
-        <div style="--index: 2">
-            <label for="frontendType">Frontend Type:</label>
-            <select id="frontendType" name="frontendType" required>
-                <option value="">Select Frontend Type</option>
-                <option value="Thymeleaf">Thymeleaf</option>
-                <option value="React">React</option>
-                <option value="Vue">Vue</option>
-                <option value="Angular">Angular</option>
-            </select>
-        </div>
-
-        <div style="--index: 3">
-            <label for="backendType">Backend Type:</label>
-            <select id="backendType" name="backendType" required>
-                <option value="">Select Backend Type</option>
-                <option value="Spring_Boot">Spring Boot</option>
-                <option value="Django">Django</option>
-                <option value="Express">Express</option>
-                <option value="Flask">Flask</option>
-            </select>
-        </div>
-
-        <div style="--index: 4">
-            <label for="databaseType">Database Type:</label>
-            <select id="databaseType" name="databaseType" required>
-                <option value="">Select Database Type</option>
-                <option value="MySQL">MySQL</option>
-                <option value="PostgreSQL">PostgreSQL</option>
-                <option value="MongoDB">MongoDB</option>
-                <option value="SQLite">SQLite</option>
-            </select>
-        </div>
-
-        <button type="submit" style="--index: 5">Generate Project</button>
-    </form>
+<div class="header">
+    <h1>Code Forge: Automated Project Generator</h1>
+    <p>Build your full-stack application instantly with your preferred technologies</p>
 </div>
+
+<div class="content">
+    <div class="form-container">
+        <form th:action="@{/generate}" method="post">
+            <div class="form-row">
+                <div class="form-group wide">
+                    <label for="projectName">Project Name</label>
+                    <div class="input-container">
+                        <input type="text" id="projectName" name="projectName" class="icon-input" required
+                               placeholder="Enter your project name"/>
+                    </div>
+                    <div class="hint">Choose a meaningful name for your project</div>
+                </div>
+            </div>
+
+            <!-- Three-column tech info section -->
+            <div class="tech-info">
+                <div class="tech-column" id="frontend-column">
+                    <h3>Frontend</h3>
+                    <p id="frontend-info">Select a frontend framework to build a dynamic and responsive user
+                        interface.</p>
+                </div>
+                <div class="tech-column" id="backend-column">
+                    <h3>Backend</h3>
+                    <p id="backend-info">Choose a backend framework to handle server-side logic and data processing.</p>
+                </div>
+                <div class="tech-column" id="database-column">
+                    <h3>Database</h3>
+                    <p id="database-info">Pick a database to store and manage your application's data efficiently.</p>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="frontendType">Frontend Framework</label>
+                    <select id="frontendType" name="frontendType" required>
+                        <option value="">Select Frontend Type</option>
+                        <option value="React">React</option>
+                        <option value="Vue">Vue.js</option>
+                        <option value="Angular">Angular</option>
+                        <option value="Thymeleaf">Thymeleaf</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="backendType">Backend Framework</label>
+                    <select id="backendType" name="backendType" required>
+                        <option value="">Select Backend Type</option>
+                        <option value="Spring_Boot">Spring Boot (Java)</option>
+                        <option value="Django">Django (Python)</option>
+                        <option value="Express">Express.js (Node)</option>
+                        <option value="Flask">Flask (Python)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="databaseType">Database Type</label>
+                    <select id="databaseType" name="databaseType" required>
+                        <option value="">Select Database Type</option>
+                        <option value="MySQL">MySQL</option>
+                        <option value="PostgreSQL">PostgreSQL</option>
+                        <option value="MongoDB">MongoDB</option>
+                        <option value="SQLite">SQLite</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="action-row">
+                <button type="submit">
+                    Generate Project
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Frontend selection
+    document.getElementById('frontendType').addEventListener('change', function () {
+        const frontendInfo = document.getElementById('frontend-info');
+        const frontendColumn = document.getElementById('frontend-column');
+        const selectedValue = this.value;
+
+        if (selectedValue) {
+            frontendInfo.textContent = getFrontendDescription(selectedValue);
+            frontendColumn.classList.add('active');
+        } else {
+            frontendInfo.textContent = "Select a frontend framework to build a dynamic and responsive user interface.";
+            frontendColumn.classList.remove('active');
+        }
+    });
+
+    // Backend selection
+    document.getElementById('backendType').addEventListener('change', function () {
+        const backendInfo = document.getElementById('backend-info');
+        const backendColumn = document.getElementById('backend-column');
+        const selectedValue = this.value;
+
+        if (selectedValue) {
+            backendInfo.textContent = getBackendDescription(selectedValue);
+            backendColumn.classList.add('active');
+        } else {
+            backendInfo.textContent = "Choose a backend framework to handle server-side logic and data processing.";
+            backendColumn.classList.remove('active');
+        }
+    });
+
+    // Database selection
+    document.getElementById('databaseType').addEventListener('change', function () {
+        const databaseInfo = document.getElementById('database-info');
+        const databaseColumn = document.getElementById('database-column');
+        const selectedValue = this.value;
+
+        if (selectedValue) {
+            databaseInfo.textContent = getDatabaseDescription(selectedValue);
+            databaseColumn.classList.add('active');
+        } else {
+            databaseInfo.textContent = "Pick a database to store and manage your application's data efficiently.";
+            databaseColumn.classList.remove('active');
+        }
+    });
+
+    // Helper functions to get descriptions
+    function getFrontendDescription(selectedValue) {
+        switch (selectedValue) {
+            case 'React':
+                return "React is a powerful JavaScript library for building modern, component-based user interfaces.";
+            case 'Vue':
+                return "Vue.js is a progressive framework for building user interfaces with a gentle learning curve.";
+            case 'Angular':
+                return "Angular is a robust framework for building scalable and feature-rich web applications.";
+            case 'Thymeleaf':
+                return "Thymeleaf is a server-side template engine for Java, ideal for server-rendered HTML.";
+            default:
+                return "Select a frontend framework to build a dynamic and responsive user interface.";
+        }
+    }
+
+    function getBackendDescription(selectedValue) {
+        switch (selectedValue) {
+            case 'Spring_Boot':
+                return "Spring Boot is a Java framework for building robust web apps and microservices.";
+            case 'Django':
+                return "Django is a high-level Python framework for rapid development and clean, pragmatic design.";
+            case 'Express':
+                return "Express.js is a minimal and flexible Node.js framework for building web applications and APIs.";
+            case 'Flask':
+                return "Flask is a lightweight Python framework for building small to medium-sized web applications.";
+            default:
+                return "Choose a backend framework to handle server-side logic and data processing.";
+        }
+    }
+
+    function getDatabaseDescription(selectedValue) {
+        switch (selectedValue) {
+            case 'MySQL':
+                return "MySQL is a reliable and widely-used relational database management system.";
+            case 'PostgreSQL':
+                return "PostgreSQL is a powerful, open-source relational database with advanced features.";
+            case 'MongoDB':
+                return "MongoDB is a NoSQL database that stores data in flexible, JSON-like documents.";
+            case 'SQLite':
+                return "SQLite is a lightweight, serverless database ideal for small applications.";
+            default:
+                return "Pick a database to store and manage your application's data efficiently.";
+        }
+    }
+</script>
 </body>
 </html>
