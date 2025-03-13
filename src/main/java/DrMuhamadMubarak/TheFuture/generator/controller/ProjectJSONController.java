@@ -22,7 +22,7 @@ public class ProjectJSONController {
             @RequestParam("entitiesJson") String entitiesJson,
             Model model) {
 
-        return projectEntityGenerationService.processJsonAndGenerateEntities(projectName, entitiesJson, model, "Entities generated successfully from JSON.");
+        return projectEntityGenerationService.processJsonAndGenerateEntities(projectName, entitiesJson, model, "Project Generated Successfully Using Your JSON.");
     }
 
     @PostMapping("/generate-entities-from-prompt")
@@ -35,7 +35,7 @@ public class ProjectJSONController {
 
             String entitiesJson = aiService.generateJsonFromPrompt(prompt).block();
 
-            return projectEntityGenerationService.processJsonAndGenerateEntities(projectName, entitiesJson, model, "Entities generated successfully from JSON.");
+            return projectEntityGenerationService.processJsonAndGenerateEntities(projectName, entitiesJson, model, "Project Generated Successfully Using OpenAi.");
         } catch (Exception e) {
             model.addAttribute("message", "An error occurred while generating JSON from prompt: " + e.getMessage());
             return "error";

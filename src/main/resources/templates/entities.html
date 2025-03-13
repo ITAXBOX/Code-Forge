@@ -28,15 +28,19 @@
             margin: 0;
             padding: 2rem;
             color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .container {
-            max-width: 800px;
+            width: 100%;
+            max-width: 1000px;
             margin: 0 auto;
             background: var(--card);
-            padding: 2.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            padding: 3rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
             animation: slideUp 0.5s ease-out;
         }
 
@@ -51,45 +55,114 @@
             }
         }
 
-        h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
+        .header {
             text-align: center;
+            margin-bottom: 3.5rem;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), #818cf8);
+            border-radius: 3px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
             background: linear-gradient(to right, var(--primary), #818cf8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .primary-option {
+            background: linear-gradient(to bottom right, rgba(79, 70, 229, 0.05), rgba(129, 140, 248, 0.05));
+            border: 2px solid var(--primary);
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .primary-option:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.1), 0 8px 10px -6px rgba(79, 70, 229, 0.1);
+        }
+
+        .manual-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .option-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .option-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
+
+        .option-card form {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .option-card .form-content {
+            flex: 1;
         }
 
         h2 {
             font-size: 1.5rem;
             font-weight: 600;
-            margin-top: 2.5rem;
-            margin-bottom: 1.5rem;
             color: var(--text);
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 0.75rem;
-            position: relative;
+            margin-bottom: 1.5rem;
         }
 
-        h2::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 100px;
-            height: 2px;
-            background: linear-gradient(to right, var(--primary), #818cf8);
+        .option-description {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            text-align: justify;
         }
 
         form {
-            margin-bottom: 2rem;
+            margin: 0;
         }
 
         label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
             font-weight: 500;
             color: var(--text);
             font-size: 0.875rem;
@@ -98,9 +171,9 @@
         input[type="text"],
         textarea {
             width: 100%;
-            padding: 0.75rem 1rem;
+            padding: 0.875rem 1rem;
             border: 1px solid var(--border);
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
             background-color: white;
             color: var(--text);
             font-size: 0.875rem;
@@ -111,7 +184,7 @@
         textarea {
             min-height: 150px;
             resize: vertical;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         input[type="text"]:focus,
@@ -129,17 +202,24 @@
 
         button {
             width: 100%;
-            padding: 0.875rem 1.5rem;
+            padding: 1rem 1.5rem;
             border: none;
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
             background-color: var(--primary);
             color: white;
-            font-size: 0.875rem;
+            font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
             position: relative;
             overflow: hidden;
+            margin-top: auto;
+        }
+
+        .primary-button {
+            font-size: 1.125rem;
+            padding: 1.25rem 2rem;
+            background: linear-gradient(to right, var(--primary), #818cf8);
         }
 
         button::after {
@@ -158,6 +238,10 @@
             background-color: var(--primary-hover);
         }
 
+        .primary-button:hover {
+            background: linear-gradient(to right, var(--primary-hover), #6b7280);
+        }
+
         button:hover::after {
             transform: translate(-50%, -50%) scale(1);
         }
@@ -166,121 +250,153 @@
             transform: translateY(1px);
         }
 
-        /* Form sections with subtle separators */
-        .form-section {
-            position: relative;
-            padding: 1.5rem;
-            background: rgba(248, 250, 252, 0.5);
-            border-radius: 0.5rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .form-section:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
             body {
                 padding: 1rem;
             }
 
             .container {
-                padding: 1.5rem;
+                padding: 2rem;
             }
 
             h1 {
-                font-size: 1.5rem;
+                font-size: 2rem;
             }
 
-            h2 {
-                font-size: 1.25rem;
+            .manual-options {
+                grid-template-columns: 1fr;
             }
 
-            .form-section {
-                padding: 1rem;
+            .primary-button {
+                font-size: 1rem;
+                padding: 1rem 1.5rem;
             }
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+        #loadingContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 1000;
+            display: none;
+        }
+
+        #loadingContainer iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .openai-text {
+            background: linear-gradient(to right, #4f46e5, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>Add Entities</h1>
-
-    <div class="form-section">
-        <form th:action="@{/generate-entities}" method="post">
-            <input type="hidden" id="projectName" name="projectName" th:value="${projectName}"/>
-
-            <label for="entities">Entities (comma-separated):</label>
-            <input
-                    type="text"
-                    id="entities"
-                    name="entities"
-                    placeholder="e.g., User, Product, Order"
-                    required
-            />
-
-            <button type="submit">Generate Entities</button>
-        </form>
+    <div class="header">
+        <h1>Code Forge: From Concept to Code</h1>
+        <p class="subtitle">Take your projects from concept to reality with our robust generation tools, designed to
+            help you innovate faster and smarter.</p>
     </div>
 
-    <h2>Or Add Entities via JSON</h2>
-    <div class="form-section">
-        <form th:action="@{/generate-entities-from-json}" method="post">
-            <input type="hidden" id="projectNameJson" name="projectName" th:value="${projectName}"/>
+    <div class="options-container">
+        <div class="primary-option">
+            <h2>AI-Powered Project Generation</h2>
+            <p class="option-description">Let our AI analyze your project requirements and automatically generate the
+                entire project, including entities, attributes, relationships, and security, using <span
+                        class="openai-text">OpenAI</span>.</p>
+            <form id="auto-generate-form" th:action="@{/generate-entities-from-prompt}" method="post">
+                <input type="hidden" id="projectNamePrompt" name="projectName" th:value="${projectName}"/>
+                <button type="submit" class="primary-button">Generate Entities Automatically</button>
+            </form>
+        </div>
 
-            <label for="entitiesJson">Entities JSON:</label>
-            <textarea
-                    id="entitiesJson"
-                    name="entitiesJson"
-                    placeholder='{
-  "User": {
-    "id": "Long",
-    "name": "String",
-    "email": "String"
-  },
-  "Product": {
-    "id": "Long",
-    "name": "String",
-    "price": "Double"
-  }
-}'
-                    required
-            ></textarea>
+        <div class="manual-options">
+            <div class="option-card">
+                <h2>Quick Entity Creation</h2>
+                <p class="option-description">Quickly create multiple entities by providing their names in a
+                    comma-separated list.<br><br><br>
+                </p>
+                <form th:action="@{/generate-entities}" method="post">
+                    <div class="form-content">
+                        <input type="hidden" id="projectName" name="projectName" th:value="${projectName}"/>
+                        <label for="entities">Entity Names</label>
+                        <input
+                                type="text"
+                                id="entities"
+                                name="entities"
+                                placeholder="e.g., User, Product, Order"
+                                required
+                        />
+                    </div>
+                    <button type="submit">Generate Entities and Proceed to Attributes</button>
+                </form>
+            </div>
 
-            <button type="submit">Generate Entities from JSON</button>
-        </form>
-    </div>
-
-    <h2>Or Generate Entities Automatically</h2>
-    <div class="form-section">
-        <form id="auto-generate-form" th:action="@{/generate-entities-from-prompt}" method="post">
-            <input type="hidden" id="projectNamePrompt" name="projectName" th:value="${projectName}"/>
-            <button type="submit">Generate Entities Automatically</button>
-        </form>
+            <div class="option-card">
+                <h2>Advanced JSON Configuration</h2>
+                <p class="option-description">Define your entire project structure, including entities and their
+                    attributes, using a JSON configuration. The project will be generated based on your
+                    specifications.</p>
+                <form th:action="@{/generate-entities-from-json}" method="post">
+                    <div class="form-content">
+                        <input type="hidden" id="projectNameJson" name="projectName" th:value="${projectName}"/>
+                        <label for="entitiesJson">Entity Configuration</label>
+                        <textarea
+                                id="entitiesJson"
+                                name="entitiesJson"
+                                placeholder='{
+               "name": "User",
+               "attributes": [
+                 {
+                   "attributeName": "id",
+                   "dataType": "Long",
+                   "isPrimaryKey": true,
+                   "isAutoGenerated": true
+                 },
+                 {
+                   "attributeName": "username",
+                   "dataType": "String"
+                 },
+                 {
+                   "attributeName": "password",
+                   "dataType": "String"
+                 },
+                 {
+                   "attributeName": "roles",
+                   "dataType": "Set<Role>=newHashSet<>()",
+                   "relationshipType": "MANY_TO_MANY",
+                   "relatedEntity": "Role",
+                   "isNullable": true
+                 }
+               ]
+             }'
+                                required
+                        ></textarea>
+                    </div>
+                    <button type="submit">Generate Project from JSON</button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
-<
-<div id="loadingContainer"
-     style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000;">
-    <iframe th:src="@{/loading-page}" style="width: 100%; height: 100%; border: none;"></iframe>
+<div id="loadingContainer">
+    <iframe th:src="@{/loading-page}"></iframe>
 </div>
 
 <script>
     document.getElementById('auto-generate-form').addEventListener('submit', function (event) {
         event.preventDefault();
-
         document.getElementById('loadingContainer').style.display = 'block';
-
         setTimeout(() => {
             this.submit();
         }, 10000);
