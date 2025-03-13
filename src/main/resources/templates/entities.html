@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Add Entities</title>
+    <title>Code Forge: Concept to Code</title>
     <style>
         :root {
             --primary: #4f46e5;
@@ -315,7 +315,7 @@
                         class="openai-text">OpenAI</span>.</p>
             <form id="auto-generate-form" th:action="@{/generate-entities-from-prompt}" method="post">
                 <input type="hidden" id="projectNamePrompt" name="projectName" th:value="${projectName}"/>
-                <button type="submit" class="primary-button">Generate Entities Automatically</button>
+                <button type="submit" class="primary-button">Generate Project Automatically</button>
             </form>
         </div>
 
