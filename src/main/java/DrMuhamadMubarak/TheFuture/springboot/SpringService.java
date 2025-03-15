@@ -7,7 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import static DrMuhamadMubarak.TheFuture.utils.Utils.capitalize;
+import static DrMuhamadMubarak.TheFuture.utils.Utils.capitalizeFirstLetter;
 
 public class SpringService {
     public static void generateSpringServiceClass(String projectName, String entityName, List<AttributeDTO> attributes) throws IOException {
@@ -55,7 +55,7 @@ public class SpringService {
             writer.write("        if (optional" + entityName + ".isPresent()) {\n");
             writer.write("            " + entityName + " " + entityName.toLowerCase() + " = optional" + entityName + ".get();\n");
             for (AttributeDTO attribute : attributes) {
-                writer.write("            " + entityName.toLowerCase() + ".set" + capitalize(attribute.getAttributeName()) + "(" + entityName.toLowerCase() + "Details.get" + capitalize(attribute.getAttributeName()) + "());\n");
+                writer.write("            " + entityName.toLowerCase() + ".set" + capitalizeFirstLetter(attribute.getAttributeName()) + "(" + entityName.toLowerCase() + "Details.get" + capitalizeFirstLetter(attribute.getAttributeName()) + "());\n");
             }
             writer.write("            return " + entityName.toLowerCase() + "Repository.save(" + entityName.toLowerCase() + ");\n");
             writer.write("        }\n");

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static DrMuhamadMubarak.TheFuture.utils.Utils.capitalize;
+import static DrMuhamadMubarak.TheFuture.utils.Utils.capitalizeFirstLetter;
 import static DrMuhamadMubarak.TheFuture.utils.Utils.createDirectory;
 
 public class SpringStructure {
@@ -26,12 +26,12 @@ public class SpringStructure {
 
         Files.write(Paths.get(baseDir + "/src/main/resources/application.properties"), getSpringApplicationPropertiesContent(databaseType, projectName).getBytes());
         Files.write(Paths.get(baseDir + "/pom.xml"), getSpringPomXmlContent(projectName, frontendType, databaseType).getBytes());
-        Files.write(Paths.get(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/" + capitalize(projectName) + "Application.java"), getSpringMainClassContent(projectName).getBytes());
+        Files.write(Paths.get(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/" + capitalizeFirstLetter(projectName) + "Application.java"), getSpringMainClassContent(projectName).getBytes());
 
     }
 
     public static String getSpringMainClassContent(String projectName) {
-        String capitalizedProjectName = capitalize(projectName);
+        String capitalizedProjectName = capitalizeFirstLetter(projectName);
         return "package com.example." + projectName.toLowerCase() + ";\n\n" + "import org.springframework.boot.SpringApplication;\n" + "import org.springframework.boot.autoconfigure.SpringBootApplication;\n\n" + "@SpringBootApplication\n" + "public class " + capitalizedProjectName + "Application {\n\n" + "    public static void main(String[] args) {\n" + "        SpringApplication.run(" + capitalizedProjectName + "Application.class, args);\n" + "    }\n" + "}";
     }
 

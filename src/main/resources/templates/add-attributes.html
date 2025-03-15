@@ -370,13 +370,13 @@
             bring your project to life with precision and power. </p>
     </div>
 
-    <div class="form-sections">
-        <div class="form-section">
-            <h2>Add Attributes for <span th:text="${entityName}">Entity</span></h2>
-            <form th:action="@{/save-attributes}" method="post">
-                <input type="hidden" name="projectName" th:value="${projectName}">
-                <input type="hidden" name="entityName" th:value="${entityName}">
+    <form th:action="@{/save-attributes}" method="post">
+        <input type="hidden" name="projectName" th:value="${projectName}">
+        <input type="hidden" name="entityName" th:value="${entityName}">
 
+        <div class="form-sections">
+            <div class="form-section">
+                <h2>Add Attributes for <span th:text="${entityName}">Entity</span></h2>
                 <div class="form-group" style="--delay: 1">
                     <label for="attributeName">Attribute Name</label>
                     <input type="text" id="attributeName" name="attributeName" placeholder="Enter attribute name"
@@ -420,12 +420,10 @@
                         <span class="checkbox-label">Is Auto-Generated?</span>
                     </label>
                 </div>
-            </form>
-        </div>
+            </div>
 
-        <div class="form-section">
-            <h2>Advanced Options</h2>
-            <form th:action="@{/save-attributes}" method="post">
+            <div class="form-section">
+                <h2>Advanced Options</h2>
                 <div class="form-group" style="--delay: 7">
                     <label for="isPrimaryKey">Is Primary Key?</label>
                     <select name="isPrimaryKey" id="isPrimaryKey" onchange="updateNullable()">
@@ -462,14 +460,14 @@
                     <label for="mappedBy">Mapped By</label>
                     <input type="text" id="mappedBy" name="mappedBy" placeholder="Enter mappedBy property">
                 </div>
-
-                <div class="form-actions">
-                    <button type="submit" name="action" value="save" class="save">Save Attribute</button>
-                    <button type="submit" name="action" value="next" class="next">Next Entity</button>
-                </div>
-            </form>
+            </div>
         </div>
-    </div>
+
+        <div class="form-actions">
+            <button type="submit" name="action" value="save" class="save">Save Attribute</button>
+            <button type="submit" name="action" value="next" class="next">Next Entity</button>
+        </div>
+    </form>
 </div>
 
 <script>

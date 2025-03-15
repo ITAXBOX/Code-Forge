@@ -9,7 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static DrMuhamadMubarak.TheFuture.utils.Utils.capitalize;
+import static DrMuhamadMubarak.TheFuture.utils.Utils.capitalizeFirstLetter;
 
 public class ProjectUI {
     public static void generateProjectUI(String projectName, String entityName, List<AttributeDTO> attributes) throws IOException {
@@ -89,7 +89,7 @@ public class ProjectUI {
             writer.write("    <div class=\"controls\">\n");
             for (int i = 0; i < attributes.size(); i++) {
                 writer.write("        <label><input type=\"checkbox\" class=\"toggle-column\" data-column=\"" + i + "\" checked> "
-                             + capitalize(attributes.get(i).getAttributeName()) + "</label>\n");
+                             + capitalizeFirstLetter(attributes.get(i).getAttributeName()) + "</label>\n");
             }
             writer.write("    </div>\n");
 
@@ -98,7 +98,7 @@ public class ProjectUI {
             writer.write("        <thead>\n");
             writer.write("            <tr>\n");
             for (AttributeDTO attribute : attributes) {
-                writer.write("                <th>" + capitalize(attribute.getAttributeName()) + "</th>\n");
+                writer.write("                <th>" + capitalizeFirstLetter(attribute.getAttributeName()) + "</th>\n");
             }
             writer.write("            </tr>\n");
             writer.write("        </thead>\n");
@@ -211,7 +211,7 @@ public class ProjectUI {
 
             // Dynamically create headers based on attributes
             for (AttributeDTO attribute : attributes) {
-                writer.write("                    <th>" + capitalize(attribute.getAttributeName()) + "</th>\n");
+                writer.write("                    <th>" + capitalizeFirstLetter(attribute.getAttributeName()) + "</th>\n");
             }
 
             writer.write("                </tr>\n");
