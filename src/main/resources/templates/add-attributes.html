@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,27 +29,25 @@
             background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
             min-height: 100vh;
             margin: 0;
+            padding: 2rem;
             color: var(--text);
-        }
-
-        header {
-            background: linear-gradient(to right, var(--primary), #818cf8);
-            color: white;
-            padding: 1.5rem;
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: 600;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 2rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
             background: var(--card);
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 3rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
             animation: slideUp 0.5s ease-out;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
         }
 
         @keyframes slideUp {
@@ -63,10 +61,46 @@
             }
         }
 
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), #818cf8);
+            border-radius: 3px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
         h2 {
             font-size: 1.5rem;
+            font-weight: 600;
             color: var(--text);
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             padding-bottom: 0.75rem;
             border-bottom: 2px solid var(--border);
             position: relative;
@@ -80,6 +114,19 @@
             width: 100px;
             height: 2px;
             background: linear-gradient(to right, var(--primary), #818cf8);
+        }
+
+        .form-sections {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .form-section {
+            flex: 1;
+            background: var(--background);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
 
         .form-group {
@@ -101,31 +148,51 @@
 
         label {
             display: block;
+            margin-bottom: 0.75rem;
             font-weight: 500;
-            margin-bottom: 0.5rem;
             color: var(--text);
             font-size: 0.875rem;
         }
 
         input[type="text"],
         input[type="number"],
-        select {
+        select,
+        textarea {
             width: 100%;
-            padding: 0.75rem 1rem;
+            padding: 0.875rem 1rem;
             border: 1px solid var(--border);
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            color: var(--text);
+            border-radius: 0.75rem;
             background-color: white;
+            color: var(--text);
+            font-size: 0.875rem;
             transition: all 0.2s ease;
+            margin-bottom: 1rem;
         }
 
         input[type="text"]:focus,
         input[type="number"]:focus,
-        select:focus {
+        select:focus,
+        textarea:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px var(--focus-ring);
+        }
+
+        input[type="text"]::placeholder,
+        input[type="number"]::placeholder,
+        textarea::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
 
         .checkbox-wrapper {
@@ -192,6 +259,15 @@
             user-select: none;
         }
 
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.25rem;
+            padding-right: 2.5rem;
+        }
+
         .form-actions {
             display: flex;
             gap: 1rem;
@@ -202,10 +278,12 @@
 
         button {
             flex: 1;
-            padding: 0.875rem 1.5rem;
+            padding: 1rem 1.5rem;
             border: none;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
+            border-radius: 0.75rem;
+            background-color: var(--primary);
+            color: white;
+            font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -225,13 +303,20 @@
             transition: transform 0.5s ease;
         }
 
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
         button:hover::after {
             transform: translate(-50%, -50%) scale(1);
         }
 
+        button:active {
+            transform: translateY(1px);
+        }
+
         button.save {
             background-color: var(--success);
-            color: white;
         }
 
         button.save:hover {
@@ -240,7 +325,6 @@
 
         button.next {
             background-color: var(--primary);
-            color: white;
         }
 
         button.next:hover {
@@ -251,19 +335,21 @@
             display: none;
         }
 
-        select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 1.25rem;
-            padding-right: 2.5rem;
-        }
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
 
-        @media (max-width: 640px) {
             .container {
-                margin: 1rem;
-                padding: 1.5rem;
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .form-sections {
+                flex-direction: column;
             }
 
             .form-actions {
@@ -274,107 +360,116 @@
                 width: 100%;
             }
         }
-
-        .disabled-field {
-            background-color: #f3f4f6;
-            cursor: not-allowed;
-            color: var(--text-secondary);
-        }
     </style>
 </head>
 <body>
-<header th:text="${entityName}">Entity Name</header>
 <div class="container">
-    <h2>Add Attributes for <span th:text="${entityName}">Entity</span></h2>
-    <form th:action="@{/save-attributes}" method="post">
-        <input type="hidden" name="projectName" th:value="${projectName}">
-        <input type="hidden" name="entityName" th:value="${entityName}">
+    <div class="header">
+        <h1>Code Forge: Shaping Your Entity</h1>
+        <p class="subtitle">Craft the blueprint of your <span th:text="${entityName}">Entity</span> attributes that
+            bring your project to life with precision and power. </p>
+    </div>
 
-        <div class="form-group" style="--delay: 1">
-            <label for="attributeName">Attribute Name</label>
-            <input type="text" id="attributeName" name="attributeName" required>
+    <div class="form-sections">
+        <div class="form-section">
+            <h2>Add Attributes for <span th:text="${entityName}">Entity</span></h2>
+            <form th:action="@{/save-attributes}" method="post">
+                <input type="hidden" name="projectName" th:value="${projectName}">
+                <input type="hidden" name="entityName" th:value="${entityName}">
+
+                <div class="form-group" style="--delay: 1">
+                    <label for="attributeName">Attribute Name</label>
+                    <input type="text" id="attributeName" name="attributeName" placeholder="Enter attribute name"
+                           required>
+                </div>
+
+                <div class="form-group" style="--delay: 2">
+                    <label for="dataType">Data Type</label>
+                    <select name="dataType" id="dataType" onchange="updateDataType()" required>
+                        <option value="String">String</option>
+                        <option value="Long">Long</option>
+                        <option value="Integer">Integer</option>
+                        <option value="Boolean">Boolean</option>
+                        <option value="Date">Date</option>
+                        <option value="Double">Double</option>
+                        <option value="Custom">Custom</option>
+                    </select>
+                </div>
+
+                <div class="form-group hidden" style="--delay: 3" id="customDataTypeGroup">
+                    <label for="customDataType">Custom Data Type</label>
+                    <input type="text" id="customDataType" name="customDataType"
+                           placeholder="e.g., User | You can add =New HashSet<>() for example for initialization">
+                </div>
+
+                <div class="form-group" style="--delay: 4">
+                    <label for="dataSize">Data Size (Optional)</label>
+                    <input type="number" id="dataSize" name="dataSize" placeholder="e.g., 255">
+                </div>
+
+                <div class="form-group" style="--delay: 5">
+                    <label for="defaultValue">Default Value (Optional)</label>
+                    <input type="text" id="defaultValue" name="defaultValue" placeholder="e.g., 'N/A' or 0">
+                </div>
+
+                <div class="form-group" style="--delay: 6">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="isAutoGenerated" name="isAutoGenerated"
+                               onchange="toggleAutoGeneration(this)">
+                        <div class="custom-checkbox"></div>
+                        <span class="checkbox-label">Is Auto-Generated?</span>
+                    </label>
+                </div>
+            </form>
         </div>
 
-        <div class="form-group" style="--delay: 2">
-            <label for="dataType">Data Type</label>
-            <select name="dataType" id="dataType" onchange="updateDataType()" required>
-                <option value="String">String</option>
-                <option value="Long">Long</option>
-                <option value="Integer">Integer</option>
-                <option value="Boolean">Boolean</option>
-                <option value="Date">Date</option>
-                <option value="Double">Double</option>
-                <option value="Custom">Custom</option>
-            </select>
-        </div>
+        <div class="form-section">
+            <h2>Advanced Options</h2>
+            <form th:action="@{/save-attributes}" method="post">
+                <div class="form-group" style="--delay: 7">
+                    <label for="isPrimaryKey">Is Primary Key?</label>
+                    <select name="isPrimaryKey" id="isPrimaryKey" onchange="updateNullable()">
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                    </select>
+                </div>
 
-        <div class="form-group hidden" style="--delay: 3" id="customDataTypeGroup">
-            <label for="customDataType">Custom Data Type</label>
-            <input type="text" id="customDataType" name="customDataType"
-                   placeholder="e.g., User | You can add =New HashSet<>() for example for initialization">
-        </div>
+                <div class="form-group" style="--delay: 8">
+                    <label for="isNullable">Is Nullable?</label>
+                    <select name="isNullable" id="isNullable">
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
 
-        <div class="form-group" style="--delay: 4">
-            <label for="dataSize">Data Size (Optional)</label>
-            <input type="number" id="dataSize" name="dataSize" placeholder="e.g., 255">
-        </div>
+                <div class="form-group" style="--delay: 9">
+                    <label for="relationshipType">Relationship Type (Optional)</label>
+                    <select name="relationshipType" id="relationshipType">
+                        <option value="NONE">None</option>
+                        <option value="ONE_TO_ONE">One-to-One</option>
+                        <option value="ONE_TO_MANY">One-to-Many</option>
+                        <option value="MANY_TO_ONE">Many-to-One</option>
+                        <option value="MANY_TO_MANY">Many-to-Many</option>
+                    </select>
+                </div>
 
-        <div class="form-group" style="--delay: 5">
-            <label for="defaultValue">Default Value (Optional)</label>
-            <input type="text" id="defaultValue" name="defaultValue" placeholder="e.g., 'N/A' or 0">
-        </div>
+                <div class="form-group hidden" style="--delay: 10" id="relatedEntityGroup">
+                    <label for="relatedEntity">Related Entity</label>
+                    <input type="text" id="relatedEntity" name="relatedEntity" placeholder="Enter related entity name">
+                </div>
 
-        <div class="form-group" style="--delay: 6">
-            <label class="checkbox-wrapper">
-                <input type="checkbox" id="isAutoGenerated" name="isAutoGenerated"
-                       onchange="toggleAutoGeneration(this)">
-                <div class="custom-checkbox"></div>
-                <span class="checkbox-label">Is Auto-Generated?</span>
-            </label>
-        </div>
+                <div class="form-group hidden" style="--delay: 11" id="mappedByGroup">
+                    <label for="mappedBy">Mapped By</label>
+                    <input type="text" id="mappedBy" name="mappedBy" placeholder="Enter mappedBy property">
+                </div>
 
-        <div class="form-group" style="--delay: 7">
-            <label for="isPrimaryKey">Is Primary Key?</label>
-            <select name="isPrimaryKey" id="isPrimaryKey" onchange="updateNullable()">
-                <option value="false">No</option>
-                <option value="true">Yes</option>
-            </select>
+                <div class="form-actions">
+                    <button type="submit" name="action" value="save" class="save">Save Attribute</button>
+                    <button type="submit" name="action" value="next" class="next">Next Entity</button>
+                </div>
+            </form>
         </div>
-
-        <div class="form-group" style="--delay: 8">
-            <label for="isNullable">Is Nullable?</label>
-            <select name="isNullable" id="isNullable">
-                <option value="true">Yes</option>
-                <option value="false">No</option>
-            </select>
-        </div>
-
-        <div class="form-group" style="--delay: 9">
-            <label for="relationshipType">Relationship Type (Optional)</label>
-            <select name="relationshipType" id="relationshipType">
-                <option value="NONE">None</option>
-                <option value="ONE_TO_ONE">One-to-One</option>
-                <option value="ONE_TO_MANY">One-to-Many</option>
-                <option value="MANY_TO_ONE">Many-to-One</option>
-                <option value="MANY_TO_MANY">Many-to-Many</option>
-            </select>
-        </div>
-
-        <div class="form-group hidden" style="--delay: 10" id="relatedEntityGroup">
-            <label for="relatedEntity">Related Entity</label>
-            <input type="text" id="relatedEntity" name="relatedEntity" placeholder="Enter related entity name">
-        </div>
-
-        <div class="form-group hidden" style="--delay: 11" id="mappedByGroup">
-            <label for="mappedBy">Mapped By</label>
-            <input type="text" id="mappedBy" name="mappedBy" placeholder="Enter mappedBy property">
-        </div>
-
-        <div class="form-actions">
-            <button type="submit" name="action" value="save" class="save">Save Attribute</button>
-            <button type="submit" name="action" value="next" class="next">Next Entity</button>
-        </div>
-    </form>
+    </div>
 </div>
 
 <script>
