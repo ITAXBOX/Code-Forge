@@ -15,7 +15,7 @@ import static DrMuhamadMubarak.TheFuture.generator.builder.AttributeBuilder.crea
 
 @Controller
 @AllArgsConstructor
-public class ProjectAttributeController {
+public class AttributeWorkflowController {
 
     private final ProjectAttributeGenerationService attributeService;
 

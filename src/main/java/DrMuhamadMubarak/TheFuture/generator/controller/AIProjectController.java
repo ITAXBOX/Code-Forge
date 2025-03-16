@@ -12,21 +12,12 @@ import static DrMuhamadMubarak.TheFuture.generator.ai.ThePrompt.PROMPT_TEMPLATE;
 
 @Controller
 @AllArgsConstructor
-public class ProjectJSONController {
+public class AIProjectController {
     private final ProjectEntityGenerationService projectEntityGenerationService;
     private final AIService aiService;
 
-    @PostMapping("/generate-entities-from-json")
-    public String generateEntitiesFromJson(
-            @RequestParam("projectName") String projectName,
-            @RequestParam("entitiesJson") String entitiesJson,
-            Model model) {
-
-        return projectEntityGenerationService.processJsonAndGenerateEntities(projectName, entitiesJson, model, "Project Generated Successfully Using Your JSON.");
-    }
-
     @PostMapping("/generate-entities-from-prompt")
-    public String generateEntitiesFromPrompt(
+    public String generateProjectFromPrompt(
             @RequestParam("projectName") String projectName,
             Model model) {
 

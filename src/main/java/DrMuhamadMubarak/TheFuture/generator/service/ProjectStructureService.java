@@ -7,7 +7,7 @@ import java.io.IOException;
 
 
 @Service
-public class ProjectGeneratorService {
+public class ProjectStructureService {
 
     public void generateProjectStructure(String projectName, String frontendType, String backendType, String databaseType) throws IOException {
         SpringStructure.generateSpringBootProjectStructure(projectName, frontendType, databaseType);
