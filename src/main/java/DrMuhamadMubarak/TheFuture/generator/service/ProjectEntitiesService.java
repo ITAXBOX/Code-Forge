@@ -1,7 +1,6 @@
 package DrMuhamadMubarak.TheFuture.generator.service;
 
 import DrMuhamadMubarak.TheFuture.generator.dto.AttributeDTO;
-import DrMuhamadMubarak.TheFuture.generator.ui.ProjectUI;
 import DrMuhamadMubarak.TheFuture.springboot.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -62,10 +61,6 @@ public class ProjectEntitiesService {
 
     public void generateDataInitializerClass(String projectName) {
         SpringDataInitializer.generateDataInitializerClass(projectName);
-    }
-
-    public void generateUI(String projectName, String entityName, List<AttributeDTO> attributes) throws IOException {
-        ProjectUI.generateProjectUI(projectName, entityName, attributes);
     }
 
     public boolean isLastEntity(String entityName) {

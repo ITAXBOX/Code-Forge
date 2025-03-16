@@ -61,7 +61,6 @@ public class ProjectEntityGenerationService {
 
             projectEntitiesService.generateServiceClass(projectName, entityName, projectAttributesService.getAttributes());
             projectEntitiesService.generateControllerClass(projectName, entityName);
-            projectEntitiesService.generateUI(projectName, entityName, projectAttributesService.getAttributes());
 
             projectAttributesService.clearAttributes();
         }

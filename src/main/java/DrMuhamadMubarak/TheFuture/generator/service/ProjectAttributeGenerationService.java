@@ -35,7 +35,6 @@ public class ProjectAttributeGenerationService {
     private String handleNextAction(String projectName, String entityName, Model model) throws IOException {
         projectEntitiesService.generateServiceClass(projectName, entityName, projectAttributesService.getAttributes());
         projectEntitiesService.generateControllerClass(projectName, entityName);
-        projectEntitiesService.generateUI(projectName, entityName, projectAttributesService.getAttributes());
 
         projectAttributesService.clearAttributes();
 
