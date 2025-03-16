@@ -1,7 +1,7 @@
 package DrMuhamadMubarak.TheFuture.generator.controller;
 
 import DrMuhamadMubarak.TheFuture.generator.dto.AttributeDTO;
-import DrMuhamadMubarak.TheFuture.generator.service.ProjectAttributeGenerationService;
+import DrMuhamadMubarak.TheFuture.generator.service.AttributeManagerService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +17,7 @@ import static DrMuhamadMubarak.TheFuture.generator.builder.AttributeBuilder.crea
 @AllArgsConstructor
 public class AttributeWorkflowController {
 
-    private final ProjectAttributeGenerationService attributeService;
+    private final AttributeManagerService attributeService;
 
     @GetMapping("/add-attributes")
     public String showAddAttributesPage(@RequestParam("projectName") String projectName,

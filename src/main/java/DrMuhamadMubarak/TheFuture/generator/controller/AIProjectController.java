@@ -1,7 +1,7 @@
 package DrMuhamadMubarak.TheFuture.generator.controller;
 
 import DrMuhamadMubarak.TheFuture.generator.ai.AIService;
-import DrMuhamadMubarak.TheFuture.generator.service.ProjectEntityGenerationService;
+import DrMuhamadMubarak.TheFuture.generator.service.EntityJsonProcessorService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +13,7 @@ import static DrMuhamadMubarak.TheFuture.generator.ai.ThePrompt.PROMPT_TEMPLATE;
 @Controller
 @AllArgsConstructor
 public class AIProjectController {
-    private final ProjectEntityGenerationService projectEntityGenerationService;
+    private final EntityJsonProcessorService entityJsonProcessorService;
     private final AIService aiService;
 
     @PostMapping("/generate-entities-from-prompt")
@@ -26,7 +26,7 @@ public class AIProjectController {
 
             String entitiesJson = aiService.generateJsonFromPrompt(prompt).block();
 
-            return projectEntityGenerationService.processJsonAndGenerateEntities(projectName, entitiesJson, model, "Project Generated Successfully Using OpenAi.");
+            return entityJsonProcessorService.processJsonAndGenerateEntities(projectName, entitiesJson, model, "Project Generated Successfully Using OpenAi.");
         } catch (Exception e) {
             model.addAttribute("message", "An error occurred while generating JSON from prompt: " + e.getMessage());
             return "error";

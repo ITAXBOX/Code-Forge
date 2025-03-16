@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @Service
-public class ProjectEntitiesService {
+public class EntityCodeGeneratorService {
     private String[] entities;
 
     public String[] processEntities(String entitiesParam) throws IllegalArgumentException {

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class ProjectAttributesService {
+public class AttributeStorageService {
 
     private final List<AttributeDTO> attributes = new ArrayList<>();
 

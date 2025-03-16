@@ -1,7 +1,7 @@
 package DrMuhamadMubarak.TheFuture.generator.controller;
 
-import DrMuhamadMubarak.TheFuture.generator.service.ProjectEntitiesService;
-import DrMuhamadMubarak.TheFuture.generator.service.ProjectEntityGenerationService;
+import DrMuhamadMubarak.TheFuture.generator.service.EntityCodeGeneratorService;
+import DrMuhamadMubarak.TheFuture.generator.service.EntityJsonProcessorService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,17 +11,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @AllArgsConstructor
 public class ProjectWorkflowController {
-    private final ProjectEntitiesService projectEntitiesService;
-    private final ProjectEntityGenerationService projectEntityGenerationService;
+    private final EntityCodeGeneratorService entityCodeGeneratorService;
+    private final EntityJsonProcessorService entityJsonProcessorService;
 
     @PostMapping("/generate-entities")
     public String generateEntities(@RequestParam("projectName") String projectName,
                                    @RequestParam("entities") String entitiesParam,
                                    Model model) {
         try {
-            String[] entities = projectEntitiesService.processEntities(entitiesParam);
-            projectEntitiesService.generateEntityClasses(projectName, entities);
-            projectEntitiesService.generateRepositoryClasses(projectName, entities);
+            String[] entities = entityCodeGeneratorService.processEntities(entitiesParam);
+            entityCodeGeneratorService.generateEntityClasses(projectName, entities);
+            entityCodeGeneratorService.generateRepositoryClasses(projectName, entities);
 
             model.addAttribute("projectName", projectName);
             model.addAttribute("entityName", entities[0]);  // Start with the first entity
@@ -38,6 +38,6 @@ public class ProjectWorkflowController {
             @RequestParam("entitiesJson") String entitiesJson,
             Model model) {
 
-        return projectEntityGenerationService.processJsonAndGenerateEntities(projectName, entitiesJson, model, "Project Generated Successfully Using Your JSON.");
+        return entityJsonProcessorService.processJsonAndGenerateEntities(projectName, entitiesJson, model, "Project Generated Successfully Using Your JSON.");
     }
 }

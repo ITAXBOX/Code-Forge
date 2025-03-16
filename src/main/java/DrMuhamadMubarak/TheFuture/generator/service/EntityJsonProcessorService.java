@@ -11,10 +11,10 @@ import java.io.IOException;
 
 @Service
 @AllArgsConstructor
-public class ProjectEntityGenerationService {
+public class EntityJsonProcessorService {
 
-    private final ProjectEntitiesService projectEntitiesService;
-    private final ProjectAttributesService projectAttributesService;
+    private final EntityCodeGeneratorService entityCodeGeneratorService;
+    private final AttributeStorageService attributeStorageService;
 
     public String processJsonAndGenerateEntities(String projectName, String json, Model model, String successMessage) {
         try {
@@ -51,26 +51,26 @@ public class ProjectEntityGenerationService {
                 return;
             }
 
-            projectEntitiesService.generateEntityClass(projectName, entityName);
-            projectEntitiesService.generateRepositoryClass(projectName, entityName);
+            entityCodeGeneratorService.generateEntityClass(projectName, entityName);
+            entityCodeGeneratorService.generateRepositoryClass(projectName, entityName);
 
             for (JsonNode attributeNode : attributesNode) {
                 AttributeDTO attribute = objectMapper.treeToValue(attributeNode, AttributeDTO.class);
-                projectAttributesService.addAttributesToEntity(projectName, entityName, attribute);
+                attributeStorageService.addAttributesToEntity(projectName, entityName, attribute);
             }
 
-            projectEntitiesService.generateServiceClass(projectName, entityName, projectAttributesService.getAttributes());
-            projectEntitiesService.generateControllerClass(projectName, entityName);
+            entityCodeGeneratorService.generateServiceClass(projectName, entityName, attributeStorageService.getAttributes());
+            entityCodeGeneratorService.generateControllerClass(projectName, entityName);
 
-            projectAttributesService.clearAttributes();
+            attributeStorageService.clearAttributes();
         }
 
-        projectEntitiesService.generateSecurityClass(projectName);
-        projectEntitiesService.generateDataInitializerClass(projectName);
+        entityCodeGeneratorService.generateSecurityClass(projectName);
+        entityCodeGeneratorService.generateDataInitializerClass(projectName);
 
-        projectEntitiesService.generateAuthenticationServiceClass(projectName);
-        projectEntitiesService.generateAuthenticationControllerClass(projectName);
+        entityCodeGeneratorService.generateAuthenticationServiceClass(projectName);
+        entityCodeGeneratorService.generateAuthenticationControllerClass(projectName);
 
-        projectEntitiesService.generateUtils(projectName);
+        entityCodeGeneratorService.generateUtils(projectName);
     }
 }
