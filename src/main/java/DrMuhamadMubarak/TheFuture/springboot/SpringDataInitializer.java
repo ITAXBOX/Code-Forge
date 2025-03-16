@@ -40,11 +40,11 @@ public class SpringDataInitializer {
                         @Override
                         public void run(String... args) throws Exception {
                             // Initialize roles
-                            Role adminRole = roleRepository.findByName("ADMIN")
-                                .orElseGet(() -> roleRepository.save(new Role("ADMIN")));
+                            Role adminRole = roleRepository.findByName("ROLE_ADMIN")
+                                .orElseGet(() -> roleRepository.save(new Role("ROLE_ADMIN")));
                     
-                            roleRepository.findByName("USER")
-                                            .orElseGet(() -> roleRepository.save(new Role("USER")));
+                            roleRepository.findByName("ROLE_USER")
+                                            .orElseGet(() -> roleRepository.save(new Role("ROLE_USER")));
                     
                             // Initialize admin user
                             if (!userRepository.existsByUsername("admin")) {

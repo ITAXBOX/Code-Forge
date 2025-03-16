@@ -18,6 +18,7 @@ public class SpringStructure {
         createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/services");
         createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/security");
         createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/config");
+        createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/config/jwt");
         createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/init");
 
         createDirectory(baseDir + "/src/main/resources/templates");
@@ -90,6 +91,26 @@ public class SpringStructure {
                             <groupId>com.mysql</groupId>
                             <artifactId>mysql-connector-j</artifactId>
                             <scope>runtime</scope>
+                        </dependency>
+                        <dependency>
+                            <groupId>me.paulschwarz</groupId>
+                            <artifactId>spring-dotenv</artifactId>
+                            <version>4.0.0</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>io.jsonwebtoken</groupId>
+                            <artifactId>jjwt-api</artifactId>
+                            <version>0.12.6</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>io.jsonwebtoken</groupId>
+                            <artifactId>jjwt-impl</artifactId>
+                            <version>0.12.6</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>io.jsonwebtoken</groupId>
+                            <artifactId>jjwt-jackson</artifactId>
+                            <version>0.12.6</version>
                         </dependency>
                     </dependencies>
                     <build>

@@ -45,6 +45,7 @@ public class ProjectEntitiesService {
 
     public void generateServiceClass(String projectName, String entityName, List<AttributeDTO> attributes) throws IOException {
         SpringService.generateSpringServiceClass(projectName, entityName, attributes);
+        SpringService.generateAuthenticationServiceClass(projectName);
     }
 
     public void generateControllerClass(String projectName, String entityName) throws IOException {
@@ -61,6 +62,10 @@ public class ProjectEntitiesService {
 
     public void generateDataInitializerClass(String projectName) {
         SpringDataInitializer.generateDataInitializerClass(projectName);
+    }
+
+    public void generateUtils(String projectName) throws IOException {
+        SpringUtils.generateUtils(projectName);
     }
 
     public boolean isLastEntity(String entityName) {

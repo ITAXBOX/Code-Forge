@@ -42,6 +42,7 @@ public class ProjectAttributeGenerationService {
             projectEntitiesService.generateSecurityClass(projectName);
             projectEntitiesService.generateDataInitializerClass(projectName);
             projectEntitiesService.generateAuthenticationControllerClass(projectName);
+            projectEntitiesService.generateUtils(projectName);
 
             model.addAttribute("message", "Project Generated Successfully.");
             return "result";

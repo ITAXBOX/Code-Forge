@@ -5,6 +5,8 @@ import DrMuhamadMubarak.TheFuture.generator.dto.AttributeDTO;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 import static DrMuhamadMubarak.TheFuture.utils.Utils.capitalizeFirstLetter;
@@ -69,5 +71,67 @@ public class SpringService {
 
             writer.write("}\n");
         }
+    }
+
+    public static void generateAuthenticationServiceClass(String projectName) throws IOException {
+        String baseDir = "./" + projectName + "/src/main/java/com/example/" + projectName.toLowerCase() + "/services";
+        String className = "AuthenticationService";
+        String classContent = String.format("""
+                package com.example.%s.services;
+                
+                import com.example.%s.models.User;
+                import com.example.%s.config.jwt.JwtService;
+                import com.example.%s.security.SecurityUser;
+                import com.example.%s.config.util.CookieUtil;
+                import jakarta.servlet.http.HttpServletResponse;
+                import org.springframework.beans.factory.annotation.Value;
+                import org.springframework.security.authentication.AuthenticationManager;
+                import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+                import org.springframework.security.core.Authentication;
+                import org.springframework.stereotype.Service;
+                import org.springframework.transaction.annotation.Transactional;
+                
+                @Service
+                @Transactional
+                public class AuthenticationService {
+                
+                    private final AuthenticationManager authenticationManager;
+                    private final UserService userService;
+                    private final JwtService jwtService;
+                
+                    @Value("${JWT_EXPIRATION_TIME}")
+                    private int accessTokenExpiration;
+                
+                    @Value("${JWT_REFRESH_EXPIRATION_TIME}")
+                    private int refreshTokenExpiration;
+                
+                    public AuthenticationService(AuthenticationManager authenticationManager, UserService userService, JwtService jwtService) {
+                        this.authenticationManager = authenticationManager;
+                        this.userService = userService;
+                        this.jwtService = jwtService;
+                    }
+                
+                    public void registerUser(User user) {
+                        userService.createUser(user);
+                    }
+                
+                    public void loginUser(User user, HttpServletResponse response) {
+                        Authentication authentication = authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
+                        );
+                
+                        SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
+                        User authenticatedUser = securityUser.user();
+                
+                        String accessToken = jwtService.generateToken(authenticatedUser);
+                        String refreshToken = jwtService.generateRefreshToken(authenticatedUser);
+                
+                        CookieUtil.addCookie("JWT", accessToken, (accessTokenExpiration / 1000), response);
+                        CookieUtil.addCookie("Refresh_Token", refreshToken, (refreshTokenExpiration / 1000), response);
+                    }
+                }
+                """, projectName.toLowerCase(), projectName.toLowerCase(), projectName.toLowerCase(), projectName.toLowerCase(), projectName.toLowerCase());
+        Files.createDirectories(Paths.get(baseDir));
+        Files.write(Paths.get(baseDir + "/" + className + ".java"), classContent.getBytes());
     }
 }
