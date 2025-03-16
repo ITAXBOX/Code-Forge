@@ -18,7 +18,6 @@ public class Utils {
         Files.createDirectories(Paths.get(path));
     }
 
-
     public static String generateSecureToken() {
         SecureRandom secureRandom = new SecureRandom();
         byte[] tokenBytes = new byte[32]; // 32 bytes = 256 bits

@@ -28,6 +28,10 @@ public class ThePrompt {
                    "dataType": "String"
                  },
                  {
+                   "attributeName": "email",
+                   "dataType": "String"
+                 },
+                 {
                    "attributeName": "password",
                    "dataType": "String"
                  },

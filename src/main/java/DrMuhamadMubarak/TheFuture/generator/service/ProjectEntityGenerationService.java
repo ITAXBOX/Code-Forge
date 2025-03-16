@@ -67,7 +67,10 @@ public class ProjectEntityGenerationService {
 
         projectEntitiesService.generateSecurityClass(projectName);
         projectEntitiesService.generateDataInitializerClass(projectName);
+
+        projectEntitiesService.generateAuthenticationServiceClass(projectName);
         projectEntitiesService.generateAuthenticationControllerClass(projectName);
+
         projectEntitiesService.generateUtils(projectName);
     }
 }

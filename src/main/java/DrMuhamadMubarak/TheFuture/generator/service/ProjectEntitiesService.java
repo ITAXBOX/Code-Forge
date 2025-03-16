@@ -45,6 +45,9 @@ public class ProjectEntitiesService {
 
     public void generateServiceClass(String projectName, String entityName, List<AttributeDTO> attributes) throws IOException {
         SpringService.generateSpringServiceClass(projectName, entityName, attributes);
+    }
+
+    public void generateAuthenticationServiceClass(String projectName) throws IOException {
         SpringService.generateAuthenticationServiceClass(projectName);
     }
 
