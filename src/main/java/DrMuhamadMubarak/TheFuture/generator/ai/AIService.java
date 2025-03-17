@@ -54,11 +54,20 @@ public class AIService {
                 .flatMap(response -> {
                     try {
                         JsonNode rootNode = objectMapper.readTree(response);
-                        JsonNode contentNode = rootNode.path("choices").path(0).path("message").path("content");
 
+                        JsonNode contentNode = rootNode.path("choices").path(0).path("message").path("content");
                         if (contentNode.isMissingNode()) {
                             return Mono.error(new RuntimeException("'content' field is missing in the API response"));
                         }
+
+                        JsonNode usageNode = rootNode.path("usage");
+                        int promptTokens = usageNode.path("prompt_tokens").asInt();
+                        int completionTokens = usageNode.path("completion_tokens").asInt();
+                        int totalTokens = usageNode.path("total_tokens").asInt();
+
+                        System.out.println("Token Usage: Prompt Tokens = " + promptTokens +
+                                           ", Completion Tokens = " + completionTokens +
+                                           ", Total Tokens = " + totalTokens);
 
                         return Mono.just(contentNode.asText());
                     } catch (Exception e) {
@@ -68,4 +77,5 @@ public class AIService {
                 .doOnNext(response -> System.out.println("Extracted JSON: " + response))
                 .doOnError(error -> System.err.println("API Error: " + error.getMessage()));
     }
+
 }
