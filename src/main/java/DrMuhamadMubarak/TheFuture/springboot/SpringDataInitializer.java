@@ -51,6 +51,7 @@ public class SpringDataInitializer {
                                 User admin = new User();
                                 admin.setUsername("admin");
                                 admin.setPassword(passwordEncoder.encode("admin"));
+                                admin.setEmail("admin@example.com");
                                 admin.setRoles(Set.of(adminRole));
                                 userRepository.save(admin);
                             }

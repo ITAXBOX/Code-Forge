@@ -25,7 +25,6 @@ public class SpringRepository {
             repositoryContent.append("    Optional<Role> findByName(String name);\n");
         } else if (entityName.equals("User")) {
             repositoryContent.append("    boolean existsByUsername(String username);\n")
-                    .append("    Optional<User> findByUsername(String username);\n")
                     .append("    Optional<User> findByEmail(String email);\n");
         }
 

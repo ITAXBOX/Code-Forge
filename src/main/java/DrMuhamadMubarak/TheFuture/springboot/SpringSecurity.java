@@ -427,7 +427,10 @@ public class SpringSecurity {
                             }
                 
                             User user = new User();
-                            user.setId(claims.get("id", long.class));
+                            Integer id = claims.get("id", Integer.class);
+                                    if (id != null) {
+                                        user.setId(id.longValue());
+                                    }
                             user.setEmail(claims.get("email", String.class));
                 
                             List<String> roles = claims.get("roles", List.class);
