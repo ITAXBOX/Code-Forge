@@ -38,13 +38,13 @@ public class AIService {
         System.out.println("Prompt: " + prompt);
 
         Map<String, Object> requestBodyMap = Map.of(
-                "model", "gpt-3.5-turbo",
+                "model", "gpt-4o",
                 "messages", List.of(
                         Map.of("role", "system", "content", "You are a helpful AI that generates structured JSON."),
                         Map.of("role", "user", "content", prompt)
                 ),
-                "temperature", 0.7,
-                "max_tokens", 1000
+                "temperature", 0.2,
+                "max_tokens", 2000
         );
 
         return webClient.post()
@@ -69,7 +69,13 @@ public class AIService {
                                            ", Completion Tokens = " + completionTokens +
                                            ", Total Tokens = " + totalTokens);
 
-                        return Mono.just(contentNode.asText());
+                        // Extract the content and clean it
+                        String content = contentNode.asText();
+
+                        // Remove Markdown formatting (e.g., ```json and ```)
+                        String cleanedContent = content.replaceAll("```json|```", "").trim();
+
+                        return Mono.just(cleanedContent);
                     } catch (Exception e) {
                         return Mono.error(new RuntimeException("Failed to parse API response", e));
                     }
@@ -77,5 +83,4 @@ public class AIService {
                 .doOnNext(response -> System.out.println("Extracted JSON: " + response))
                 .doOnError(error -> System.err.println("API Error: " + error.getMessage()));
     }
-
 }
