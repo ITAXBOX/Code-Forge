@@ -53,4 +53,9 @@ public class ProjectStructureController {
     public String loadingPage() {
         return "loading-page";
     }
+
+    @GetMapping("/start")
+    public String start() {
+        return "start";
+    }
 }

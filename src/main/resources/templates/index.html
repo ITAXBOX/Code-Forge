@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,12 +7,16 @@
     <style>
         :root {
             --primary: #4f46e5;
-            --primary-hover: #4338ca;
+            --primary-light: #818cf8;
+            --primary-dark: #4338ca;
+            --accent: #06b6d4;
             --background: #f8fafc;
             --card: #ffffff;
             --text: #1f2937;
             --text-secondary: #64748b;
             --border: #e2e8f0;
+            --gradient-start: #4f46e5;
+            --gradient-end: #06b6d4;
         }
 
         * {
@@ -23,429 +27,834 @@
         }
 
         body {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Navigation */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .logo span {
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .logo svg {
+            width: 2rem;
+            height: 2rem;
+            fill: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            transition: color 0.2s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a:hover::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            border-radius: 2px;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            padding: 6rem 0 8rem;
+            overflow: hidden;
+        }
+
+        .hero-content {
             display: flex;
             flex-direction: column;
-        }
-
-        @keyframes shimmer {
-            0% {
-                background-position: 200% 0;
-            }
-            100% {
-                background-position: -200% 0;
-            }
-        }
-
-        .header {
-            background: linear-gradient(90deg, var(--primary), #818cf8);
-            padding: 2.5rem;
-            color: white;
+            align-items: center;
             text-align: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.75rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+        }
+
+        .hero-illustration {
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .hero-illustration::before {
+            content: '';
+            position: absolute;
+            width: 120vw;
+            height: 120vw;
+            top: -60vw;
+            left: -10vw;
+            background: radial-gradient(circle, rgba(79, 70, 229, 0.05) 0%, rgba(6, 182, 212, 0.05) 50%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        /* Features */
+        .features {
+            padding: 6rem 0;
+            background-color: var(--card);
             position: relative;
             overflow: hidden;
         }
 
-        .header::before {
+        .features::before {
             content: '';
+            position: absolute;
+            top: -5rem;
+            left: 0;
+            right: 0;
+            height: 10rem;
+            background: linear-gradient(to bottom right, var(--background) 49.5%, var(--card) 50%);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .section-header p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 3.5rem;
+            height: 3.5rem;
+            background: linear-gradient(to bottom right, var(--primary-light), var(--primary));
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-icon svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            fill: white;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            flex-grow: 1;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 6rem 0;
+            position: relative;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .step-number {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background: linear-gradient(to bottom right, var(--primary), var(--primary-dark));
+            color: white;
+            font-weight: 700;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .step-number::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -100%;
+            height: 2px;
+            width: 100%;
+            background: linear-gradient(to right, var(--primary), transparent);
+        }
+
+        .step:last-child .step-number::after {
+            display: none;
+        }
+
+        .step h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+        }
+
+        .step p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Tech Stack */
+        .tech-stack {
+            padding: 6rem 0;
+            background-color: var(--card);
+            position: relative;
+        }
+
+        .tech-stack::before {
+            content: '';
+            position: absolute;
+            top: -5rem;
+            left: 0;
+            right: 0;
+            height: 10rem;
+            background: linear-gradient(to bottom left, var(--background) 49.5%, var(--card) 50%);
+        }
+
+        .tech-categories {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .tech-category {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .tech-category:hover {
+            transform: translateY(-5px);
+        }
+
+        .tech-category h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .tech-logos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .tech-logo {
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: var(--background);
+            padding: 0.5rem;
+            transition: transform 0.2s ease;
+        }
+
+        .tech-logo:hover {
+            transform: scale(1.1);
+        }
+
+        .tech-logo img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 8rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 2;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .cta h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .cta p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+        }
+
+        .cta-bg {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.1) 50%, transparent 52%);
-            background-size: 200% 200%;
-            animation: shimmer 3s infinite linear;
+            background: radial-gradient(circle at 70% 30%, rgba(79, 70, 229, 0.07) 0%, rgba(6, 182, 212, 0.05) 50%, transparent 70%);
+            z-index: 1;
         }
 
-        .header h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-            background: rgba(255, 255, 255, 0.2);
-            -webkit-background-clip: text;
-            background-clip: text;
+        /* Footer */
+        .footer {
+            background-color: #1f2937;
             color: white;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 4rem 0 2rem;
         }
 
-        .header p {
-            font-size: 1.125rem;
-            max-width: 700px;
-            margin: 0 auto;
-            opacity: 0.9;
-        }
-
-        .content {
+        .footer-content {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-            flex-grow: 1;
-        }
-
-        .form-container {
-            background: var(--card);
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 1000px;
-            padding: 2rem;
-            transform: translateY(-1.5rem); /* Reduced from -3rem to -1.5rem */
-            margin-top: 2rem; /* Added margin to push it down further */
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .form-row {
-            display: flex;
+            justify-content: space-between;
             flex-wrap: wrap;
-            gap: 1rem;
-            align-items: flex-start;
+            gap: 3rem;
+            margin-bottom: 3rem;
         }
 
-        .form-group {
+        .footer-logo {
             flex: 1;
-            min-width: 200px;
+            min-width: 250px;
         }
 
-        .form-group.wide {
-            flex: 100%;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--text);
-            font-size: 0.875rem;
-        }
-
-        .input-container {
-            position: relative;
-        }
-
-        input[type="text"],
-        select {
-            width: 100%;
-            padding: 0.875rem 1rem;
-            border: 1px solid var(--border);
-            border-radius: 0.5rem;
-            background-color: white;
-            color: var(--text);
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
-            outline: none;
-        }
-
-        input[type="text"]:focus,
-        select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-
-        select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 1rem;
-            padding-right: 2.5rem;
-        }
-
-        .icon-input {
-            padding-left: 2.5rem;
-        }
-
-        .hint {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-top: 0.375rem;
-        }
-
-        .tech-info {
-            display: flex;
-            gap: 1.5rem;
-            background: linear-gradient(to right, #f9fafb, #f3f4f6);
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .tech-column {
-            flex: 1;
-            background: white;
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .tech-column h3 {
-            color: var(--primary);
-            font-size: 1.25rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .tech-column p {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            line-height: 1.5;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .tech-column.active p {
-            opacity: 1;
-        }
-
-        .action-row {
-            display: flex;
-            justify-content: center;
-            margin-top: 1rem;
-        }
-
-        button {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 0.5rem;
-            padding: 0.875rem 1.75rem;
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .footer-logo h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
         }
 
-        button:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 10px -1px rgba(79, 70, 229, 0.25);
+        .footer-logo svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            fill: white;
         }
 
-        button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px -1px rgba(79, 70, 229, 0.2);
+        .footer-logo p {
+            color: #d1d5db;
+            font-size: 0.95rem;
+            max-width: 300px;
         }
 
-        button svg {
-            width: 1.25rem;
-            height: 1.25rem;
+        .footer-links {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .footer-links h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links a {
+            color: #d1d5db;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .copyright {
+            border-top: 1px solid #374151;
+            padding-top: 2rem;
+            color: #9ca3af;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 991px) {
+            .tech-categories {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .section-header h2, .cta h2 {
+                font-size: 2.25rem;
+            }
         }
 
         @media (max-width: 768px) {
-            .header h1 {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.125rem;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .step-number::after {
+                display: none;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-links {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .container {
+                padding: 0 1.5rem;
+            }
+
+            .hero h1 {
                 font-size: 2rem;
             }
 
-            .header p {
-                font-size: 1rem;
-            }
-
-            .form-container {
-                padding: 1.5rem;
-            }
-
-            .form-row {
-                flex-direction: column;
-            }
-
-            .form-group {
+            .btn {
                 width: 100%;
-            }
-
-            .tech-info {
-                flex-direction: column;
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
-<div class="header">
-    <h1>Code Forge: Automated Project Generator</h1>
-    <p>Build your full-stack application instantly with your preferred technologies</p>
-</div>
-
-<div class="content">
-    <div class="form-container">
-        <form th:action="@{/generate}" method="post">
-            <div class="form-row">
-                <div class="form-group wide">
-                    <label for="projectName">Project Name</label>
-                    <div class="input-container">
-                        <input type="text" id="projectName" name="projectName" class="icon-input" required
-                               placeholder="Enter your project name"/>
-                    </div>
-                    <div class="hint">Choose a meaningful name for your project</div>
-                </div>
-            </div>
-
-            <!-- Three-column tech info section -->
-            <div class="tech-info">
-                <div class="tech-column" id="frontend-column">
-                    <h3>Frontend</h3>
-                    <p id="frontend-info">Select a frontend framework to build a dynamic and responsive user
-                        interface.</p>
-                </div>
-                <div class="tech-column" id="backend-column">
-                    <h3>Backend</h3>
-                    <p id="backend-info">Choose a backend framework to handle server-side logic and data processing.</p>
-                </div>
-                <div class="tech-column" id="database-column">
-                    <h3>Database</h3>
-                    <p id="database-info">Pick a database to store and manage your application's data efficiently.</p>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="frontendType">Frontend Framework</label>
-                    <select id="frontendType" name="frontendType" required>
-                        <option value="">Select Frontend Type</option>
-                        <option value="React">React</option>
-                        <option value="Vue">Vue.js</option>
-                        <option value="Angular">Angular</option>
-                        <option value="Thymeleaf">Thymeleaf (Server-Side Rendering)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="backendType">Backend Framework</label>
-                    <select id="backendType" name="backendType" required>
-                        <option value="">Select Backend Type</option>
-                        <option value="Spring_Boot">Spring Boot (Java)</option>
-                        <option value="Django">Django (Python)</option>
-                        <option value="Express">Express.js (Node)</option>
-                        <option value="Flask">Flask (Python)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="databaseType">Database Type</label>
-                    <select id="databaseType" name="databaseType" required>
-                        <option value="">Select Database Type</option>
-                        <option value="MySQL">MySQL</option>
-                        <option value="PostgreSQL">PostgreSQL</option>
-                        <option value="MongoDB">MongoDB</option>
-                        <option value="SQLite">SQLite</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="action-row">
-                <button type="submit">
-                    Generate Project
-                </button>
-            </div>
-        </form>
+<nav class="navbar container">
+    <div class="logo">
+        <span>Code Forge</span>
     </div>
-</div>
+    <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#tech-stack">Tech Stack</a></li>
+        <li><a href="#cta">Get Started</a></li>
+    </ul>
+</nav>
 
-<script>
-    // Frontend selection
-    document.getElementById('frontendType').addEventListener('change', function () {
-        const frontendInfo = document.getElementById('frontend-info');
-        const frontendColumn = document.getElementById('frontend-column');
-        const selectedValue = this.value;
+<section class="hero">
+    <div class="hero-illustration"></div>
+    <div class="hero-content">
+        <h1>Transform Your Ideas Into Full-Stack Applications Instantly</h1>
+        <p>Code Forge automates the entire development process, from database design to front-end implementation, so you
+            can focus on what matters most—your business logic.</p>
+        <a th:href="@{/start}" class="btn btn-primary">
+            Get Started
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </a>
+    </div>
+</section>
 
-        if (selectedValue) {
-            frontendInfo.textContent = getFrontendDescription(selectedValue);
-            frontendColumn.classList.add('active');
-        } else {
-            frontendInfo.textContent = "Select a frontend framework to build a dynamic and responsive user interface.";
-            frontendColumn.classList.remove('active');
-        }
-    });
+<section class="features" id="features">
+    <div class="container">
+        <div class="section-header">
+            <h2>Powerful Features</h2>
+            <p>Everything you need to build complete applications in minutes instead of weeks</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H5V5h7v12zm7 0h-5V5h5v12z"/>
+                    </svg>
+                </div>
+                <h3>Flexible Entity Creation</h3>
+                <p>Create data models manually with intuitive UI, import from JSON, or let our AI generate them for you
+                    based on your project requirements.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                    </svg>
+                </div>
+                <h3>Full-Stack Technology</h3>
+                <p>Choose from popular frontend frameworks, backend technologies, and databases to create a perfectly
+                    tailored stack for your project.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                    </svg>
+                </div>
+                <h3>Built-in JWT Security</h3>
+                <p>Every project comes with pre-configured JWT authentication and role-based authorization, ensuring
+                    your application is secure from day one.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M7.77 6.76L6.23 5.48.82 12l5.41 6.52 1.54-1.28L3.42 12l4.35-5.24zM7 13h2v-2H7v2zm10-2h-2v2h2v-2zm-6 2h2v-2h-2v2zm6.77-7.52l-1.54 1.28L20.58 12l-4.35 5.24 1.54 1.28L23.18 12l-5.41-6.52z"/>
+                    </svg>
+                </div>
+                <h3>Complete API Generation</h3>
+                <p>Automatically generate controllers, services, and repositories with full CRUD operations for all your
+                    entities, saving weeks of development time.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                    </svg>
+                </div>
+                <h3>Rapid Development</h3>
+                <p>What would take days or weeks to code manually is generated in seconds, dramatically accelerating
+                    your development cycle.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                    </svg>
+                </div>
+                <h3>AI-Powered Assistance</h3>
+                <p>Let our AI analyze your requirements and suggest optimal entity relationships, attribute types, and
+                    database configurations.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-    // Backend selection
-    document.getElementById('backendType').addEventListener('change', function () {
-        const backendInfo = document.getElementById('backend-info');
-        const backendColumn = document.getElementById('backend-column');
-        const selectedValue = this.value;
+<section class="how-it-works" id="how-it-works">
+    <div class="container">
+        <div class="section-header">
+            <h2>How It Works</h2>
+            <p>Generate a complete application in just three simple steps</p>
+        </div>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Select Your Tech Stack</h3>
+                <p>Choose your preferred frontend framework, backend technology, and database from our wide selection of
+                    supported technologies.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Define Your Entities</h3>
+                <p>Add entities and their attributes manually, import from JSON, or let our AI generate them based on
+                    your project description.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Generate & Download</h3>
+                <p>With one click, generate your complete application with all necessary code and download it ready for
+                    deployment.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-        if (selectedValue) {
-            backendInfo.textContent = getBackendDescription(selectedValue);
-            backendColumn.classList.add('active');
-        } else {
-            backendInfo.textContent = "Choose a backend framework to handle server-side logic and data processing.";
-            backendColumn.classList.remove('active');
-        }
-    });
+<section class="tech-stack" id="tech-stack">
+    <div class="container">
+        <div class="section-header">
+            <h2>Supported Technologies</h2>
+            <p>Mix and match from our extensive library of supported technologies</p>
+        </div>
+        <div class="tech-categories">
+            <div class="tech-category">
+                <h3>Frontend</h3>
+                <p>Build dynamic user interfaces with your preferred framework</p>
+                <div class="tech-logos">
+                    <div class="tech-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" alt="React Logo">
+                    </div>
+                    <div class="tech-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/95/Vue.js_Logo_2.svg"
+                             alt="Vue.js Logo">
+                    </div>
+                    <div class="tech-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Angular_full_color_logo.svg"
+                             alt="Angular Logo">
+                    </div>
+                    <div class="tech-logo">
+                        <img src="/logo/Thymeleaf.svg" alt="Thymeleaf Logo">
+                    </div>
+                </div>
+            </div>
+            <div class="tech-category">
+                <h3>Backend</h3>
+                <p>Power your application with robust server-side technologies</p>
+                <div class="tech-logos">
+                    <div class="tech-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Spring_Framework_Logo_2018.svg"
+                             alt="Spring Boot Logo">
+                    </div>
+                    <div class="tech-logo">
+                        <img src="/logo/Django.svg"
+                             alt="Django Logo">
+                    </div>
+                    <div class="tech-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d9/Node.js_logo.svg"
+                             alt="Express Logo">
+                    </div>
+                    <div class="tech-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Flask_logo.svg" alt="Flask Logo">
+                    </div>
+                </div>
+            </div>
+            <div class="tech-category">
+                <h3>Database</h3>
+                <p>Store and manage your data with industry-leading databases</p>
+                <div class="tech-logos">
+                    <div class="tech-logo">
+                        <img src="/logo/MySQL.svg" alt="MySQL Logo">
+                    </div>
+                    <div class="tech-logo">
+                        <img src="/logo/Mongo.svg"
+                             alt="MongoDB Logo">
+                    </div>
+                    <div class="tech-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/29/Postgresql_elephant.svg"
+                             alt="PostgreSQL Logo">
+                    </div>
+                    <div class="tech-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/SQLite370.svg" alt="SQLite Logo">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-    // Database selection
-    document.getElementById('databaseType').addEventListener('change', function () {
-        const databaseInfo = document.getElementById('database-info');
-        const databaseColumn = document.getElementById('database-column');
-        const selectedValue = this.value;
+<section class="cta" id="cta">
+    <div class="cta-bg"></div>
+    <div class="cta-content container">
+        <h2>Ready to Transform Your Ideas into Reality?</h2>
+        <p>Start building your full-stack application today with Code Forge. No setup, no hassle—just pure
+            productivity.</p>
+        <a th:href="@{/start}" class="btn btn-primary">
+            Get Started Now
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </a>
+    </div>
+</section>
 
-        if (selectedValue) {
-            databaseInfo.textContent = getDatabaseDescription(selectedValue);
-            databaseColumn.classList.add('active');
-        } else {
-            databaseInfo.textContent = "Pick a database to store and manage your application's data efficiently.";
-            databaseColumn.classList.remove('active');
-        }
-    });
-
-    // Helper functions to get descriptions
-    function getFrontendDescription(selectedValue) {
-        switch (selectedValue) {
-            case 'React':
-                return "React is a powerful JavaScript library for building modern, component-based user interfaces.";
-            case 'Vue':
-                return "Vue.js is a progressive framework for building user interfaces with a gentle learning curve.";
-            case 'Angular':
-                return "Angular is a robust framework for building scalable and feature-rich web applications.";
-            case 'Thymeleaf':
-                return "Thymeleaf is a server-side template engine for Java, ideal for server-rendered HTML.";
-            default:
-                return "Select a frontend framework to build a dynamic and responsive user interface.";
-        }
-    }
-
-    function getBackendDescription(selectedValue) {
-        switch (selectedValue) {
-            case 'Spring_Boot':
-                return "Spring Boot is a Java framework for building robust web apps and microservices.";
-            case 'Django':
-                return "Django is a high-level Python framework for rapid development and clean, pragmatic design.";
-            case 'Express':
-                return "Express.js is a minimal and flexible Node.js framework for building web applications and APIs.";
-            case 'Flask':
-                return "Flask is a lightweight Python framework for building small to medium-sized web applications.";
-            default:
-                return "Choose a backend framework to handle server-side logic and data processing.";
-        }
-    }
-
-    function getDatabaseDescription(selectedValue) {
-        switch (selectedValue) {
-            case 'MySQL':
-                return "MySQL is a reliable and widely-used relational database management system.";
-            case 'PostgreSQL':
-                return "PostgreSQL is a powerful, open-source relational database with advanced features.";
-            case 'MongoDB':
-                return "MongoDB is a NoSQL database that stores data in flexible, JSON-like documents.";
-            case 'SQLite':
-                return "SQLite is a lightweight, serverless database ideal for small applications.";
-            default:
-                return "Pick a database to store and manage your application's data efficiently.";
-        }
-    }
-</script>
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <h3>
+                    <div class="logo">
+                        <span>Code Forge</span>
+                    </div>
+                </h3>
+                <p>Empowering developers to build better applications faster.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="#tech-stack">Tech Stack</a></li>
+                    <li><a href="#cta">Get Started</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">Tutorials</a></li>
+                    <li><a href="#">API Reference</a></li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Licenses</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 Code Forge. All rights reserved.
+        </div>
+    </div>
+</footer>
 </body>
 </html>
