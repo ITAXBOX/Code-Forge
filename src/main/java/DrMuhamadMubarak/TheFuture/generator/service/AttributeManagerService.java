@@ -19,10 +19,17 @@ public class AttributeManagerService {
             String entityName,
             String action,
             AttributeDTO attribute,
-            Model model) throws IOException {
+            Model model,
+            String frontend,
+            String backend,
+            String database) throws IOException {
 
         attributeStorageService.addAttributesToEntity(projectName, entityName, attribute);
         model.addAttribute("projectName", projectName);
+        model.addAttribute("entityNames", entityCodeGeneratorService.getEntitiesAsList());
+        model.addAttribute("frontendType", frontend);
+        model.addAttribute("backendType", backend);
+        model.addAttribute("databaseType", database);
 
         if ("next".equals(action)) {
             return handleNextAction(projectName, entityName, model);

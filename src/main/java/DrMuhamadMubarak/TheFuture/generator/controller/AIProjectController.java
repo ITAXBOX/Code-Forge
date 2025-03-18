@@ -7,11 +7,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import static DrMuhamadMubarak.TheFuture.generator.ai.ThePrompt.*;
 
 @Controller
 @AllArgsConstructor
+@SessionAttributes({"frontendType", "backendType", "databaseType"})
 public class AIProjectController {
     private final EntityJsonProcessorService entityJsonProcessorService;
     private final AIService aiService;
@@ -31,8 +33,7 @@ public class AIProjectController {
                 return "error";
             }
 
-            // Step 2: Use entity names to generate and validate entity definitions in one
-            // step
+            // Step 2: Use entity names to generate and validate entity definitions
             String entityDefinitionAndFixPrompt = String.format(ENTITY_DEFINITION_AND_FIX_PROMPT, entityNamesJson);
             String fixedEntitiesJson = aiService.generateJsonFromPrompt(entityDefinitionAndFixPrompt).block();
 
@@ -41,9 +42,13 @@ public class AIProjectController {
                 return "error";
             }
 
-            // Step 3: Process the validated JSON and generate entities
+            String frontendType = (String) model.getAttribute("frontendType");
+            String backendType = (String) model.getAttribute("backendType");
+            String databaseType = (String) model.getAttribute("databaseType");
+
+            // Step 3: Process the validated JSON and generate the project
             return entityJsonProcessorService.processJsonAndGenerateEntities(projectName, fixedEntitiesJson, model,
-                    "Project Generated Successfully Using OpenAI.");
+                    frontendType, backendType, databaseType, "Project Generated Successfully Using OpenAI.");
         } catch (Exception e) {
             model.addAttribute("message", "An error occurred while generating JSON from prompt: " + e.getMessage());
             return "error";

@@ -87,4 +87,8 @@ public class EntityCodeGeneratorService {
         }
         return null;
     }
+
+    public List<String> getEntitiesAsList() {
+        return List.of(getEntities());
+    }
 }

@@ -1,162 +1,488 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-  <title>Code Forge: Result Page</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" th:href="@{/css/styles.css}">
-  <style>
-    :root {
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
-      --background: #f8fafc;
-      --card: #ffffff;
-      --text: #1f2937;
-      --text-secondary: #64748b;
-      --border: #e2e8f0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Forge: Project Ready</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --background: #f8fafc;
+            --card: #ffffff;
+            --text: #1f2937;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+        }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: system-ui, -apple-system, sans-serif;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
 
-    body {
-      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-      min-height: 100vh;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    .container {
-      background: var(--card);
-      border-radius: 16px;
-      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-      padding: 2.5rem;
-      width: 100%;
-      max-width: 500px;
-      text-align: center;
-      transition: transform 0.2s ease;
-    }
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
 
-    .container:hover {
-      transform: translateY(-2px);
-    }
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
 
-    h1 {
-      color: var(--text);
-      font-size: 2rem;
-      font-weight: 700;
-      background: linear-gradient(to right, var(--primary), #818cf8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 1.5rem;
-    }
+        .header {
+            background: linear-gradient(90deg, var(--primary), #818cf8);
+            padding: 3rem 2.5rem;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
 
-    h2 {
-      font-size: 1.5rem;
-      color: var(--text);
-      margin-bottom: 1rem;
-      font-weight: 600;
-    }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.1) 50%, transparent 52%);
+            background-size: 200% 200%;
+            animation: shimmer 3s infinite linear;
+        }
 
-    p {
-      font-size: 1rem;
-      color: var(--text-secondary);
-      margin-bottom: 2rem;
-    }
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
 
-    a {
-      text-decoration: none;
-      color: white;
-      background-color: var(--primary);
-      padding: 0.875rem 1.5rem;
-      border-radius: 0.5rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      position: relative;
-      overflow: hidden;
-      display: inline-block;
-    }
+        .header h1 {
+            font-size: 2.75rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.8s ease-out;
+        }
 
-    a::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 300%;
-      height: 300%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
-      transform: translate(-50%, -50%) scale(0);
-      transition: transform 0.5s ease;
-    }
+        .header h2 {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 0.5rem;
+            font-weight: 500;
+            animation: fadeIn 0.8s ease-out 0.2s backwards;
+        }
 
-    a:hover {
-      background-color: var(--primary-hover);
-    }
+        .project-name-banner {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: -2rem auto 2rem auto;
+            max-width: 800px;
+            text-align: center;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.8s ease-out 0.4s backwards;
+        }
 
-    a:hover::after {
-      transform: translate(-50%, -50%) scale(1);
-    }
+        .project-name-banner h3 {
+            font-size: 1.75rem;
+            background: linear-gradient(90deg, var(--primary), #818cf8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.75rem;
+        }
 
-    a:active {
-      transform: translateY(1px);
-    }
+        .project-name-banner p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
 
-    footer {
-      margin-top: 2rem;
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-    }
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            flex-grow: 1;
+            animation: fadeIn 0.8s ease-out 0.6s backwards;
+        }
 
-    @media (max-width: 640px) {
-      body {
-        padding: 1rem;
-      }
+        .result-container {
+            background: var(--card);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 1100px;
+            padding: 2.5rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
 
-      .container {
-        padding: 1.5rem;
-        border-radius: 12px;
-      }
+        .section-title {
+            font-size: 1.75rem;
+            color: var(--text);
+            margin: 2.5rem 0 2rem;
+            text-align: center;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
 
-      h1 {
-        font-size: 1.5rem;
-      }
+        .section-title::before,
+        .section-title::after {
+            content: "";
+            height: 2px;
+            width: 50px;
+            background: linear-gradient(90deg, transparent, var(--primary));
+        }
 
-      h2 {
-        font-size: 1.25rem;
-      }
+        .section-title::after {
+            background: linear-gradient(90deg, var(--primary), transparent);
+        }
 
-      p {
-        font-size: 0.875rem;
-      }
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin: 2rem 0;
+        }
 
-      a {
-        padding: 0.75rem 1.25rem;
-        font-size: 0.875rem;
-      }
-    }
-  </style>
+        .tech-card {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tech-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), #818cf8);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .tech-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tech-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .tech-card h3 {
+            font-size: 1.25rem;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .tech-card p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .entity-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .entity-card {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .entity-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, var(--background), white);
+        }
+
+        .structure-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .structure-item {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .structure-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.1);
+        }
+
+        .structure-item h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .structure-item ul {
+            list-style: none;
+            padding-left: 0.5rem;
+        }
+
+        .structure-item li {
+            margin: 0.75rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-secondary);
+        }
+
+        .structure-item li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .success-message {
+            font-size: 1.25rem;
+            color: var(--success);
+            text-align: center;
+            margin: 3rem 0;
+            padding: 2rem;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 12px;
+            border: 2px solid var(--success);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .success-message::before {
+            content: "✓";
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            background: var(--success);
+            color: white;
+            border-radius: 50%;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 2rem;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .back-link::before {
+            content: "←";
+            font-weight: bold;
+        }
+
+        @media (max-width: 1024px) {
+            .tech-stack {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 2rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header h2 {
+                font-size: 1rem;
+            }
+
+            .project-name-banner {
+                margin: -1rem auto 1.5rem;
+                padding: 1.5rem;
+            }
+
+            .project-name-banner h3 {
+                font-size: 1.5rem;
+            }
+
+            .tech-stack {
+                grid-template-columns: 1fr;
+            }
+
+            .structure-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .result-container {
+                padding: 1.5rem;
+            }
+
+            .section-title::before,
+            .section-title::after {
+                width: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.75rem;
+            }
+
+            .content {
+                padding: 1rem;
+            }
+
+            .tech-card,
+            .entity-card,
+            .structure-item {
+                padding: 1.25rem;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-  <h1>Generation Result</h1>
-  <section>
-    <p th:text="${message}">Result message will be displayed here.</p>
-  </section>
-  <section>
-    <a href="/" th:href="@{/}">Go Back to Home</a>
-  </section>
-  <footer>
-    <p>&copy; 2025 THE FUTURE</p>
-  </footer>
+<div class="header">
+    <h1>Code Forge: Unleash Your Project</h1>
+    <h2>Crafted with Precision, Tailored to Your Technology Stack</h2>
+</div>
+
+<div class="project-name-banner">
+    <h3>Project: <span th:text="${projectName}">Project Name</span></h3>
+    <p>Your application infrastructure has been successfully generated.</p>
+</div>
+
+<div class="content">
+    <div class="result-container">
+        <h2 class="section-title">Technology Stack</h2>
+        <div class="tech-stack">
+            <div class="tech-card">
+                <h3>Frontend</h3>
+                <p th:text="${frontendType}">Frontend Type</p>
+            </div>
+            <div class="tech-card">
+                <h3>Backend</h3>
+                <p th:text="${backendType}">Backend Type</p>
+            </div>
+            <div class="tech-card">
+                <h3>Database</h3>
+                <p th:text="${databaseType}">Database Type</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">Project Entities</h2>
+        <div class="entity-list">
+            <div class="entity-card" th:each="entityName : ${entityNames}">
+                <h3 th:text="${entityName}">Entity</h3>
+                <p>CRUD operations enabled</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">Project Structure</h2>
+        <div class="structure-grid">
+            <div class="structure-item">
+                <h3>Source Directory</h3>
+                <ul>
+                    <li>Entity Classes</li>
+                    <li>Repositories</li>
+                    <li>REST Controllers</li>
+                    <li>Service Layer</li>
+                </ul>
+            </div>
+
+            <div class="structure-item">
+                <h3>Configuration</h3>
+                <ul>
+                    <li>Security JWT</li>
+                    <li>Database Configuration</li>
+                    <li>Roles Authorization</li>
+                    <li>Database Initializer</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="success-message">
+            <p th:text="${message}">Your project has been successfully generated!</p>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="/" th:href="@{/}" class="back-link">Back to Home</a>
+        </div>
+    </div>
 </div>
 </body>
 </html>

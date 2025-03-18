@@ -10,7 +10,7 @@ public class ThePrompt {
                  that cannot be represented by "User".
             
                  Additionally, avoid using entity names that are forbidden or problematic in backends and databases, such as:
-                 - Reserved SQL keywords (e.g., "Order", "Group", "Table").
+                 - Reserved SQL keywords (e.g., "Order", "Group", "Table", "Match").
                  - Reserved programming language keywords (e.g., "Class", "Public", "Default").
                  - Names that are too generic or ambiguous (e.g., "Data", "Object", "Entity").
             

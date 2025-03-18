@@ -7,9 +7,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 @Controller
 @AllArgsConstructor
+@SessionAttributes({"frontendType", "backendType", "databaseType"})
 public class ProjectWorkflowController {
     private final EntityCodeGeneratorService entityCodeGeneratorService;
     private final EntityJsonProcessorService entityJsonProcessorService;
@@ -38,6 +40,10 @@ public class ProjectWorkflowController {
             @RequestParam("entitiesJson") String entitiesJson,
             Model model) {
 
-        return entityJsonProcessorService.processJsonAndGenerateEntities(projectName, entitiesJson, model, "Project Generated Successfully Using Your JSON.");
+        String frontendType = (String) model.getAttribute("frontendType");
+        String backendType = (String) model.getAttribute("backendType");
+        String databaseType = (String) model.getAttribute("databaseType");
+
+        return entityJsonProcessorService.processJsonAndGenerateEntities(projectName, entitiesJson, model, frontendType, backendType, databaseType, "Project Generated Successfully Using Your JSON.");
     }
 }

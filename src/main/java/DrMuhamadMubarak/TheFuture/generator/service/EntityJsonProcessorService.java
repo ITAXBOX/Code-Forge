@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -16,7 +18,7 @@ public class EntityJsonProcessorService {
     private final EntityCodeGeneratorService entityCodeGeneratorService;
     private final AttributeStorageService attributeStorageService;
 
-    public String processJsonAndGenerateEntities(String projectName, String json, Model model, String successMessage) {
+    public String processJsonAndGenerateEntities(String projectName, String json, Model model, String frontend, String backend, String database, String successMessage) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(json);
@@ -26,6 +28,18 @@ public class EntityJsonProcessorService {
                 model.addAttribute("message", "Invalid JSON format: 'entities' array is missing or invalid.");
                 return "error";
             }
+
+            List<String> entityNames = new ArrayList<>();
+            for (JsonNode entityNode : entitiesNode) {
+                String entityName = entityNode.path("name").asText();
+                entityNames.add(entityName);
+            }
+
+            model.addAttribute("projectName", projectName);
+            model.addAttribute("frontendType", frontend);
+            model.addAttribute("backendType", backend);
+            model.addAttribute("databaseType", database);
+            model.addAttribute("entityNames", entityNames);
 
             processEntities(projectName, entitiesNode, model);
             model.addAttribute("message", successMessage);

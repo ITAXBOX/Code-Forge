@@ -10,11 +10,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import java.io.IOException;
 
 @Controller
 @AllArgsConstructor
+@SessionAttributes({"frontendType", "backendType", "databaseType"})
 public class ProjectStructureController {
 
     private final ProjectStructureService projectStructureService;
@@ -36,6 +38,9 @@ public class ProjectStructureController {
         try {
             projectStructureService.generateProjectStructure(projectName, frontendType, backendType, databaseType);
             model.addAttribute("projectName", projectName);
+            model.addAttribute("frontendType", frontendType);
+            model.addAttribute("backendType", backendType);
+            model.addAttribute("databaseType", databaseType);
         } catch (IOException e) {
             model.addAttribute("message", "An error occurred: " + e.getMessage());
             return "error";
