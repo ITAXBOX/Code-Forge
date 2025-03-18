@@ -63,37 +63,50 @@
 
         .header {
             text-align: center;
-            margin-bottom: 2rem;
             position: relative;
+            background: linear-gradient(90deg, var(--primary), #818cf8);
+            margin: -3rem -3rem 2rem -3rem;
+            padding: 3rem;
+            border-radius: 1.5rem 1.5rem 0 0;
+            overflow: hidden;
+            color: white;
         }
 
-        .header::after {
+        .header::before {
             content: '';
             position: absolute;
-            bottom: -1.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 3px;
-            background: linear-gradient(to right, var(--primary), #818cf8);
-            border-radius: 3px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.1) 50%, transparent 52%);
+            background-size: 200% 200%;
+            animation: shimmer 3s infinite linear;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
         }
 
         h1 {
             font-size: 2.5rem;
             font-weight: 700;
-            background: linear-gradient(to right, var(--primary), #818cf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: white;
             margin-bottom: 1rem;
+            position: relative;
         }
 
         .subtitle {
-            color: var(--text-secondary);
+            color: rgba(255, 255, 255, 0.9);
             font-size: 1.1rem;
             max-width: 600px;
             margin: 0 auto;
+            position: relative;
         }
 
         h2 {
@@ -344,6 +357,11 @@
                 padding: 2rem;
             }
 
+            .header {
+                margin: -2rem -2rem 2rem -2rem;
+                padding: 2rem;
+            }
+
             h1 {
                 font-size: 2rem;
             }
@@ -367,7 +385,7 @@
     <div class="header">
         <h1>Code Forge: Shaping Your Entity</h1>
         <p class="subtitle">Craft the blueprint of your <span th:text="${entityName}">Entity</span> attributes that
-            bring your project to life with precision and power. </p>
+            bring your project to life with precision and power.</p>
     </div>
 
     <form th:action="@{/save-attributes}" method="post">

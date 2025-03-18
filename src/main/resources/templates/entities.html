@@ -59,35 +59,47 @@
             text-align: center;
             margin-bottom: 3.5rem;
             position: relative;
+            background: linear-gradient(90deg, var(--primary), #818cf8);
+            padding: 3rem;
+            border-radius: 1.5rem 1.5rem 0 0;
+            overflow: hidden;
         }
 
-        .header::after {
+        .header::before {
             content: '';
             position: absolute;
-            bottom: -1.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 3px;
-            background: linear-gradient(to right, var(--primary), #818cf8);
-            border-radius: 3px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.1) 50%, transparent 52%);
+            background-size: 200% 200%;
+            animation: shimmer 3s infinite linear;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
         }
 
         h1 {
             font-size: 2.5rem;
             font-weight: 700;
-            background: linear-gradient(to right, var(--primary), #818cf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: white;
             margin-bottom: 1rem;
+            position: relative;
         }
 
         .subtitle {
-            color: var(--text-secondary);
+            color: rgba(255, 255, 255, 0.9);
             font-size: 1.1rem;
             max-width: 600px;
             margin: 0 auto;
+            position: relative;
         }
 
         .options-container {
@@ -270,6 +282,11 @@
             .primary-button {
                 font-size: 1rem;
                 padding: 1rem 1.5rem;
+            }
+
+            .header {
+                margin: -2rem -2rem 2rem -2rem;
+                padding: 2rem;
             }
         }
 
