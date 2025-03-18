@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,123 +14,256 @@
             --text-secondary: #64748b;
             --border: #e2e8f0;
             --error: #dc3545;
-            --error-bg: #f8d7da;
-            --error-border: #f5c6cb;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, -apple-system, sans-serif;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         body {
             background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
         }
 
-        .container {
+        .header {
+            background: linear-gradient(90deg, var(--primary), #818cf8);
+            padding: 3rem 2.5rem;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.1) 50%, transparent 52%);
+            background-size: 200% 200%;
+            animation: shimmer 3s infinite linear;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .header h1 {
+            font-size: 2.75rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .header h2 {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 0.5rem;
+            font-weight: 500;
+            animation: fadeIn 0.8s ease-out 0.2s backwards;
+        }
+
+        .error-banner {
             background: var(--card);
             border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            padding: 2.5rem;
-            width: 100%;
-            max-width: 500px;
+            padding: 2rem;
+            margin: -2rem auto 2rem auto;
+            max-width: 800px;
             text-align: center;
-            transition: transform 0.2s ease;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.8s ease-out 0.4s backwards;
         }
 
-        .container:hover {
+        .error-banner h3 {
+            font-size: 1.75rem;
+            color: var(--error);
+            margin-bottom: 0.75rem;
+        }
+
+        .error-banner p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            flex-grow: 1;
+            animation: fadeIn 0.8s ease-out 0.6s backwards;
+        }
+
+        .error-container {
+            background: var(--card);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            padding: 2.5rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            text-align: center;
+        }
+
+        .error-message {
+            font-size: 1.25rem;
+            color: var(--error);
+            text-align: center;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: rgba(220, 53, 69, 0.1);
+            border-radius: 12px;
+            border: 2px solid var(--error);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .error-message::before {
+            content: "!";
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            background: var(--error);
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 2rem;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: var(--primary);
+            color: white;
             transform: translateY(-2px);
         }
 
-        h1 {
-            color: var(--error);
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
+        .back-link::before {
+            content: "←";
+            font-weight: bold;
         }
 
-        p {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-        }
-
-        a {
-            text-decoration: none;
-            color: white;
-            background-color: var(--primary);
-            padding: 0.875rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-        }
-
-        a::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 300%;
-            height: 300%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
-            transform: translate(-50%, -50%) scale(0);
-            transition: transform 0.5s ease;
-        }
-
-        a:hover {
-            background-color: var(--primary-hover);
-        }
-
-        a:hover::after {
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        a:active {
-            transform: translateY(1px);
-        }
-
-        @media (max-width: 640px) {
-            body {
-                padding: 1rem;
+        @media (max-width: 768px) {
+            .header {
+                padding: 2rem;
             }
 
-            .container {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header h2 {
+                font-size: 1rem;
+            }
+
+            .error-banner {
+                margin: -1rem auto 1.5rem;
                 padding: 1.5rem;
-                border-radius: 12px;
             }
 
-            h1 {
+            .error-banner h3 {
                 font-size: 1.5rem;
             }
 
-            p {
-                font-size: 0.875rem;
+            .error-container {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.75rem;
             }
 
-            a {
-                padding: 0.75rem 1.25rem;
-                font-size: 0.875rem;
+            .content {
+                padding: 1rem;
             }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>Error</h1>
-    <p th:text="${message}">An error occurred. Please try again later.</p>
-    <a href="/">Go Back to Home</a>
+<div class="header">
+    <h1>Code Forge: Operation Failed</h1>
+    <h2>Something went wrong with your request</h2>
+</div>
+
+<div class="error-banner">
+    <h3>Error Encountered</h3>
+    <p>We couldn't process your request at this time.</p>
+</div>
+
+<div class="content">
+    <div class="error-container">
+        <div class="error-message">
+            <p th:text="${message}">An error occurred. Please try again later.</p>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="/" th:href="@{/}" class="back-link">Back to Home</a>
+        </div>
+    </div>
 </div>
 </body>
 </html>
