@@ -16,7 +16,7 @@ import java.io.IOException;
 
 @Controller
 @AllArgsConstructor
-@SessionAttributes({"frontendType", "backendType", "databaseType"})
+@SessionAttributes({"frontendType", "backendType", "databaseType", "projectDescription"})
 public class ProjectStructureController {
 
     private final ProjectStructureService projectStructureService;
@@ -27,6 +27,7 @@ public class ProjectStructureController {
             @RequestParam("frontendType") String frontendType,
             @RequestParam("backendType") String backendType,
             @RequestParam("databaseType") String databaseType,
+            @RequestParam(value = "projectDescription", required = false) String projectDescription,
             Model model) {
         if (!FrontendType.isValid(frontendType) ||
             !BackendType.isValid(backendType) ||
@@ -41,6 +42,7 @@ public class ProjectStructureController {
             model.addAttribute("frontendType", frontendType);
             model.addAttribute("backendType", backendType);
             model.addAttribute("databaseType", databaseType);
+            model.addAttribute("projectDescription", projectDescription);
         } catch (IOException e) {
             model.addAttribute("message", "An error occurred: " + e.getMessage());
             return "error";

@@ -1,8 +1,10 @@
 package DrMuhamadMubarak.TheFuture.generator.ai;
 
 public class ThePrompt {
+    private static final int ENTITY_NUMBERS = 10;
+
     public static final String ENTITY_NAMES_PROMPT = """
-                 Given the project topic: "%s", generate a list of up to 5 unique entity names that would be realistically needed for this project.
+                 Given the project topic: "%s", generate a list of up to %d unique entity names that would be realistically needed for this project.
                  The list should be relevant to the domain and follow good database design principles.
             
                  Do NOT include "User" or "Role" in the list, as they will be added separately.
@@ -18,7 +20,26 @@ public class ThePrompt {
                  ["Book", "Course", "Product"]
             
                  IMPORTANT: Return only a JSON array of entity names (strings) and nothing else.
-            """;
+            """.formatted("%s", ENTITY_NUMBERS);
+
+    public static final String ENTITY_NAMES_PROMPT_WITH_DESCRIPTION = """
+            Given the project topic: "%s" and the following description: "%s", generate a list of up to %d unique entity names that would be realistically needed for this project.
+            The list should be relevant to the domain and follow good database design principles.
+            
+            Do NOT include "User" or "Role" in the list, as they will be added separately.
+            Avoid including entities that represent people (e.g., "Author", "Student", "Customer") unless they have distinct properties
+            that cannot be represented by "User".
+            
+            Additionally, avoid using entity names that are forbidden or problematic in backends and databases, such as:
+            - Reserved SQL keywords (e.g., "Order", "Group", "Table", "Match").
+            - Reserved programming language keywords (e.g., "Class", "Public", "Default").
+            - Names that are too generic or ambiguous (e.g., "Data", "Object", "Entity").
+            
+            Example Output:
+            ["Book", "Course", "Product"]
+            
+            IMPORTANT: Return only a JSON array of entity names (strings) and nothing else.
+            """.formatted("%s", "%s", ENTITY_NUMBERS);
 
     public static final String ENTITY_DEFINITION_AND_FIX_PROMPT = """
              Based on the following entity names: %s, generate a structured JSON defining their attributes and relationships\s

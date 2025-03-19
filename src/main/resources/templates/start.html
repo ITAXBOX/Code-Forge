@@ -80,6 +80,25 @@
             opacity: 0.9;
         }
 
+        textarea.icon-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            background-color: white;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            outline: none;
+            resize: vertical; /* Allows vertical resizing */
+            min-height: 100px; /* Sets a minimum height for the textarea */
+        }
+
+        textarea.icon-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
         .content {
             display: flex;
             flex-direction: column;
@@ -291,6 +310,17 @@
                                placeholder="Enter your project name"/>
                     </div>
                     <div class="hint">Choose a meaningful name for your project</div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group wide">
+                    <label for="projectDescription">Project Description (Optional, for AI only)</label>
+                    <div class="input-container">
+            <textarea id="projectDescription" name="projectDescription" class="icon-input"
+                      placeholder="Provide a brief description of your project (e.g., purpose, features, domain)"></textarea>
+                    </div>
+                    <div class="hint">This description will help the AI generate more accurate entities.</div>
                 </div>
             </div>
 

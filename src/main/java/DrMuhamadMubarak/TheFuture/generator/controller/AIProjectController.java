@@ -13,7 +13,7 @@ import static DrMuhamadMubarak.TheFuture.generator.ai.ThePrompt.*;
 
 @Controller
 @AllArgsConstructor
-@SessionAttributes({"frontendType", "backendType", "databaseType"})
+@SessionAttributes({"frontendType", "backendType", "databaseType", "projectDescription"})
 public class AIProjectController {
     private final EntityJsonProcessorService entityJsonProcessorService;
     private final AIService aiService;
@@ -22,10 +22,17 @@ public class AIProjectController {
     public String generateProjectFromPrompt(
             @RequestParam("projectName") String projectName,
             Model model) {
+        String projectDescription = (String) model.getAttribute("projectDescription");
 
         try {
             // Step 1: Get entity names based on the project topic
-            String entityNamesPrompt = String.format(ENTITY_NAMES_PROMPT, projectName);
+            String entityNamesPrompt;
+            if (projectDescription != null && !projectDescription.isEmpty()) {
+                entityNamesPrompt = String.format(ENTITY_NAMES_PROMPT_WITH_DESCRIPTION, projectName, projectDescription);
+            } else {
+                entityNamesPrompt = String.format(ENTITY_NAMES_PROMPT, projectName);
+            }
+
             String entityNamesJson = aiService.generateJsonFromPrompt(entityNamesPrompt).block();
 
             if (entityNamesJson == null || entityNamesJson.isEmpty()) {
