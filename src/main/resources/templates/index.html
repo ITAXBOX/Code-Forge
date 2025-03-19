@@ -6,16 +6,16 @@
     <title>Code Forge: Home Page</title>
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-light: #818cf8;
-            --primary-dark: #4338ca;
+            --primary: #8b5cf6;
+            --primary-light: #a78bfa;
+            --primary-dark: #7c3aed;
             --accent: #06b6d4;
-            --background: #f8fafc;
-            --card: #ffffff;
-            --text: #1f2937;
-            --text-secondary: #64748b;
-            --border: #e2e8f0;
-            --gradient-start: #4f46e5;
+            --background: #0f172a;
+            --card: #111827;
+            --text: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --gradient-start: #8b5cf6;
             --gradient-end: #06b6d4;
         }
 
@@ -31,12 +31,53 @@
             color: var(--text);
             line-height: 1.6;
             overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Stars Animation */
+        #stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background-color: #ffffff;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle var(--duration) infinite;
+            animation-delay: var(--delay);
+        }
+
+        @keyframes twinkle {
+            0% {
+                opacity: 0;
+                transform: translateY(0);
+            }
+            10% {
+                opacity: var(--opacity);
+            }
+            90% {
+                opacity: var(--opacity);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100px);
+            }
         }
 
         .container {
             max-width: 1280px;
             margin: 0 auto;
             padding: 0 2rem;
+            position: relative;
+            z-index: 1;
         }
 
         /* Navigation */
@@ -151,12 +192,12 @@
         .btn-primary {
             background: linear-gradient(to right, var(--primary), var(--accent));
             color: white;
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
         }
 
         .hero-illustration {
@@ -176,27 +217,27 @@
             height: 120vw;
             top: -60vw;
             left: -10vw;
-            background: radial-gradient(circle, rgba(79, 70, 229, 0.05) 0%, rgba(6, 182, 212, 0.05) 50%, transparent 70%);
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(6, 182, 212, 0.1) 50%, transparent 70%);
             border-radius: 50%;
+            z-index: -1;
+        }
+
+        /* Global radial gradient background for all sections */
+        .section-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 70% 30%, rgba(139, 92, 246, 0.15) 0%, rgba(6, 182, 212, 0.1) 50%, transparent 70%);
             z-index: -1;
         }
 
         /* Features */
         .features {
             padding: 6rem 0;
-            background-color: var(--card);
             position: relative;
             overflow: hidden;
-        }
-
-        .features::before {
-            content: '';
-            position: absolute;
-            top: -5rem;
-            left: 0;
-            right: 0;
-            height: 10rem;
-            background: linear-gradient(to bottom right, var(--background) 49.5%, var(--card) 50%);
         }
 
         .section-header {
@@ -228,19 +269,22 @@
         }
 
         .feature-card {
-            background: white;
+            background: rgba(17, 24, 39, 0.7);
             border-radius: 1rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
             padding: 2rem;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             display: flex;
             flex-direction: column;
             height: 100%;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            backdrop-filter: blur(4px);
         }
 
         .feature-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 30px -5px rgba(139, 92, 246, 0.2);
+            border-color: rgba(139, 92, 246, 0.3);
         }
 
         .feature-icon {
@@ -337,18 +381,7 @@
         /* Tech Stack */
         .tech-stack {
             padding: 6rem 0;
-            background-color: var(--card);
             position: relative;
-        }
-
-        .tech-stack::before {
-            content: '';
-            position: absolute;
-            top: -5rem;
-            left: 0;
-            right: 0;
-            height: 10rem;
-            background: linear-gradient(to bottom left, var(--background) 49.5%, var(--card) 50%);
         }
 
         .tech-categories {
@@ -359,16 +392,19 @@
         }
 
         .tech-category {
-            background: white;
+            background: rgba(17, 24, 39, 0.7);
             border-radius: 1rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
             padding: 2rem;
             text-align: center;
             transition: transform 0.3s ease;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            backdrop-filter: blur(4px);
         }
 
         .tech-category:hover {
             transform: translateY(-5px);
+            border-color: rgba(139, 92, 246, 0.3);
         }
 
         .tech-category h3 {
@@ -396,7 +432,7 @@
             align-items: center;
             justify-content: center;
             border-radius: 12px;
-            background: var(--background);
+            background: rgba(15, 23, 42, 0.7);
             padding: 0.5rem;
             transition: transform 0.2s ease;
         }
@@ -441,21 +477,13 @@
             margin-bottom: 2.5rem;
         }
 
-        .cta-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 70% 30%, rgba(79, 70, 229, 0.07) 0%, rgba(6, 182, 212, 0.05) 50%, transparent 70%);
-            z-index: 1;
-        }
-
         /* Footer */
         .footer {
-            background-color: #1f2937;
+            background-color: rgba(15, 23, 42, 0.8);
             color: white;
             padding: 4rem 0 2rem;
+            position: relative;
+            backdrop-filter: blur(8px);
         }
 
         .footer-content {
@@ -522,7 +550,7 @@
         }
 
         .copyright {
-            border-top: 1px solid #374151;
+            border-top: 1px solid rgba(51, 65, 85, 0.5);
             padding-top: 2rem;
             color: #9ca3af;
             font-size: 0.875rem;
@@ -595,6 +623,8 @@
     </style>
 </head>
 <body>
+<div id="stars-container"></div>
+
 <nav class="navbar container">
     <div class="logo">
         <span>Code Forge</span>
@@ -625,6 +655,7 @@
 </section>
 
 <section class="features" id="features">
+    <div class="section-bg"></div>
     <div class="container">
         <div class="section-header">
             <h2>Powerful Features</h2>
@@ -696,6 +727,7 @@
 </section>
 
 <section class="how-it-works" id="how-it-works">
+    <div class="section-bg"></div>
     <div class="container">
         <div class="section-header">
             <h2>How It Works</h2>
@@ -725,6 +757,7 @@
 </section>
 
 <section class="tech-stack" id="tech-stack">
+    <div class="section-bg"></div>
     <div class="container">
         <div class="section-header">
             <h2>Supported Technologies</h2>
@@ -797,7 +830,7 @@
 </section>
 
 <section class="cta" id="cta">
-    <div class="cta-bg"></div>
+    <div class="section-bg"></div>
     <div class="cta-content container">
         <h2>Ready to Transform Your Ideas into Reality?</h2>
         <p>Start building your full-stack application today with Code Forge. No setup, no hassle—just pure
@@ -856,5 +889,42 @@
         </div>
     </div>
 </footer>
+
+<script>
+    // Stars animation
+    document.addEventListener('DOMContentLoaded', function () {
+        const starsContainer = document.getElementById('stars-container');
+        const starCount = 200; // Increased number of stars
+
+        // Create stars
+        for (let i = 0; i < starCount; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+
+            // Random size between 1px and 4px
+            const size = Math.random() * 3 + 1;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+
+            // Random position
+            const posX = Math.random() * 100;
+            const posY = Math.random() * 100;
+            star.style.left = `${posX}%`;
+            star.style.top = `${posY}%`;
+
+            // Random animation duration and delay
+            const duration = Math.random() * 15 + 10; // 10-25s
+            const delay = Math.random() * 15;
+            star.style.setProperty('--duration', `${duration}s`);
+            star.style.setProperty('--delay', `${delay}s`);
+
+            // Random opacity
+            const opacity = Math.random() * 0.7 + 0.3; // 0.3-1.0
+            star.style.setProperty('--opacity', opacity);
+
+            starsContainer.appendChild(star);
+        }
+    });
+</script>
 </body>
 </html>
