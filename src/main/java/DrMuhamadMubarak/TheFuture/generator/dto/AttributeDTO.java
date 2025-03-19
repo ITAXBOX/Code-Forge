@@ -3,12 +3,14 @@ package DrMuhamadMubarak.TheFuture.generator.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class AttributeDTO {
 
     @NotBlank(message = "Attribute Name is required")
