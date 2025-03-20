@@ -1,7 +1,7 @@
 package DrMuhamadMubarak.TheFuture.generator.ai;
 
 public class ThePrompt {
-    private static final int ENTITY_NUMBERS = 10;
+    private static final int ENTITY_NUMBERS = 5;
 
     public static final String ENTITY_NAMES_PROMPT = """
                  Given the project topic: "%s", generate a list of up to %d unique entity names that would be realistically needed for this project.
