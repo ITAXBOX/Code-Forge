@@ -54,7 +54,7 @@ public class AIProjectController {
             String databaseType = (String) model.getAttribute("databaseType");
 
             // Step 3: Process the validated JSON and generate the project
-            return entityJsonProcessorService.processJsonAndGenerateEntities(projectName, fixedEntitiesJson, model,
+            return entityJsonProcessorService.processJsonAndGenerateEntities(true, projectName, fixedEntitiesJson, model,
                     frontendType, backendType, databaseType, "Project Generated Successfully Using OpenAI.");
         } catch (Exception e) {
             model.addAttribute("message", "An error occurred while generating JSON from prompt: " + e.getMessage());

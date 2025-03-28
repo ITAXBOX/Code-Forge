@@ -17,8 +17,9 @@ public class EntityJsonProcessorService {
 
     private final EntityCodeGeneratorService entityCodeGeneratorService;
     private final AttributeStorageService attributeStorageService;
+    private final BehaviorService behaviorService;
 
-    public String processJsonAndGenerateEntities(String projectName, String json, Model model, String frontend, String backend, String database, String successMessage) {
+    public String processJsonAndGenerateEntities(boolean AI, String projectName, String json, Model model, String frontend, String backend, String database, String successMessage) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(json);
@@ -41,7 +42,7 @@ public class EntityJsonProcessorService {
             model.addAttribute("databaseType", database);
             model.addAttribute("entityNames", entityNames);
 
-            processEntities(projectName, entitiesNode, model);
+            processEntities(AI, projectName, entitiesNode, model);
             model.addAttribute("message", successMessage);
             return "result";
         } catch (IOException e) {
@@ -53,7 +54,7 @@ public class EntityJsonProcessorService {
         }
     }
 
-    private void processEntities(String projectName, JsonNode entitiesNode, Model model) throws IOException {
+    private void processEntities(boolean AI, String projectName, JsonNode entitiesNode, Model model) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
         for (JsonNode entityNode : entitiesNode) {
@@ -75,6 +76,14 @@ public class EntityJsonProcessorService {
 
             entityCodeGeneratorService.generateServiceClass(projectName, entityName, attributeStorageService.getAttributes());
             entityCodeGeneratorService.generateControllerClass(projectName, entityName);
+
+            if (AI) {
+                behaviorService.generateEntityBehaviors(
+                        projectName,
+                        entityName,
+                        attributeStorageService.getAttributes()
+                );
+            }
 
             attributeStorageService.clearAttributes();
         }

@@ -288,4 +288,42 @@ public class ThePrompt {
             \s
              IMPORTANT: Return only the JSON structure and nothing else. Do not include any additional text, formatting, or explanations.
             \s""";
+
+    public static final String BEHAVIOR_PROMPT = """
+            Generate ONLY method implementations for %s entity.
+            Attributes: %s
+            Available Repositories: %s
+            
+            STRICT RULES:
+            1. ONLY use these exact attributes: %s
+            2. NEVER use attributes/methods not in this list
+            3. If unsure, throw UnsupportedOperationException()
+            4. Use == for ID comparisons
+            5. Format:
+               @Transactional
+               public ReturnType methodName(Params) {
+                   Entity entity = repository.findById(id).orElseThrow();
+                   // ONLY use: entity.get[Attr], entity.set[Attr], repository.method()
+                   repository.save(entity);
+               }
+            
+            EXAMPLE FOR USER (if 'email' exists but 'active' doesn't):
+            @Transactional
+            public void updateEmail(Long userId, String email) {
+                User user = userRepository.findById(userId).orElseThrow();
+                if (email == null) throw new IllegalArgumentException();
+                user.setEmail(email); // ✅ ALLOWED (email is declared)
+                userRepository.save(user);
+            }
+            
+            @Transactional
+            public void deactivateUser(Long userId) {
+                throw new UnsupportedOperationException(); // ❌ 'active' not in attributes
+            }
+            
+            Generate 3-5 methods for %s using ONLY:
+            - Declared attributes
+            - Available repositories
+            - No comments
+            """;
 }

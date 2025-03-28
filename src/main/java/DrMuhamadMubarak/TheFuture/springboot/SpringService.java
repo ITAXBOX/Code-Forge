@@ -73,6 +73,48 @@ public class SpringService {
         }
     }
 
+    public static void generateSpringBehaviorServiceClass(
+            String projectName,
+            String entityName,
+            String behaviorMethods) throws IOException {
+
+        String className = entityName + "BehaviorService";
+        String packagePath = projectName.toLowerCase();
+        String basePackage = "com.example." + projectName.toLowerCase();
+
+        String classCode = """
+                package %s.behaviorservices;
+                
+                import %s.models.*;
+                import %s.repositories.*;
+                import lombok.AllArgsConstructor;
+                import org.springframework.stereotype.Service;
+                import jakarta.transaction.Transactional;
+                import java.time.LocalDateTime;
+                import java.util.stream.Collectors;
+                
+                import java.util.*;
+                
+                @Service
+                @AllArgsConstructor
+                public class %s {
+                
+                    %s
+                }
+                """.formatted(
+                basePackage,
+                basePackage,
+                basePackage,
+                className,
+                behaviorMethods
+        );
+
+        String baseDir = "./" + projectName + "/src/main/java/com/example/" + packagePath + "/behaviorservices";
+        Files.createDirectories(Paths.get(baseDir));
+        String path = baseDir + "/" + className + ".java";
+        Files.write(Paths.get(path), classCode.getBytes());
+    }
+
     public static void generateAuthenticationServiceClass(String projectName) throws IOException {
         String baseDir = "./" + projectName + "/src/main/java/com/example/" + projectName.toLowerCase() + "/services";
         String className = "AuthenticationService";

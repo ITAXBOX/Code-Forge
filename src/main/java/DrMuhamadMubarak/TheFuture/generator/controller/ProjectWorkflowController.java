@@ -44,6 +44,6 @@ public class ProjectWorkflowController {
         String backendType = (String) model.getAttribute("backendType");
         String databaseType = (String) model.getAttribute("databaseType");
 
-        return entityJsonProcessorService.processJsonAndGenerateEntities(projectName, entitiesJson, model, frontendType, backendType, databaseType, "Project Generated Successfully Using Your JSON.");
+        return entityJsonProcessorService.processJsonAndGenerateEntities(false, projectName, entitiesJson, model, frontendType, backendType, databaseType, "Project Generated Successfully Using Your JSON.");
     }
 }

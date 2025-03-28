@@ -47,6 +47,10 @@ public class EntityCodeGeneratorService {
         SpringService.generateSpringServiceClass(projectName, entityName, attributes);
     }
 
+    public void generateBehaviorServiceClass(String projectName, String entityName, String behaviorMethods) throws IOException {
+        SpringService.generateSpringBehaviorServiceClass(projectName, entityName, behaviorMethods);
+    }
+
     public void generateAuthenticationServiceClass(String projectName) throws IOException {
         SpringService.generateAuthenticationServiceClass(projectName);
     }
