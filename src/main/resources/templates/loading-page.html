@@ -3,60 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <title>Code Forge: Loading Page</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --background: #f8fafc;
-            --card: #ffffff;
-            --text: #1f2937;
-            --text-secondary: #64748b;
-            --border: #e2e8f0;
-            --focus-ring: rgba(79, 70, 229, 0.1);
+            --primary: #8b5cf6;
+            --primary-light: #a78bfa;
+            --primary-dark: #7c3aed;
+            --accent: #06b6d4;
+            --background: #0f172a;
+            --card: #111827;
+            --text: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --gradient-start: #8b5cf6;
+            --gradient-end: #06b6d4;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, -apple-system, sans-serif;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            background-color: var(--background);
+            color: var(--text);
             min-height: 100vh;
             margin: 0;
             padding: 2rem;
-            color: var(--text);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
             overflow: hidden;
+            position: relative;
+        }
+
+        /* Stars Animation */
+        #stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background-color: #ffffff;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle var(--duration) infinite;
+            animation-delay: var(--delay);
+        }
+
+        @keyframes twinkle {
+            0% {
+                opacity: 0;
+                transform: translateY(0);
+            }
+            10% {
+                opacity: var(--opacity);
+            }
+            90% {
+                opacity: var(--opacity);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100px);
+            }
+        }
+
+        /* Section Background */
+        .section-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 70% 30%, rgba(139, 92, 246, 0.15) 0%, rgba(6, 182, 212, 0.1) 50%, transparent 70%);
+            z-index: -1;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100vh;
+            padding: 2rem;
         }
 
         h1 {
             font-size: clamp(2rem, 5vw, 3.5rem);
             font-weight: 800;
             text-align: center;
-            background: linear-gradient(to right, var(--primary), #818cf8);
+            background: linear-gradient(to right, var(--primary), var(--accent));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            line-height: 2;
-            margin: 2rem 0;
+            line-height: 1.4;
+            margin: 2rem 0 1rem;
             max-width: 90%;
             animation: slideDown 1s ease-out forwards;
             opacity: 0;
             transform: translateY(-20px);
+            text-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            font-weight: 500;
+            text-align: center;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            opacity: 0;
+            animation: slideUp 1s ease-out forwards 0.5s;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background: rgba(17, 24, 39, 0.5);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(139, 92, 246, 0.1);
         }
 
         h2 {
             font-size: clamp(1.2rem, 3vw, 1.75rem);
             font-weight: 500;
             text-align: center;
-            background: linear-gradient(to right, var(--primary), #818cf8);
+            background: linear-gradient(to right, var(--primary), var(--accent));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -97,6 +179,45 @@
             }
         }
 
+        /* Code particles */
+        .code-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .code-particle {
+            position: absolute;
+            color: var(--text-secondary);
+            font-family: monospace;
+            font-size: 14px;
+            opacity: 0;
+            animation: float-up var(--float-duration) ease-out forwards;
+            animation-delay: var(--float-delay);
+        }
+
+        @keyframes float-up {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-100px) translateX(var(--float-x));
+                opacity: 0;
+            }
+        }
+
+        /* Original Cube Animation */
         .scene {
             position: relative;
             z-index: 2;
@@ -140,7 +261,7 @@
         .cube-face.shadow {
             transform: translateZ(-80px);
             animation: bouncing-shadow 2s infinite;
-            background: rgba(79, 70, 229, 0.2);
+            background: rgba(139, 92, 246, 0.2);
         }
 
         .cube-face.top {
@@ -215,7 +336,72 @@
             }
         }
 
-        @media (max-height: 600px) {
+        /* Floating orbs */
+        .orbs-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(8px);
+            opacity: 0.5;
+            z-index: -1;
+            animation: float var(--orb-duration) ease-in-out infinite;
+            animation-delay: var(--orb-delay);
+        }
+
+        .orb-1 {
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            top: 20%;
+            left: 15%;
+            --orb-duration: 15s;
+            --orb-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+            bottom: 15%;
+            right: 20%;
+            --orb-duration: 12s;
+            --orb-delay: 2s;
+        }
+
+        .orb-3 {
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #f472b6 0%, transparent 70%);
+            top: 60%;
+            left: 25%;
+            --orb-duration: 18s;
+            --orb-delay: 1s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+            }
+            25% {
+                transform: translateY(-20px) translateX(20px);
+            }
+            50% {
+                transform: translateY(0) translateX(40px);
+            }
+            75% {
+                transform: translateY(20px) translateX(20px);
+            }
+        }
+
+        @media (max-height: 700px) {
             .scene {
                 height: 200px;
                 width: 200px;
@@ -223,33 +409,133 @@
 
             h1 {
                 margin: 1rem 0;
+                font-size: 2rem;
             }
 
             h2 {
                 margin-bottom: 1rem;
+                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
-<h1>Code Forge: Building Your Future</h1>
+<div id="stars-container"></div>
+<div class="section-bg"></div>
+<div class="orbs-container">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+</div>
 
-<div class="scene">
-    <div class="cube-wrapper">
-        <div class="cube">
-            <div class="cube-faces">
-                <div class="cube-face shadow"></div>
-                <div class="cube-face bottom"></div>
-                <div class="cube-face top"></div>
-                <div class="cube-face left"></div>
-                <div class="cube-face right"></div>
-                <div class="cube-face back"></div>
-                <div class="cube-face front"></div>
+<div class="content">
+    <h1>Code Forge: Building Your Future</h1>
+    <p class="subtitle">AI-powered code generation in progress</p>
+
+    <div class="scene">
+        <div class="cube-wrapper">
+            <div class="cube">
+                <div class="cube-faces">
+                    <div class="cube-face shadow"></div>
+                    <div class="cube-face bottom"></div>
+                    <div class="cube-face top"></div>
+                    <div class="cube-face left"></div>
+                    <div class="cube-face right"></div>
+                    <div class="cube-face back"></div>
+                    <div class="cube-face front"></div>
+                </div>
             </div>
         </div>
     </div>
+
+    <h2>Loading your future, one line of code at a time...</h2>
 </div>
 
-<h2>Loading your future, one line of code at a time...</h2>
+<div class="code-particles" id="code-particles"></div>
+
+<script>
+    // Stars animation
+    document.addEventListener('DOMContentLoaded', function () {
+        const starsContainer = document.getElementById('stars-container');
+        const starCount = 200; // Number of stars
+
+        // Create stars
+        for (let i = 0; i < starCount; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+
+            // Random size between 1px and 4px
+            const size = Math.random() * 3 + 1;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+
+            // Random position
+            const posX = Math.random() * 100;
+            const posY = Math.random() * 100;
+            star.style.left = `${posX}%`;
+            star.style.top = `${posY}%`;
+
+            // Random animation duration and delay
+            const duration = Math.random() * 15 + 10; // 10-25s
+            const delay = Math.random() * 15;
+            star.style.setProperty('--duration', `${duration}s`);
+            star.style.setProperty('--delay', `${delay}s`);
+
+            // Random opacity
+            const opacity = Math.random() * 0.7 + 0.3; // 0.3-1.0
+            star.style.setProperty('--opacity', opacity);
+
+            starsContainer.appendChild(star);
+        }
+
+        // Code particles animation
+        const codeParticles = document.getElementById('code-particles');
+        const codeSnippets = [
+            '{ }', 'function()', 'const data = [];', 'if (condition) {', 'return result;',
+            'class Entity {', 'import React from "react";', '<Component />', 'export default',
+            '@Entity', '@Table', 'public class', 'private String', 'new ArrayList<>()',
+            'SELECT * FROM', 'INSERT INTO', 'UPDATE table SET', 'JOIN table ON',
+            'npm install', 'git commit', 'docker build', 'mvn clean install'
+        ];
+
+        // Create code particles
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
+                createCodeParticle();
+            }, i * 500); // Stagger the creation
+        }
+
+        function createCodeParticle() {
+            const particle = document.createElement('div');
+            particle.classList.add('code-particle');
+
+            // Random code snippet
+            const randomSnippet = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+            particle.textContent = randomSnippet;
+
+            // Random position
+            const posX = Math.random() * 100;
+            particle.style.left = `${posX}%`;
+
+            // Random animation duration and delay
+            const duration = Math.random() * 10 + 15; // 15-25s
+            const delay = Math.random() * 5;
+            particle.style.setProperty('--float-duration', `${duration}s`);
+            particle.style.setProperty('--float-delay', `${delay}s`);
+
+            // Random horizontal drift
+            const floatX = (Math.random() * 200 - 100) + 'px';
+            particle.style.setProperty('--float-x', floatX);
+
+            codeParticles.appendChild(particle);
+
+            // Remove particle after animation completes
+            setTimeout(() => {
+                particle.remove();
+                createCodeParticle(); // Create a new one to replace it
+            }, (duration + delay) * 1000);
+        }
+    });
+</script>
 </body>
 </html>
