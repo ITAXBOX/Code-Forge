@@ -5,32 +5,77 @@
     <title>Code Forge: Concept to Code</title>
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --background: #f8fafc;
-            --card: #ffffff;
-            --text: #1f2937;
-            --text-secondary: #64748b;
-            --border: #e2e8f0;
-            --focus-ring: rgba(79, 70, 229, 0.1);
+            --primary: #8b5cf6;
+            --primary-light: #a78bfa;
+            --primary-dark: #7c3aed;
+            --accent: #06b6d4;
+            --background: #0f172a;
+            --card: #111827;
+            --text: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --focus-ring: rgba(139, 92, 246, 0.2);
+            --gradient-start: #8b5cf6;
+            --gradient-end: #06b6d4;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, -apple-system, sans-serif;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
             min-height: 100vh;
             margin: 0;
             padding: 2rem;
-            color: var(--text);
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Stars Animation */
+        #stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background-color: #ffffff;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle var(--duration) infinite;
+            animation-delay: var(--delay);
+        }
+
+        @keyframes twinkle {
+            0% {
+                opacity: 0;
+                transform: translateY(0);
+            }
+            10% {
+                opacity: var(--opacity);
+            }
+            90% {
+                opacity: var(--opacity);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100px);
+            }
         }
 
         .container {
@@ -38,10 +83,14 @@
             max-width: 1000px;
             margin: 0 auto;
             background: var(--card);
-            padding: 3rem;
             border-radius: 1.5rem;
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
             animation: slideUp 0.5s ease-out;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            backdrop-filter: blur(4px);
+            overflow: hidden;
         }
 
         @keyframes slideUp {
@@ -59,39 +108,32 @@
             text-align: center;
             margin-bottom: 3.5rem;
             position: relative;
-            background: linear-gradient(90deg, var(--primary), #818cf8);
+            background: linear-gradient(to right, var(--primary), var(--accent));
             padding: 3rem;
-            border-radius: 1.5rem 1.5rem 0 0;
+            border-radius: 0;
             overflow: hidden;
         }
 
         .header::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.1) 50%, transparent 52%);
-            background-size: 200% 200%;
-            animation: shimmer 3s infinite linear;
-        }
-
-        @keyframes shimmer {
-            0% {
-                background-position: 200% 0;
-            }
-            100% {
-                background-position: -200% 0;
-            }
+            width: 120vw;
+            height: 120vw;
+            top: -60vw;
+            left: -10vw;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
         }
 
         h1 {
             font-size: 2.5rem;
-            font-weight: 700;
+            font-weight: 800;
             color: white;
             margin-bottom: 1rem;
             position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
 
         .subtitle {
@@ -100,26 +142,30 @@
             max-width: 600px;
             margin: 0 auto;
             position: relative;
+            z-index: 1;
         }
 
         .options-container {
             display: grid;
             grid-template-columns: 1fr;
             gap: 2rem;
+            padding: 0 3rem 3rem;
         }
 
         .primary-option {
-            background: linear-gradient(to bottom right, rgba(79, 70, 229, 0.05), rgba(129, 140, 248, 0.05));
-            border: 2px solid var(--primary);
+            background: rgba(17, 24, 39, 0.7);
+            border: 1px solid rgba(139, 92, 246, 0.2);
             border-radius: 1rem;
             padding: 2rem;
             text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            backdrop-filter: blur(4px);
         }
 
         .primary-option:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.1), 0 8px 10px -6px rgba(79, 70, 229, 0.1);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px -5px rgba(139, 92, 246, 0.2);
+            border-color: rgba(139, 92, 246, 0.3);
         }
 
         .manual-options {
@@ -130,18 +176,20 @@
         }
 
         .option-card {
-            background: white;
-            border: 1px solid var(--border);
+            background: rgba(17, 24, 39, 0.7);
+            border: 1px solid rgba(139, 92, 246, 0.1);
             border-radius: 1rem;
             padding: 2rem;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             display: flex;
             flex-direction: column;
+            backdrop-filter: blur(4px);
         }
 
         .option-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px -5px rgba(139, 92, 246, 0.2);
+            border-color: rgba(139, 92, 246, 0.3);
         }
 
         .option-card form {
@@ -156,9 +204,12 @@
 
         h2 {
             font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text);
+            font-weight: 700;
             margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
         .option-description {
@@ -186,7 +237,7 @@
             padding: 0.875rem 1rem;
             border: 1px solid var(--border);
             border-radius: 0.75rem;
-            background-color: white;
+            background-color: rgba(17, 24, 39, 0.7);
             color: var(--text);
             font-size: 0.875rem;
             transition: all 0.2s ease;
@@ -212,26 +263,38 @@
             opacity: 0.7;
         }
 
-        button {
-            width: 100%;
-            padding: 1rem 1.5rem;
-            border: none;
-            border-radius: 0.75rem;
-            background-color: var(--primary);
-            color: white;
-            font-size: 1rem;
-            font-weight: 500;
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.75rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: none;
+            width: 100%;
+            justify-content: center;
+            margin-top: auto;
             position: relative;
             overflow: hidden;
-            margin-top: auto;
         }
 
-        .primary-button {
-            font-size: 1.125rem;
-            padding: 1.25rem 2rem;
-            background: linear-gradient(to right, var(--primary), #818cf8);
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
         }
 
         button::after {
@@ -241,25 +304,13 @@
             left: 50%;
             width: 300%;
             height: 300%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
             transform: translate(-50%, -50%) scale(0);
             transition: transform 0.5s ease;
         }
 
-        button:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .primary-button:hover {
-            background: linear-gradient(to right, var(--primary-hover), #6b7280);
-        }
-
         button:hover::after {
             transform: translate(-50%, -50%) scale(1);
-        }
-
-        button:active {
-            transform: translateY(1px);
         }
 
         @media (max-width: 768px) {
@@ -268,7 +319,7 @@
             }
 
             .container {
-                padding: 2rem;
+                padding: 0;
             }
 
             h1 {
@@ -279,14 +330,13 @@
                 grid-template-columns: 1fr;
             }
 
-            .primary-button {
-                font-size: 1rem;
-                padding: 1rem 1.5rem;
+            .options-container {
+                padding: 0 1.5rem 1.5rem;
             }
 
             .header {
-                margin: -2rem -2rem 2rem -2rem;
                 padding: 2rem;
+                margin-bottom: 2rem;
             }
         }
 
@@ -296,7 +346,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: white;
+            background: var(--background);
             z-index: 1000;
             display: none;
         }
@@ -308,15 +358,28 @@
         }
 
         .openai-text {
-            background: linear-gradient(to right, #4f46e5, #818cf8);
+            background: linear-gradient(to right, var(--primary), var(--accent));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             font-weight: 600;
         }
+
+        /* Section Background */
+        .section-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 70% 30%, rgba(139, 92, 246, 0.15) 0%, rgba(6, 182, 212, 0.1) 50%, transparent 70%);
+            z-index: -1;
+        }
     </style>
 </head>
 <body>
+<div id="stars-container"></div>
+<div class="section-bg"></div>
 <div class="container">
     <div class="header">
         <h1>Code Forge: From Concept to Code</h1>
@@ -332,7 +395,14 @@
                         class="openai-text">OpenAI</span>.</p>
             <form id="auto-generate-form" th:action="@{/generate-entities-from-prompt}" method="post">
                 <input type="hidden" id="projectNamePrompt" name="projectName" th:value="${projectName}"/>
-                <button type="submit" class="primary-button">Generate Project Automatically</button>
+                <button type="submit" class="btn btn-primary">
+                    Generate Project Automatically
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
             </form>
         </div>
 
@@ -354,7 +424,14 @@
                                 required
                         />
                     </div>
-                    <button type="submit">Generate Entities and Proceed to Attributes</button>
+                    <button type="submit" class="btn btn-primary">
+                        Generate Entities and Proceed to Attributes
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </button>
                 </form>
             </div>
 
@@ -371,35 +448,42 @@
                                 id="entitiesJson"
                                 name="entitiesJson"
                                 placeholder='{
-               "name": "User",
-               "attributes": [
-                 {
-                   "attributeName": "id",
-                   "dataType": "Long",
-                   "isPrimaryKey": true,
-                   "isAutoGenerated": true
-                 },
-                 {
-                   "attributeName": "username",
-                   "dataType": "String"
-                 },
-                 {
-                   "attributeName": "password",
-                   "dataType": "String"
-                 },
-                 {
-                   "attributeName": "roles",
-                   "dataType": "Set<Role>=newHashSet<>()",
-                   "relationshipType": "MANY_TO_MANY",
-                   "relatedEntity": "Role",
-                   "isNullable": true
-                 }
-               ]
-             }'
+  "name": "User",
+  "attributes": [
+    {
+      "attributeName": "id",
+      "dataType": "Long",
+      "isPrimaryKey": true,
+      "isAutoGenerated": true
+    },
+    {
+      "attributeName": "username",
+      "dataType": "String"
+    },
+    {
+      "attributeName": "password",
+      "dataType": "String"
+    },
+    {
+      "attributeName": "roles",
+      "dataType": "Set<Role>=newHashSet<>()",
+      "relationshipType": "MANY_TO_MANY",
+      "relatedEntity": "Role",
+      "isNullable": true
+    }
+  ]
+}'
                                 required
                         ></textarea>
                     </div>
-                    <button type="submit">Generate Project from JSON</button>
+                    <button type="submit" class="btn btn-primary">
+                        Generate Project from JSON
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </button>
                 </form>
             </div>
         </div>
@@ -411,6 +495,41 @@
 </div>
 
 <script>
+    // Stars animation
+    document.addEventListener('DOMContentLoaded', function () {
+        const starsContainer = document.getElementById('stars-container');
+        const starCount = 200; // Number of stars
+
+        // Create stars
+        for (let i = 0; i < starCount; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+
+            // Random size between 1px and 4px
+            const size = Math.random() * 3 + 1;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+
+            // Random position
+            const posX = Math.random() * 100;
+            const posY = Math.random() * 100;
+            star.style.left = `${posX}%`;
+            star.style.top = `${posY}%`;
+
+            // Random animation duration and delay
+            const duration = Math.random() * 15 + 10; // 10-25s
+            const delay = Math.random() * 15;
+            star.style.setProperty('--duration', `${duration}s`);
+            star.style.setProperty('--delay', `${delay}s`);
+
+            // Random opacity
+            const opacity = Math.random() * 0.7 + 0.3; // 0.3-1.0
+            star.style.setProperty('--opacity', opacity);
+
+            starsContainer.appendChild(star);
+        }
+    });
+
     document.getElementById('auto-generate-form').addEventListener('submit', function (event) {
         event.preventDefault();
         document.getElementById('loadingContainer').style.display = 'block';
