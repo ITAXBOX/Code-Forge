@@ -309,7 +309,6 @@ public class SpringSecurity {
                     }
                 }
                 """, projectName.toLowerCase());
-        Files.createDirectories(Paths.get(baseDir));
         Files.write(Paths.get(baseDir + "/" + className + ".java"), classContent.getBytes());
     }
 
@@ -456,7 +455,6 @@ public class SpringSecurity {
                 JWT_EXPIRATION_TIME=3600000
                 JWT_REFRESH_EXPIRATION_TIME=604800000
                 """, jwtTokenSecret);
-        Files.createDirectories(Paths.get(baseDir));
         Files.write(Paths.get(baseDir + "/" + fileName), envContent.getBytes());
     }
 }

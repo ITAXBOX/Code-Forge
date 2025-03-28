@@ -110,7 +110,6 @@ public class SpringService {
         );
 
         String baseDir = "./" + projectName + "/src/main/java/com/example/" + packagePath + "/behaviorservices";
-        Files.createDirectories(Paths.get(baseDir));
         String path = baseDir + "/" + className + ".java";
         Files.write(Paths.get(path), classCode.getBytes());
     }
@@ -173,7 +172,6 @@ public class SpringService {
                     }
                 }
                 """, projectName.toLowerCase(), projectName.toLowerCase(), projectName.toLowerCase(), projectName.toLowerCase(), projectName.toLowerCase());
-        Files.createDirectories(Paths.get(baseDir));
         Files.write(Paths.get(baseDir + "/" + className + ".java"), classContent.getBytes());
     }
 }

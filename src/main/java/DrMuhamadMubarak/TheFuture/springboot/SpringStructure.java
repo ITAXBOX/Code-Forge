@@ -16,10 +16,12 @@ public class SpringStructure {
         createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/models");
         createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/repositories");
         createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/services");
+        createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/behaviorservices");
         createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/security");
         createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/config");
         createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/config/jwt");
         createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/init");
+        createDirectory(baseDir + "/src/main/java/com/example/" + projectName.toLowerCase() + "/config/util");
 
         createDirectory(baseDir + "/src/main/resources/templates");
         createDirectory(baseDir + "/src/main/resources/static");

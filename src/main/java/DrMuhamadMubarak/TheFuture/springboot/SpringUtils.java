@@ -36,7 +36,6 @@ public class SpringUtils {
                 }
                 """, projectName.toLowerCase());
 
-        Files.createDirectories(Paths.get(baseDir));
         Files.write(Paths.get(baseDir + "/" + className + ".java"), classContent.getBytes());
     }
 }
