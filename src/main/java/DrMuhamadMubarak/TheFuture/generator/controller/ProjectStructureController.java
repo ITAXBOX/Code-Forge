@@ -15,7 +15,7 @@ import java.io.IOException;
 
 @Controller
 @AllArgsConstructor
-@SessionAttributes({"frontendType", "backendType", "databaseType", "projectDescription"})
+@SessionAttributes({"projectName", "frontendType", "backendType", "databaseType", "projectDescription"})
 public class ProjectStructureController {
 
     private final ProjectStructureService projectStructureService;
