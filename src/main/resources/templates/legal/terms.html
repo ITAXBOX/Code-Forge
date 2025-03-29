@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service | Code Forge</title>
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-light: #a78bfa;
+            --primary-dark: #7c3aed;
+            --accent: #06b6d4;
+            --background: #0f172a;
+            --card: #111827;
+            --text: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: var(--card);
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            margin-bottom: 2rem;
+        }
+
+        .back-link:hover {
+            background-color: rgba(139, 92, 246, 0.1);
+            transform: translateX(-5px);
+        }
+
+        .back-link svg {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin: 2rem 0 1rem;
+            color: var(--primary-light);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin: 1.5rem 0 0.75rem;
+            color: var(--text);
+        }
+
+        p, li {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .last-updated {
+            font-style: italic;
+            color: var(--text-secondary);
+            margin-top: 2rem;
+            text-align: right;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/static" th:href="@{/}" class="back-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Home Page
+    </a>
+
+    <h1>Terms of Service</h1>
+
+    <p>Last Updated: January 1, 2025</p>
+
+    <p>Welcome to Code Forge! These Terms of Service ("Terms") govern your use of our application generation service
+        ("Service"). By accessing or using our Service, you agree to be bound by these Terms.</p>
+
+    <h2>1. Account Registration</h2>
+
+    <p>To use certain features of the Service, you must register for an account. You agree to:</p>
+
+    <ul>
+        <li>Provide accurate, current, and complete information</li>
+        <li>Maintain the security of your password</li>
+        <li>Be responsible for all activities that occur under your account</li>
+    </ul>
+
+    <h2>2. Service Usage</h2>
+
+    <h3>2.1 Permitted Use</h3>
+    <p>You may use the Service to generate application code for your personal or commercial projects.</p>
+
+    <h3>2.2 Restrictions</h3>
+    <p>You agree not to:</p>
+    <ul>
+        <li>Reverse engineer, decompile, or disassemble the Service</li>
+        <li>Use the Service to create malicious or harmful software</li>
+        <li>Violate any applicable laws or regulations</li>
+    </ul>
+
+    <h2>3. Intellectual Property</h2>
+
+    <h3>3.1 Our Rights</h3>
+    <p>Code Forge retains all rights, title, and interest in and to the Service, including all related intellectual
+        property rights.</p>
+
+    <h3>3.2 Your Rights</h3>
+    <p>You retain ownership of any applications you generate using the Service, excluding any Code Forge proprietary
+        components.</p>
+
+    <h2>4. Payments and Subscriptions</h2>
+    <p>Certain features may require payment. You agree to pay all fees in accordance with the pricing and payment terms
+        presented to you.</p>
+
+    <h2>5. Termination</h2>
+    <p>We may terminate or suspend your account immediately, without prior notice, for any violation of these Terms.</p>
+
+    <h2>6. Disclaimer of Warranties</h2>
+    <p>The Service is provided "as is" without warranties of any kind, either express or implied.</p>
+
+    <h2>7. Limitation of Liability</h2>
+    <p>Code Forge shall not be liable for any indirect, incidental, special, or consequential damages resulting from
+        your use of the Service.</p>
+
+    <h2>8. Changes to Terms</h2>
+    <p>We reserve the right to modify these Terms at any time. We will notify you of significant changes through the
+        Service.</p>
+
+    <h2>9. Governing Law</h2>
+    <p>These Terms shall be governed by the laws of [Your Jurisdiction] without regard to its conflict of law
+        provisions.</p>
+
+    <h2>10. Contact Us</h2>
+    <p>If you have questions about these Terms, please contact us at callcenter@codeforge.com.</p>
+
+    <div class="last-updated">Last updated: January 1, 2025</div>
+</div>
+</body>
+</html>
