@@ -10,6 +10,11 @@ public class NavigationController {
         return "start";
     }
 
+    @GetMapping("/support")
+    public String support() {
+        return "resources/support";
+    }
+
     @GetMapping("/privacy-policy")
     public String privacyPolicy() {
         return "legal/privacy";
