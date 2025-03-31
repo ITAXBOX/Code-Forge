@@ -78,7 +78,7 @@ public class EntityJsonProcessorService {
             entityCodeGeneratorService.generateControllerClass(projectName, entityName);
 
             if (AI) {
-                behaviorService.generateEntityBehaviors(
+                behaviorService.generateEntityServiceBehaviors(
                         projectName,
                         entityName,
                         attributeStorageService.getAttributes()

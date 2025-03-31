@@ -290,7 +290,7 @@ public class ThePrompt {
             \s""";
 
     public static final String BEHAVIOR_PROMPT = """
-            Generate ONLY method implementations for %s entity.
+            Generate ONLY NON CRUD method implementations for %s entity.
             Attributes: %s
             Available Repositories: %s
             

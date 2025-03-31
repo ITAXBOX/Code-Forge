@@ -20,8 +20,9 @@ import static DrMuhamadMubarak.TheFuture.generator.ai.ThePrompt.BEHAVIOR_PROMPT;
 public class BehaviorService {
     private final AIService aiService;
     private final EntityCodeGeneratorService entityCodeGeneratorService;
+    private final BehaviorControllerService behaviorControllerService;
 
-    public void generateEntityBehaviors(String projectName, String entityName, List<AttributeDTO> attributes) throws IOException {
+    public void generateEntityServiceBehaviors(String projectName, String entityName, List<AttributeDTO> attributes) throws IOException {
         String attributeDescription = createAttributeDescription(attributes);
         String repositories = getRequiredRepositories(entityName, attributes);
 
@@ -47,6 +48,8 @@ public class BehaviorService {
                 entityName,
                 validatedMethods
         );
+
+        behaviorControllerService.generateControllerBehaviors(projectName, entityName, validatedMethods);
     }
 
     private String createAttributeDescription(List<AttributeDTO> attributes) {
