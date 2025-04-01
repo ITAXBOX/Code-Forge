@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static DrMuhamadMubarak.TheFuture.utils.Utils.capitalizeFirstLetter;
+import static DrMuhamadMubarak.TheFuture.utils.StringUtils.capitalizeFirstLetter;
 
 public class SpringEntities {
     public static void generateSpringEntityClass(String projectName, String entity) throws IOException {

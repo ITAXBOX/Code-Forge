@@ -1,6 +1,6 @@
 package DrMuhamadMubarak.TheFuture.springboot;
 
-import DrMuhamadMubarak.TheFuture.utils.Utils;
+import DrMuhamadMubarak.TheFuture.utils.TokenUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,7 +18,7 @@ public class SpringSecurity {
             generateJwtAuthFilter(projectName);
             generateJwtService(projectName);
 
-            generateEnvFile(projectName, Utils.generateSecureToken());
+            generateEnvFile(projectName, TokenUtils.generateSecureToken());
         } catch (IOException e) {
             System.err.println("Error generating security classes: " + e.getMessage());
         }

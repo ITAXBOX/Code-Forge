@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static DrMuhamadMubarak.TheFuture.utils.Utils.capitalizeFirstLetter;
-import static DrMuhamadMubarak.TheFuture.utils.Utils.createDirectory;
+import static DrMuhamadMubarak.TheFuture.utils.StringUtils.capitalizeFirstLetter;
+import static DrMuhamadMubarak.TheFuture.utils.FileUtils.createDirectory;
 
 public class SpringStructure {
     public static void generateSpringBootProjectStructure(String projectName, String frontendType, String databaseType) throws IOException {

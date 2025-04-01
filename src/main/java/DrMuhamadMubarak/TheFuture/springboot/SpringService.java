@@ -9,7 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static DrMuhamadMubarak.TheFuture.utils.Utils.capitalizeFirstLetter;
+import static DrMuhamadMubarak.TheFuture.utils.StringUtils.capitalizeFirstLetter;
 
 public class SpringService {
     public static void generateSpringServiceClass(String projectName, String entityName, List<AttributeDTO> attributes) throws IOException {
