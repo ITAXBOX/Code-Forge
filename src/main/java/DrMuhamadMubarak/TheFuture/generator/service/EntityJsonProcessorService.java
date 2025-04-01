@@ -69,7 +69,7 @@ public class EntityJsonProcessorService {
             }
 
             entityCodeGeneratorService.generateEntityClass(projectName, entityName);
-            entityCodeGeneratorService.generateRepositoryClass(projectName, entityName);
+            if (!AI) entityCodeGeneratorService.generateRepositoryClass(projectName, entityName);
 
             for (JsonNode attributeNode : attributesNode) {
                 AttributeDTO attribute = objectMapper.treeToValue(attributeNode, AttributeDTO.class);

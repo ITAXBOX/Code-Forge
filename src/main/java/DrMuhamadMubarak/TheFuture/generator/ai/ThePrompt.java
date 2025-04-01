@@ -329,6 +329,7 @@ public class ThePrompt {
             - Use only declared attributes
             - Include proper validation
             - No comments
+            - Don't use Streams or Lambdas
             - Only method implementations
             """;
 }
