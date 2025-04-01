@@ -42,8 +42,8 @@ public class SpringStructure {
     public static String getSpringApplicationPropertiesContent(String databaseType, String projectName) {
         return "server.port=8081\n" +
                "spring.datasource.url=jdbc:mysql://localhost:3306/" + projectName.toLowerCase() + "?createDatabaseIfNotExist=true\n" +
-               "spring.datasource.username=root\n" +
-               "spring.datasource.password=Sql01276084$\n" +
+               "spring.datasource.username=${DATABASE_USERNAME}\n" +
+               "spring.datasource.password=${DATABASE_PASSWORD}\n" +
                "spring.jpa.hibernate.ddl-auto=update";
     }
 

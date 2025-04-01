@@ -454,6 +454,8 @@ public class SpringSecurity {
                 JWT_TOKEN_SECRET=%s
                 JWT_EXPIRATION_TIME=3600000
                 JWT_REFRESH_EXPIRATION_TIME=604800000
+                DATABASE_USERNAME=root
+                DATABASE_PASSWORD=Sql01276084$
                 """, jwtTokenSecret);
         Files.write(Paths.get(baseDir + "/" + fileName), envContent.getBytes());
     }
