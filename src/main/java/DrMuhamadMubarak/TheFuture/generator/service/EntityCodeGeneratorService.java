@@ -2,6 +2,7 @@ package DrMuhamadMubarak.TheFuture.generator.service;
 
 import DrMuhamadMubarak.TheFuture.generator.dto.AttributeDTO;
 import DrMuhamadMubarak.TheFuture.springboot.*;
+import DrMuhamadMubarak.TheFuture.springboot.util.RepositoryEnhancer;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,7 @@ public class EntityCodeGeneratorService {
 
     public void generateBehaviorServiceClass(String projectName, String entityName, String behaviorMethods) throws IOException {
         SpringService.generateSpringBehaviorServiceClass(projectName, entityName, behaviorMethods);
+        RepositoryEnhancer.enhanceRepository(projectName, entityName, behaviorMethods);
     }
 
     public void generateAuthenticationServiceClass(String projectName) throws IOException {

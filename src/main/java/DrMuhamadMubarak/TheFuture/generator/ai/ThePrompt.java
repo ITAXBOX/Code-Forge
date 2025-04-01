@@ -290,40 +290,45 @@ public class ThePrompt {
             \s""";
 
     public static final String BEHAVIOR_PROMPT = """
-            Generate ONLY NON CRUD method implementations for %s entity.
-            Attributes: %s
-            Available Repositories: %s
+            STRICTLY GENERATE ONLY METHOD IMPLEMENTATIONS for %1$s entity. FOLLOW EXACTLY:
+            
+            CONTEXT:
+            - Main Entity Attributes: %2$s
+            - Available Repositories and Their Attributes:
+            %3$s
             
             STRICT RULES:
-            1. ONLY use these exact attributes: %s
-            2. NEVER use attributes/methods not in this list
-            3. If unsure, throw UnsupportedOperationException()
-            4. Use == for ID comparisons
-            5. Format:
-               @Transactional
-               public ReturnType methodName(Params) {
-                   Entity entity = repository.findById(id).orElseThrow();
-                   // ONLY use: entity.get[Attr], entity.set[Attr], repository.method()
-                   repository.save(entity);
-               }
+            1. ONLY USE THESE ATTRIBUTES:
+               - Main entity: %4$s
+               - Related entities: %5$s
+            2. ONLY USE THESE REPOSITORY METHODS:
+               - findById(), save(), delete()
+               - findBy[Attribute]()
+               - count()
+            3. NEVER INVENT METHODS OR ATTRIBUTES
+            4. VALIDATE ALL INPUTS WITH IllegalArgumentException
             
-            EXAMPLE FOR USER (if 'email' exists but 'active' doesn't):
+            METHOD FORMAT:
             @Transactional
-            public void updateEmail(Long userId, String email) {
+            public ReturnType methodName(Params) {
+                // Implementation
+            }
+            
+            EXAMPLES:
+            @Transactional
+            public void assignToDepartment(Long userId, Long deptId) {
+                if (userId == null || deptId == null) throw new IllegalArgumentException();
                 User user = userRepository.findById(userId).orElseThrow();
-                if (email == null) throw new IllegalArgumentException();
-                user.setEmail(email); // ✅ ALLOWED (email is declared)
+                Department dept = departmentRepository.findById(deptId).orElseThrow();
+                user.setDepartment(dept);
                 userRepository.save(user);
             }
             
-            @Transactional
-            public void deactivateUser(Long userId) {
-                throw new UnsupportedOperationException(); // ❌ 'active' not in attributes
-            }
-            
-            Generate 3-5 methods for %s using ONLY:
-            - Declared attributes
-            - Available repositories
+            Generate 4-6 methods for %6$s that:
+            - Solve real business needs
+            - Use only declared attributes
+            - Include proper validation
             - No comments
+            - Only method implementations
             """;
 }

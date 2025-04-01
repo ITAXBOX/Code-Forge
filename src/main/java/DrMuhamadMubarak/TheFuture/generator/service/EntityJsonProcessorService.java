@@ -1,6 +1,7 @@
 package DrMuhamadMubarak.TheFuture.generator.service;
 
 import DrMuhamadMubarak.TheFuture.generator.dto.AttributeDTO;
+import DrMuhamadMubarak.TheFuture.utils.EntityContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,7 @@ public class EntityJsonProcessorService {
     private final EntityCodeGeneratorService entityCodeGeneratorService;
     private final AttributeStorageService attributeStorageService;
     private final BehaviorService behaviorService;
+    private final EntityContext entityContext;
 
     public String processJsonAndGenerateEntities(boolean AI, String projectName, String json, Model model, String frontend, String backend, String database, String successMessage) {
         try {
@@ -78,14 +80,33 @@ public class EntityJsonProcessorService {
             entityCodeGeneratorService.generateControllerClass(projectName, entityName);
 
             if (AI) {
-                behaviorService.generateEntityServiceBehaviors(
-                        projectName,
-                        entityName,
-                        attributeStorageService.getAttributes()
-                );
+                List<AttributeDTO> attributes = new ArrayList<>();
+                for (JsonNode attributeNode : attributesNode) {
+                    AttributeDTO attribute = objectMapper.treeToValue(attributeNode, AttributeDTO.class);
+                    attributes.add(attribute);
+                }
+                entityContext.addEntity(entityName, attributes);
             }
 
             attributeStorageService.clearAttributes();
+        }
+
+        if (AI) {
+            for (JsonNode entityNode : entitiesNode) {
+                String entityName = entityNode.path("name").asText();
+                JsonNode attributesNode = entityNode.path("attributes");
+
+                List<AttributeDTO> attributes = new ArrayList<>();
+                for (JsonNode attributeNode : attributesNode) {
+                    attributes.add(objectMapper.treeToValue(attributeNode, AttributeDTO.class));
+                }
+
+                behaviorService.generateEntityServiceBehaviors(
+                        projectName,
+                        entityName,
+                        attributes
+                );
+            }
         }
 
         entityCodeGeneratorService.generateSecurityClass(projectName);

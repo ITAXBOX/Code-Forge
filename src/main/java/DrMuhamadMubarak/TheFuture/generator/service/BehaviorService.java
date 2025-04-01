@@ -3,6 +3,7 @@ package DrMuhamadMubarak.TheFuture.generator.service;
 import DrMuhamadMubarak.TheFuture.generator.ai.AIService;
 import DrMuhamadMubarak.TheFuture.generator.dto.AttributeDTO;
 import DrMuhamadMubarak.TheFuture.generator.dto.BehaviorGenerationResult;
+import DrMuhamadMubarak.TheFuture.utils.EntityContext;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +12,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static DrMuhamadMubarak.TheFuture.generator.ai.ThePrompt.BEHAVIOR_PROMPT;
 
@@ -21,17 +21,21 @@ public class BehaviorService {
     private final AIService aiService;
     private final EntityCodeGeneratorService entityCodeGeneratorService;
     private final BehaviorControllerService behaviorControllerService;
+    private final EntityContext entityContext;
 
     public void generateEntityServiceBehaviors(String projectName, String entityName, List<AttributeDTO> attributes) throws IOException {
         String attributeDescription = createAttributeDescription(attributes);
-        String repositories = getRequiredRepositories(entityName, attributes);
+        String repositoriesWithAttributes = buildRepositoriesWithAttributes(entityName, attributes);
+        String relatedEntitiesAttributes = getRelatedEntitiesAttributes(attributes);
 
         String prompt = String.format(BEHAVIOR_PROMPT,
                 entityName,
                 attributeDescription,
-                repositories,
+                repositoriesWithAttributes,
                 attributeDescription,
-                entityName);
+                relatedEntitiesAttributes,
+                entityName
+        );
 
         BehaviorGenerationResult result = aiService.generateBehaviorCode(prompt)
                 .blockOptional()
@@ -49,23 +53,59 @@ public class BehaviorService {
                 validatedMethods
         );
 
-        behaviorControllerService.generateControllerBehaviors(projectName, entityName, validatedMethods);
+        behaviorControllerService.generateControllerBehaviors(
+                projectName,
+                entityName,
+                validatedMethods);
     }
 
+    private String buildRepositoriesWithAttributes(String entityName, List<AttributeDTO> attributes) {
+        StringBuilder sb = new StringBuilder();
+
+        // Add main entity repository with attributes
+        sb.append("- ").append(entityName).append("Repository: ")
+                .append(createAttributeDescription(attributes)).append("\n");
+
+        // Add related entity repositories with their attributes
+        attributes.stream()
+                .filter(attr -> attr.getRelationshipType() != null)
+                .forEach(attr -> {
+                    String relatedEntity = attr.getRelatedEntity();
+                    if (entityContext.hasEntity(relatedEntity)) {
+                        List<AttributeDTO> relatedAttrs = entityContext.getAttributesFor(relatedEntity);
+                        sb.append("- ").append(relatedEntity).append("Repository: ")
+                                .append(createAttributeDescription(relatedAttrs)).append("\n");
+                    }
+                });
+
+        return sb.toString();
+    }
+
+    private String getRelatedEntitiesAttributes(List<AttributeDTO> attributes) {
+        String result = attributes.stream()
+                .filter(attr -> attr.getRelationshipType() != null)
+                .filter(attr -> entityContext.hasEntity(attr.getRelatedEntity()))
+                .map(attr -> {
+                    List<AttributeDTO> relatedAttrs = entityContext.getAttributesFor(attr.getRelatedEntity());
+                    return attr.getRelatedEntity() + ": " + createAttributeDescription(relatedAttrs);
+                })
+                .collect(Collectors.joining(", "));
+
+        return result.isEmpty() ? "NONE" : result;
+    }
+
+    // Modified to include relationship information
     private String createAttributeDescription(List<AttributeDTO> attributes) {
         return attributes.stream()
                 .filter(Objects::nonNull)
-                .map(attr -> attr.getAttributeName() + ":" + attr.getDataType())
+                .map(attr -> {
+                    String desc = attr.getAttributeName() + ":" + attr.getDataType();
+                    if (attr.getRelationshipType() != null) {
+                        desc += "(" + attr.getRelationshipType() + " to " + attr.getRelatedEntity() + ")";
+                    }
+                    return desc;
+                })
                 .collect(Collectors.joining(", "));
-    }
-
-    private String getRequiredRepositories(String entityName, List<AttributeDTO> attributes) {
-        return Stream.concat(
-                Stream.of(entityName + "Repository"),
-                attributes.stream()
-                        .filter(attr -> attr.getRelationshipType() != null)
-                        .map(attr -> attr.getRelatedEntity() + "Repository")
-        ).distinct().collect(Collectors.joining(", "));
     }
 
     private String processGeneratedMethods(String methods, String entityName,

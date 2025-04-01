@@ -3,7 +3,9 @@ package DrMuhamadMubarak.TheFuture.springboot;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -12,7 +14,7 @@ public class SpringBehaviorController {
     private static final String CONTROLLER_TEMPLATE = """
             package com.example.%s.behaviorcontrollers;
             
-            import com.example.%s.behaviorServices.*;
+            import com.example.%s.behaviorservices.*;
             import com.example.%s.models.*;
             import lombok.RequiredArgsConstructor;
             import org.springframework.web.bind.annotation.*;
@@ -30,15 +32,22 @@ public class SpringBehaviorController {
     public static void generateControllerClass(String projectName,
                                                String entityName,
                                                String behaviorMethods) throws IOException {
+
+        if (projectName == null || entityName == null || behaviorMethods == null) {
+            throw new IllegalArgumentException("Parameters cannot be null");
+        }
+
         // Extract endpoints from behavior methods
         String endpoints = generateEndpoints(behaviorMethods);
 
         String packagePath = projectName.toLowerCase();
+        String entityPath = entityName.toLowerCase();
+
         String controllerCode = String.format(CONTROLLER_TEMPLATE,
                 packagePath,
                 packagePath,
-                entityName,
-                entityName.toLowerCase(),
+                packagePath,
+                entityPath,
                 entityName,
                 entityName,
                 endpoints);
@@ -74,15 +83,29 @@ public class SpringBehaviorController {
     private static String generateEndpoint(String returnType, String methodName, String params) {
         String path = mapMethodToPath(methodName);
         String httpMethod = mapMethodToHttpMethod(methodName);
-        String paramMappings = Arrays.stream(params.split(","))
+
+        // Handle empty parameters
+        List<String> paramList = new ArrayList<>();
+        if (params != null && !params.trim().isEmpty()) {
+            paramList = Arrays.stream(params.split(","))
+                    .map(String::trim)
+                    .filter(p -> !p.isEmpty())
+                    .toList();
+        }
+
+        String paramMappings = paramList.stream()
                 .map(p -> {
-                    String[] parts = p.trim().split(" ");
+                    String[] parts = p.split("\\s+"); // Handle multiple spaces
                     String type = parts[0];
                     String name = parts[1];
                     return name.equals("id")
                             ? "@PathVariable " + type + " " + name
                             : "@RequestParam " + type + " " + name;
                 })
+                .collect(Collectors.joining(", "));
+
+        String methodCallArgs = paramList.stream()
+                .map(p -> p.split("\\s+")[1])
                 .collect(Collectors.joining(", "));
 
         return """
@@ -98,9 +121,8 @@ public class SpringBehaviorController {
                 paramMappings,
                 returnType.equals("void") ? "" : "return ",
                 methodName,
-                Arrays.stream(params.split(","))
-                        .map(p -> p.trim().split(" ")[1])
-                        .collect(Collectors.joining(", ")));
+                methodCallArgs
+        );
     }
 
     // Helper methods
