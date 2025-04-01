@@ -17,6 +17,7 @@ public class SpringBehaviorController {
             import com.example.%s.behaviorservices.*;
             import com.example.%s.models.*;
             import lombok.RequiredArgsConstructor;
+            import java.time.*;
             import org.springframework.web.bind.annotation.*;
             
             @RestController
