@@ -82,10 +82,9 @@ public class SpringBehaviorController {
     }
 
     private static String generateEndpoint(String returnType, String methodName, String params) {
-        String path = mapMethodToPath(methodName);
+        String basePath = mapMethodToPath(methodName);
         String httpMethod = mapMethodToHttpMethod(methodName);
 
-        // Handle empty parameters
         List<String> paramList = new ArrayList<>();
         if (params != null && !params.trim().isEmpty()) {
             paramList = Arrays.stream(params.split(","))
@@ -94,35 +93,67 @@ public class SpringBehaviorController {
                     .toList();
         }
 
+        StringBuilder pathBuilder = new StringBuilder(basePath);
+        List<String> pathVariables = new ArrayList<>();
+
         String paramMappings = paramList.stream()
                 .map(p -> {
-                    String[] parts = p.split("\\s+"); // Handle multiple spaces
-                    String type = parts[0];
-                    String name = parts[1];
-                    return name.equals("id")
-                            ? "@PathVariable " + type + " " + name
-                            : "@RequestParam " + type + " " + name;
+                    String[] parts = p.trim().split("\\s+");
+                    String name = parts[parts.length - 1];
+                    String type = String.join(" ", Arrays.copyOf(parts, parts.length - 1));
+
+                    if (name.equals("id") || name.endsWith("Id")) {
+                        pathVariables.add(name);
+                        return "@PathVariable " + type + " " + name;
+                    }
+                    return "@RequestParam " + type + " " + name;
                 })
                 .collect(Collectors.joining(", "));
 
+        if (!pathVariables.isEmpty()) {
+            for (String var : pathVariables) {
+                pathBuilder.append("/{").append(var).append("}");
+            }
+        }
+
         String methodCallArgs = paramList.stream()
-                .map(p -> p.split("\\s+")[1])
+                .map(p -> {
+                    String[] parts = p.trim().split("\\s+");
+                    return parts[parts.length - 1];
+                })
                 .collect(Collectors.joining(", "));
+
+        // Handle Optional return
+        boolean isOptional = returnType.startsWith("Optional<");
+        String actualReturnType = isOptional
+                ? returnType.substring("Optional<".length(), returnType.length() - 1)
+                : returnType;
+
+        String returnLine;
+        if (returnType.equals("void")) {
+            returnLine = "        behaviorService.%s(%s);".formatted(methodName, methodCallArgs);
+        } else if (isOptional) {
+            returnLine = """
+                    return behaviorService.%s(%s)
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));"""
+                    .formatted(methodName, methodCallArgs);
+        } else {
+            returnLine = "        return behaviorService.%s(%s);".formatted(methodName, methodCallArgs);
+        }
 
         return """
                 @%sMapping("%s")
                 public %s %s(%s) {
-                    %sbehaviorService.%s(%s);
+                %s
                 }
+                
                 """.formatted(
                 httpMethod,
-                path,
-                returnType,
+                pathBuilder.toString(),
+                actualReturnType,
                 methodName,
                 paramMappings,
-                returnType.equals("void") ? "" : "return ",
-                methodName,
-                methodCallArgs
+                returnLine
         );
     }
 
