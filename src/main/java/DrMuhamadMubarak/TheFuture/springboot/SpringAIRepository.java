@@ -12,6 +12,13 @@ public class SpringAIRepository {
             "findAll", "findById", "save", "deleteById", "delete", "existsById", "count"
     );
 
+    private static final Set<String> LIST_RETURNING_METHODS = Set.of(
+            "findAll", "findAllBy", "findBy", "list", "listAll", "search", "query"
+    );
+
+    private static final Pattern LIST_RETURN_PATTERN = Pattern.compile(
+            "List<\\w+>\\s+(" + String.join("|", LIST_RETURNING_METHODS) + "\\w*)\\(");
+
     public static void generateCompleteRepository(
             String projectName,
             String entityName,
@@ -33,7 +40,7 @@ public class SpringAIRepository {
         Set<MethodSignature> serviceMethodCalls = extractRepositoryCalls(behaviorServiceCode, repoVar, entityName);
         Set<MethodSignature> serviceDeclaredMethods = extractServiceMethods(behaviorServiceCode);
 
-        Set<MethodSignature> allMethods = new HashSet<>();
+        Set<MethodSignature> allMethods = new LinkedHashSet<>();
         for (MethodSignature m : serviceMethodCalls) {
             if (!DEFAULT_JPA_METHODS.contains(m.name) && !serviceDeclaredMethods.contains(m)) {
                 allMethods.add(m);
@@ -45,7 +52,6 @@ public class SpringAIRepository {
         if (!allMethods.isEmpty()) {
             String customMethods = allMethods.stream()
                     .map(MethodSignature::toString)
-                    .distinct()
                     .collect(Collectors.joining("\n\n"));
 
             repoContent = repoContent.replace("}", "\n\n" + customMethods + "\n}");
@@ -107,23 +113,68 @@ public class SpringAIRepository {
         while (matcher.find()) {
             String name = matcher.group(1);
             String rawParams = matcher.group(2);
-            String returnType = determineReturnType(name, entityName);
+            String returnType = determineReturnType(name, entityName, code);
             List<Param> params = parseParameters(rawParams, code);
             methods.add(new MethodSignature(returnType, name, params));
         }
         return methods;
     }
 
-    private static String determineReturnType(String methodName, String entityName) {
+    private static String determineReturnType(String methodName, String entityName, String contextCode) {
+        // First check for explicit List return types in the context
+        Matcher listMatcher = LIST_RETURN_PATTERN.matcher(contextCode);
+        while (listMatcher.find()) {
+            String matchedMethod = listMatcher.group(1);
+            if (matchedMethod.equals(methodName)) {
+                return "List<" + entityName + ">";
+            }
+        }
+
+        // Then check method name patterns
+        if (shouldReturnList(methodName)) {
+            return "List<" + entityName + ">";
+        }
+
         if (methodName.startsWith("find")) {
-            if (methodName.matches("findAll[A-Z].*")) return "List<" + entityName + ">";
             return "Optional<" + entityName + ">";
         }
-        if (methodName.startsWith("count")) return "long";
-        if (methodName.startsWith("exists")) return "boolean";
-        if (methodName.startsWith("delete") || methodName.startsWith("remove")) return "void";
-        if (methodName.equals("save")) return entityName;
+        if (methodName.startsWith("count")) {
+            return "long";
+        }
+        if (methodName.startsWith("exists")) {
+            return "boolean";
+        }
+        if (methodName.startsWith("delete") || methodName.startsWith("remove")) {
+            return "void";
+        }
+        if (methodName.equals("save")) {
+            return entityName;
+        }
         return "Object";
+    }
+
+    private static boolean shouldReturnList(String methodName) {
+        if (methodName.startsWith("findAll")) {
+            return true;
+        }
+        if (methodName.startsWith("findBy") &&
+            (methodName.contains("And") || methodName.contains("Or"))) {
+            return true;
+        }
+        if (methodName.startsWith("list")) {
+            return true;
+        }
+        if (methodName.startsWith("search")) {
+            return true;
+        }
+        if (methodName.startsWith("query")) {
+            return true;
+        }
+
+        String lowerName = methodName.toLowerCase();
+        return lowerName.contains("all") ||
+               lowerName.contains("multiple") ||
+               lowerName.contains("several");
     }
 
     private static List<Param> parseParameters(String rawParams, String contextCode) {
@@ -160,15 +211,20 @@ public class SpringAIRepository {
     private record MethodSignature(String returnType, String name, List<Param> params) {
         @Override
         public String toString() {
-            String paramStr = params.stream().map(p -> p.type + " " + p.name).collect(Collectors.joining(", "));
+            String paramStr = params.stream()
+                    .map(p -> p.type + " " + p.name)
+                    .collect(Collectors.joining(", "));
             return "    " + returnType + " " + name + "(" + paramStr + ");";
         }
 
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
-            if (!(o instanceof MethodSignature(String type, String name1, List<Param> params1))) return false;
-            return returnType.equals(type) && name.equals(name1) && params.equals(params1);
+            if (o == null || getClass() != o.getClass()) return false;
+            MethodSignature that = (MethodSignature) o;
+            return returnType.equals(that.returnType) &&
+                   name.equals(that.name) &&
+                   params.equals(that.params);
         }
 
         @Override
@@ -181,8 +237,9 @@ public class SpringAIRepository {
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
-            if (!(o instanceof Param(String type1, String name1))) return false;
-            return type.equals(type1) && name.equals(name1);
+            if (o == null || getClass() != o.getClass()) return false;
+            Param param = (Param) o;
+            return type.equals(param.type) && name.equals(param.name);
         }
 
         @Override

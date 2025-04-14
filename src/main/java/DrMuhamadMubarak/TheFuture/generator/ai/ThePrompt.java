@@ -56,6 +56,7 @@ public class ThePrompt {
              - Dont forget that entities should have relationships with each other (if needed).
              - In `@ManyToMany`, specify the owning side (without `mappedBy`) and inverse side (with `mappedBy`).
              - Include the predefined entities `"User"` and `"Role"` exactly as they are, without modification.
+             - You may add to User relationships with the other entities, but do not remove the existing ones.
             \s
              **Mandatory Relationship Fields:**
              - **MANY_TO_ONE:** Must include `@ManyToOne` with `@JoinColumn(name = "<related_entity>_id")`
@@ -333,5 +334,6 @@ public class ThePrompt {
             - No comments
             - Don't use Streams or Lambdas
             - Only method implementations
+            - Do not include any additional text, formatting, or explanations.
             """;
 }
