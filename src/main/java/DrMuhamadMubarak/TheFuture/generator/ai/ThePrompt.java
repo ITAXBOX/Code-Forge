@@ -311,6 +311,33 @@ public class ThePrompt {
             4. VALIDATE ALL INPUTS WITH IllegalArgumentException
             5. Use Optional in return type if needed
             
+            ALWAYS AVAILABLE METHODS to use from the repo class:
+            - For Role entity:
+              @Transactional
+              public Optional<Role> findByName(String name) {
+                  if (name == null) throw new IllegalArgumentException();
+                  return roleRepository.findByName(name);
+              }
+            
+            - For User entity:
+              @Transactional
+              public boolean existsByUsername(String username) {
+                  if (username == null) throw new IllegalArgumentException();
+                  return userRepository.existsByUsername(username);
+              }
+            
+              @Transactional
+              public Optional<User> findByEmail(String email) {
+                  if (email == null) throw new IllegalArgumentException();
+                  return userRepository.findByEmail(email);
+              }
+            
+              @Transactional
+              public Optional<User> findByUsername(String username) {
+                  if (username == null) throw new IllegalArgumentException();
+                  return userRepository.findByUsername(username);
+              }
+            
             METHOD FORMAT:
             @Transactional
             public ReturnType methodName(Params) {
@@ -329,7 +356,7 @@ public class ThePrompt {
             
             Generate 4-6 methods for %6$s that:
             - Solve real business needs
-            - Use only declared attributes
+            - USE ONLY DECLARED ATTRIBUTES
             - Include proper validation
             - No comments
             - Don't use Streams or Lambdas

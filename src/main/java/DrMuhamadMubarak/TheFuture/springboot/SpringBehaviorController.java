@@ -19,6 +19,8 @@ public class SpringBehaviorController {
             import lombok.RequiredArgsConstructor;
             import java.time.*;
             import org.springframework.web.bind.annotation.*;
+            import org.springframework.http.HttpStatus;
+            import org.springframework.web.server.ResponseStatusException;
             
             @RestController
             @RequestMapping("/api/%s")
@@ -33,12 +35,10 @@ public class SpringBehaviorController {
     public static void generateControllerClass(String projectName,
                                                String entityName,
                                                String behaviorMethods) throws IOException {
-
         if (projectName == null || entityName == null || behaviorMethods == null) {
             throw new IllegalArgumentException("Parameters cannot be null");
         }
 
-        // Extract endpoints from behavior methods
         String endpoints = generateEndpoints(behaviorMethods);
 
         String packagePath = projectName.toLowerCase();
@@ -60,10 +60,7 @@ public class SpringBehaviorController {
     }
 
     private static String generateEndpoints(String behaviorMethods) {
-        // Parse methods and generate corresponding endpoints
         StringBuilder endpoints = new StringBuilder();
-
-        // Pattern to match method signatures
         Pattern methodPattern = Pattern.compile(
                 "@Transactional\\s+public\\s+(\\w+)\\s+(\\w+)\\(([^)]*)\\)");
 
@@ -123,7 +120,6 @@ public class SpringBehaviorController {
                 })
                 .collect(Collectors.joining(", "));
 
-        // Handle Optional return
         boolean isOptional = returnType.startsWith("Optional<");
         String actualReturnType = isOptional
                 ? returnType.substring("Optional<".length(), returnType.length() - 1)
@@ -157,15 +153,15 @@ public class SpringBehaviorController {
         );
     }
 
-    // Helper methods
     private static String mapMethodToPath(String methodName) {
         if (methodName.startsWith("get")) return "/" + methodName.substring(3).toLowerCase();
+        if (methodName.startsWith("find")) return "/" + methodName.substring(4).toLowerCase();
         if (methodName.startsWith("update")) return "/" + methodName.substring(6).toLowerCase();
         return "/" + methodName.toLowerCase();
     }
 
     private static String mapMethodToHttpMethod(String methodName) {
-        if (methodName.startsWith("get")) return "Get";
+        if (methodName.startsWith("get") || methodName.startsWith("find")) return "Get";
         if (methodName.startsWith("create") || methodName.startsWith("add")) return "Post";
         if (methodName.startsWith("update")) return "Put";
         if (methodName.startsWith("delete") || methodName.startsWith("remove")) return "Delete";
