@@ -12,13 +12,6 @@ public class SpringAIRepository {
             "findAll", "findById", "save", "deleteById", "delete", "existsById", "count"
     );
 
-    private static final Set<String> LIST_RETURNING_METHODS = Set.of(
-            "findAll", "findAllBy", "findBy", "list", "listAll", "search", "query"
-    );
-
-    private static final Pattern LIST_RETURN_PATTERN = Pattern.compile(
-            "List<\\w+>\\s+(" + String.join("|", LIST_RETURNING_METHODS) + "\\w*)\\(");
-
     public static void generateCompleteRepository(
             String projectName,
             String entityName,
@@ -37,20 +30,13 @@ public class SpringAIRepository {
         Path repoPath = repoDir.resolve(entityName + "Repository.java");
         String repoVar = detectRepositoryVariableName(behaviorServiceCode, entityName);
 
-        Set<MethodSignature> serviceMethodCalls = extractRepositoryCalls(behaviorServiceCode, repoVar, entityName);
-        Set<MethodSignature> serviceDeclaredMethods = extractServiceMethods(behaviorServiceCode);
-
-        Set<MethodSignature> allMethods = new LinkedHashSet<>();
-        for (MethodSignature m : serviceMethodCalls) {
-            if (!DEFAULT_JPA_METHODS.contains(m.name) && !serviceDeclaredMethods.contains(m)) {
-                allMethods.add(m);
-            }
-        }
+        Map<String, String> repositoryMethodReturnTypes = analyzeRepositoryMethodUsage(behaviorServiceCode, repoVar, entityName);
+        Set<MethodSignature> repositoryMethods = extractRepositoryMethods(behaviorServiceCode, repoVar, entityName, repositoryMethodReturnTypes);
 
         String repoContent = generateBaseRepositoryContent(projectName, entityName);
 
-        if (!allMethods.isEmpty()) {
-            String customMethods = allMethods.stream()
+        if (!repositoryMethods.isEmpty()) {
+            String customMethods = repositoryMethods.stream()
                     .map(MethodSignature::toString)
                     .collect(Collectors.joining("\n\n"));
 
@@ -58,6 +44,52 @@ public class SpringAIRepository {
         }
 
         Files.writeString(repoPath, repoContent);
+    }
+
+    private static Map<String, String> analyzeRepositoryMethodUsage(String code, String repoVar, String entityName) {
+        Map<String, String> returnTypes = new HashMap<>();
+        // Pattern to capture service method return type and repository method usage
+        Pattern pattern = Pattern.compile(
+                "@Transactional\\s+public\\s+([\\w<>]+)\\s+\\w+\\([^)]*\\)\\s*\\{[^}]*?" +
+                Pattern.quote(repoVar) + "\\.(\\w+)\\([^)]*\\)([^}]*)}");
+
+        Matcher matcher = pattern.matcher(code);
+
+        while (matcher.find()) {
+            String serviceReturnType = matcher.group(1);
+            String repoMethodName = matcher.group(2);
+            String methodBody = matcher.group(3);
+
+            boolean returnsList = serviceReturnType.startsWith("List<") ||
+                                  methodBody.contains(".addAll(") ||
+                                  methodBody.contains("new ArrayList<") ||
+                                  methodBody.contains("Arrays.asList(") ||
+                                  methodBody.contains(".add(");
+
+            returnTypes.put(repoMethodName, returnsList ? "List<" + entityName + ">" : "Optional<" + entityName + ">");
+        }
+        return returnTypes;
+    }
+
+    private static Set<MethodSignature> extractRepositoryMethods(
+            String code, String repoVar, String entityName,
+            Map<String, String> returnTypes) {
+
+        Set<MethodSignature> methods = new LinkedHashSet<>();
+        Pattern pattern = Pattern.compile("\\b" + Pattern.quote(repoVar) + "\\.(\\w+)\\(([^)]*)\\)");
+        Matcher matcher = pattern.matcher(code);
+
+        while (matcher.find()) {
+            String name = matcher.group(1);
+            if (DEFAULT_JPA_METHODS.contains(name)) continue;
+
+            String rawParams = matcher.group(2);
+            List<Param> params = parseParameters(rawParams, code);
+
+            String returnType = returnTypes.getOrDefault(name, "Optional<" + entityName + ">");
+            methods.add(new MethodSignature(returnType, name, params));
+        }
+        return methods;
     }
 
     private static String detectRepositoryVariableName(String serviceCode, String entityName) {
@@ -91,97 +123,29 @@ public class SpringAIRepository {
                base + "}\n";
     }
 
-    private static Set<MethodSignature> extractServiceMethods(String code) {
-        Set<MethodSignature> methods = new HashSet<>();
-        Pattern pattern = Pattern.compile("public\\s+(\\w+(?:<[^>]+>)?)\\s+(\\w+)\\(([^)]*)\\)");
-        Matcher matcher = pattern.matcher(code);
-
-        while (matcher.find()) {
-            String returnType = matcher.group(1);
-            String name = matcher.group(2);
-            List<Param> params = parseParameters(matcher.group(3), code);
-            methods.add(new MethodSignature(returnType, name, params));
-        }
-        return methods;
-    }
-
-    private static Set<MethodSignature> extractRepositoryCalls(String code, String repoVar, String entityName) {
-        Set<MethodSignature> methods = new HashSet<>();
-        Pattern pattern = Pattern.compile("\\b" + Pattern.quote(repoVar) + "\\.(\\w+)\\(([^)]*)\\)");
-        Matcher matcher = pattern.matcher(code);
-
-        while (matcher.find()) {
-            String name = matcher.group(1);
-            String rawParams = matcher.group(2);
-            String returnType = determineReturnType(name, entityName, code);
-            List<Param> params = parseParameters(rawParams, code);
-            methods.add(new MethodSignature(returnType, name, params));
-        }
-        return methods;
-    }
-
-    private static String determineReturnType(String methodName, String entityName, String contextCode) {
-        // First check for explicit List return types in the context
-        Matcher listMatcher = LIST_RETURN_PATTERN.matcher(contextCode);
-        while (listMatcher.find()) {
-            String matchedMethod = listMatcher.group(1);
-            if (matchedMethod.equals(methodName)) {
-                return "List<" + entityName + ">";
-            }
-        }
-
-        // Then check method name patterns
-        if (shouldReturnList(methodName)) {
-            return "List<" + entityName + ">";
-        }
-
-        if (methodName.startsWith("find")) {
-            return "Optional<" + entityName + ">";
-        }
-        if (methodName.startsWith("count")) {
-            return "long";
-        }
-        if (methodName.startsWith("exists")) {
-            return "boolean";
-        }
-        if (methodName.startsWith("delete") || methodName.startsWith("remove")) {
-            return "void";
-        }
-        if (methodName.equals("save")) {
-            return entityName;
-        }
-        return "Object";
-    }
-
-    private static boolean shouldReturnList(String methodName) {
-        if (methodName.startsWith("findAll")) {
-            return true;
-        }
-        if (methodName.startsWith("findBy") &&
-            (methodName.contains("And") || methodName.contains("Or"))) {
-            return true;
-        }
-        if (methodName.startsWith("list")) {
-            return true;
-        }
-        if (methodName.startsWith("search")) {
-            return true;
-        }
-        if (methodName.startsWith("query")) {
-            return true;
-        }
-
-        String lowerName = methodName.toLowerCase();
-        return lowerName.contains("all") ||
-               lowerName.contains("multiple") ||
-               lowerName.contains("several");
-    }
-
     private static List<Param> parseParameters(String rawParams, String contextCode) {
         if (rawParams == null || rawParams.trim().isEmpty()) return Collections.emptyList();
-        return Arrays.stream(rawParams.split(","))
-                .map(String::trim)
-                .filter(p -> !p.isEmpty())
+
+        List<String> paramStrings = new ArrayList<>();
+        int angleBracketDepth = 0;
+        StringBuilder currentParam = new StringBuilder();
+
+        for (char c : rawParams.toCharArray()) {
+            if (c == '<') angleBracketDepth++;
+            if (c == '>') angleBracketDepth--;
+
+            if (c == ',' && angleBracketDepth == 0) {
+                paramStrings.add(currentParam.toString().trim());
+                currentParam = new StringBuilder();
+            } else {
+                currentParam.append(c);
+            }
+        }
+        if (!currentParam.isEmpty()) {
+            paramStrings.add(currentParam.toString().trim());
+        }
+
+        return paramStrings.stream()
                 .map(p -> {
                     String[] parts = p.split("\\s+");
                     if (parts.length == 1) {
@@ -190,13 +154,15 @@ public class SpringAIRepository {
                     } else if (parts.length == 2) {
                         return new Param(parts[0], parts[1]);
                     } else {
-                        return new Param(parts[parts.length - 2], parts[parts.length - 1]);
+                        String type = String.join(" ", Arrays.copyOf(parts, parts.length - 1));
+                        return new Param(type, parts[parts.length - 1]);
                     }
-                }).collect(Collectors.toList());
+                })
+                .collect(Collectors.toList());
     }
 
     private static String inferParameterType(String name, String code) {
-        Pattern p = Pattern.compile("(\\w+)\\s+" + Pattern.quote(name) + "\\s*[\";=)]");
+        Pattern p = Pattern.compile("(\\w+(?:<[^>]+>)?)\\s+" + Pattern.quote(name) + "\\s*[;=),]");
         Matcher m = p.matcher(code);
         if (m.find()) return m.group(1);
 
@@ -216,35 +182,7 @@ public class SpringAIRepository {
                     .collect(Collectors.joining(", "));
             return "    " + returnType + " " + name + "(" + paramStr + ");";
         }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            MethodSignature that = (MethodSignature) o;
-            return returnType.equals(that.returnType) &&
-                   name.equals(that.name) &&
-                   params.equals(that.params);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(returnType, name, params);
-        }
     }
 
-    private record Param(String type, String name) {
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Param param = (Param) o;
-            return type.equals(param.type) && name.equals(param.name);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(type, name);
-        }
-    }
+    private record Param(String type, String name) {}
 }
