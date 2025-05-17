@@ -2,6 +2,7 @@ package DrMuhamadMubarak.TheFuture.generator.controller;
 
 import DrMuhamadMubarak.TheFuture.generator.ai.AIService;
 import DrMuhamadMubarak.TheFuture.generator.service.EntityJsonProcessorService;
+import DrMuhamadMubarak.TheFuture.generator.service.RelationshipValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +18,7 @@ import static DrMuhamadMubarak.TheFuture.generator.ai.ThePrompt.*;
 public class AIProjectController {
     private final EntityJsonProcessorService entityJsonProcessorService;
     private final AIService aiService;
+    private final RelationshipValidator relationshipValidator;
 
     @PostMapping("/generate-entities-from-prompt")
     public String generateProjectFromPrompt(
@@ -49,12 +51,15 @@ public class AIProjectController {
                 return "error";
             }
 
+            // Step 2.5: Apply extra relationship validation to ensure all bidirectional relationships exist
+            String validatedEntitiesJson = relationshipValidator.validateAndFixRelationships(fixedEntitiesJson);
+
             String frontendType = (String) model.getAttribute("frontendType");
             String backendType = (String) model.getAttribute("backendType");
             String databaseType = (String) model.getAttribute("databaseType");
 
             // Step 3: Process the validated JSON and generate the project
-            return entityJsonProcessorService.processJsonAndGenerateEntities(true, projectName, fixedEntitiesJson, model,
+            return entityJsonProcessorService.processJsonAndGenerateEntities(true, projectName, validatedEntitiesJson, model,
                     frontendType, backendType, databaseType, "Project Generated Successfully Using OpenAI.");
         } catch (Exception e) {
             model.addAttribute("message", "An error occurred while generating JSON from prompt: " + e.getMessage());
