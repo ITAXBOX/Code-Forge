@@ -8,8 +8,53 @@ import java.util.stream.Collectors;
 
 public class SpringAIRepository {
 
+    // Default JPA methods that should not be duplicated
     private static final Set<String> DEFAULT_JPA_METHODS = Set.of(
             "findAll", "findById", "save", "deleteById", "delete", "existsById", "count"
+    );
+
+    // Known method name prefixes and their return types
+    private static final Map<String, String> METHOD_PREFIX_RETURN_TYPES = Map.of(
+            "findAll", "List",
+            "findBy", "Optional",
+            "getBy", "Optional",
+            "findFirstBy", "Optional",
+            "countBy", "Long",
+            "existsBy", "boolean",
+            "deleteBy", "void"
+    );
+
+    // Methods that should be excluded from duplicate checking
+    private static final Set<String> STANDARD_METHODS = Set.of(
+            "existsByUsername",
+            "findByEmail",
+            "findByUsername",
+            "findByName"
+    );
+
+    // Collection indicator method names - methods that should always return collections
+    private static final Set<String> COLLECTION_METHOD_PATTERNS = Set.of(
+            "findAll",
+            "findBy(.*)Between",
+            "findBy(.*)In",
+            "findBy(.*)After",
+            "findBy(.*)Before",
+            "findBy(.*)GreaterThan",
+            "findBy(.*)LessThan",
+            "findBy(.*)Containing",
+            "findBy(.*)NotIn",
+            "findBy(.*)Like",
+            "findBy(.*)OrderBy"
+    );
+
+    // Methods that should specifically return Optional<Entity> rather than List
+    private static final Set<String> SINGLE_ENTITY_METHOD_PATTERNS = Set.of(
+            "findByUsername",
+            "findByEmail",
+            "findByPhone",
+            "findByIdentifier",
+            "findByCode",
+            "findOneBy(.*)"
     );
 
     public static void generateCompleteRepository(
@@ -18,13 +63,13 @@ public class SpringAIRepository {
             String behaviorServiceCode) throws IOException {
 
         if (projectName == null || projectName.trim().isEmpty() ||
-            entityName == null || entityName.trim().isEmpty() ||
-            behaviorServiceCode == null || behaviorServiceCode.trim().isEmpty()) {
+                entityName == null || entityName.trim().isEmpty() ||
+                behaviorServiceCode == null || behaviorServiceCode.trim().isEmpty()) {
             throw new IllegalArgumentException("Inputs must not be null or empty");
         }
 
         Path repoDir = Paths.get("./" + projectName + "/src/main/java/com/example/" +
-                                 projectName.toLowerCase() + "/repositories/");
+                projectName.toLowerCase() + "/repositories/");
         Files.createDirectories(repoDir);
 
         Path repoPath = repoDir.resolve(entityName + "Repository.java");
@@ -36,39 +81,163 @@ public class SpringAIRepository {
         String repoContent = generateBaseRepositoryContent(projectName, entityName);
 
         if (!repositoryMethods.isEmpty()) {
+            // Keep track of methods we've already added to avoid duplicates
+            Set<String> addedMethodSignatures = extractExistingMethodSignatures(repoContent);
+
             String customMethods = repositoryMethods.stream()
+                    .filter(method -> !isDuplicateMethod(method, addedMethodSignatures))
                     .map(MethodSignature::toString)
                     .collect(Collectors.joining("\n\n"));
 
-            repoContent = repoContent.replace("}", "\n\n" + customMethods + "\n}");
+            if (!customMethods.isEmpty()) {
+                repoContent = repoContent.replace("}", "\n\n" + customMethods + "\n}");
+            }
         }
 
         Files.writeString(repoPath, repoContent);
     }
 
+    private static Set<String> extractExistingMethodSignatures(String repoContent) {
+        Set<String> signatures = new HashSet<>();
+        Pattern methodPattern = Pattern.compile("\\s+(\\w+(?:<[^>]+>)?)\\s+(\\w+)\\(([^)]*?)\\);");
+        Matcher methodMatcher = methodPattern.matcher(repoContent);
+
+        while (methodMatcher.find()) {
+            String methodName = methodMatcher.group(2);
+            signatures.add(methodName);
+        }
+
+        return signatures;
+    }
+
+    private static boolean isDuplicateMethod(MethodSignature method, Set<String> existingMethods) {
+        // If it's a standard method that's already defined, consider it a duplicate
+        if (STANDARD_METHODS.contains(method.name()) && existingMethods.contains(method.name())) {
+            return true;
+        }
+        return existingMethods.contains(method.name());
+    }
+
     private static Map<String, String> analyzeRepositoryMethodUsage(String code, String repoVar, String entityName) {
         Map<String, String> returnTypes = new HashMap<>();
+
         // Pattern to capture service method return type and repository method usage
         Pattern pattern = Pattern.compile(
-                "@Transactional\\s+public\\s+([\\w<>]+)\\s+\\w+\\([^)]*\\)\\s*\\{[^}]*?" +
-                Pattern.quote(repoVar) + "\\.(\\w+)\\([^)]*\\)([^}]*)}");
+                "@Transactional\\s+public\\s+([\\w<>\\s,]+)\\s+\\w+\\([^)]*\\)\\s*\\{([^}]*?)" +
+                        Pattern.quote(repoVar) + "\\.(\\w+)\\([^)]*\\)([^}]*)}");
 
         Matcher matcher = pattern.matcher(code);
 
         while (matcher.find()) {
-            String serviceReturnType = matcher.group(1);
-            String repoMethodName = matcher.group(2);
-            String methodBody = matcher.group(3);
+            String serviceReturnType = matcher.group(1).trim();
+            String beforeMethodCall = matcher.group(2);
+            String repoMethodName = matcher.group(3);
+            String afterMethodCall = matcher.group(4);
 
-            boolean returnsList = serviceReturnType.startsWith("List<") ||
-                                  methodBody.contains(".addAll(") ||
-                                  methodBody.contains("new ArrayList<") ||
-                                  methodBody.contains("Arrays.asList(") ||
-                                  methodBody.contains(".add(");
-
-            returnTypes.put(repoMethodName, returnsList ? "List<" + entityName + ">" : "Optional<" + entityName + ">");
+            String returnType = determineReturnType(serviceReturnType, beforeMethodCall + afterMethodCall,
+                    repoMethodName, entityName);
+            returnTypes.put(repoMethodName, returnType);
         }
+
+        // Look for repository methods outside @Transactional methods too
+        Pattern repoMethodPattern = Pattern.compile(
+                "\\b" + Pattern.quote(repoVar) + "\\.(\\w+)\\([^)]*\\)");
+        Matcher repoMethodMatcher = repoMethodPattern.matcher(code);
+
+        while (repoMethodMatcher.find()) {
+            String repoMethodName = repoMethodMatcher.group(1);
+            if (!returnTypes.containsKey(repoMethodName)) {
+                returnTypes.put(repoMethodName, inferReturnTypeFromMethodName(repoMethodName, entityName));
+            }
+        }
+
         return returnTypes;
+    }
+
+    private static String determineReturnType(String serviceReturnType, String methodBody,
+                                              String repoMethodName, String entityName) {
+        // Check if the method name tells us the return type
+        String inferredType = inferReturnTypeFromMethodName(repoMethodName, entityName);
+        if (inferredType != null) {
+            return inferredType;
+        }
+
+        // Check if service returns a list or collection type
+        boolean serviceReturnsList = serviceReturnType.startsWith("List<") ||
+                serviceReturnType.startsWith("Collection<") ||
+                serviceReturnType.contains("Iterable<");
+
+        // Check if method body uses collection operations
+        boolean usesCollectionOps = methodBody.contains(".addAll(") ||
+                methodBody.contains("new ArrayList<") ||
+                methodBody.contains("Arrays.asList(") ||
+                methodBody.contains(".add(") ||
+                methodBody.contains("stream().") ||
+                methodBody.contains(".forEach") ||
+                methodBody.contains(".collect(");
+
+        if (serviceReturnsList || usesCollectionOps) {
+            return "List<" + entityName + ">";
+        }
+
+        // Check for boolean methods
+        if (serviceReturnType.equals("boolean") || methodBody.contains("return true") ||
+                methodBody.contains("return false")) {
+            return "boolean";
+        }
+
+        // Check for count methods
+        if (serviceReturnType.equals("long") || serviceReturnType.equals("int") ||
+                serviceReturnType.equals("Integer") || serviceReturnType.equals("Long")) {
+            return "Long";
+        }
+
+        // Default to Optional for singular entity returns
+        return "Optional<" + entityName + ">";
+    }
+
+    private static String inferReturnTypeFromMethodName(String methodName, String entityName) {
+        // Check if method matches any of the collection method patterns
+        for (String pattern : COLLECTION_METHOD_PATTERNS) {
+            if (methodName.matches(pattern.replace("(.*)", ".*"))) {
+                return "List<" + entityName + ">";
+            }
+        }
+
+        // Check if method matches any of the single entity method patterns
+        for (String pattern : SINGLE_ENTITY_METHOD_PATTERNS) {
+            if (methodName.matches(pattern.replace("(.*)", ".*"))) {
+                return "Optional<" + entityName + ">";
+            }
+        }
+
+        // Methods that return an entity from a relationship often return a List
+        if (methodName.startsWith("findBy") && !methodName.startsWith("findById") &&
+            !methodName.contains("Username") && !methodName.contains("Email")) {
+            // These methods typically return lists when the parameter is singular
+            return "List<" + entityName + ">";
+        }
+
+        // Direct method prefix matching
+        for (Map.Entry<String, String> entry : METHOD_PREFIX_RETURN_TYPES.entrySet()) {
+            if (methodName.startsWith(entry.getKey())) {
+                String returnType = entry.getValue();
+                if (returnType.equals("List")) {
+                    return "List<" + entityName + ">";
+                } else if (returnType.equals("Optional")) {
+                    return "Optional<" + entityName + ">";
+                } else {
+                    return returnType;
+                }
+            }
+        }
+
+        // Generic inference
+        if (methodName.startsWith("findAll")) {
+            return "List<" + entityName + ">";
+        }
+
+        return null;
     }
 
     private static Set<MethodSignature> extractRepositoryMethods(
@@ -86,7 +255,11 @@ public class SpringAIRepository {
             String rawParams = matcher.group(2);
             List<Param> params = parseParameters(rawParams, code);
 
-            String returnType = returnTypes.getOrDefault(name, "Optional<" + entityName + ">");
+            String returnType = returnTypes.getOrDefault(name, inferReturnTypeFromMethodName(name, entityName));
+            if (returnType == null) {
+                returnType = "Optional<" + entityName + ">";
+            }
+
             methods.add(new MethodSignature(returnType, name, params));
         }
         return methods;
@@ -113,14 +286,14 @@ public class SpringAIRepository {
         }
 
         return "package com.example." + projectName.toLowerCase() + ".repositories;\n\n" +
-               "import org.springframework.data.jpa.repository.JpaRepository;\n" +
-               "import com.example." + projectName.toLowerCase() + ".models.*;\n" +
-               "import org.springframework.stereotype.Repository;\n" +
-               "import java.util.*;\n" +
-               "import java.time.*;\n\n" +
-               "@Repository\n" +
-               "public interface " + entityName + "Repository extends JpaRepository<" + entityName + ", Long> {\n" +
-               base + "}\n";
+                "import org.springframework.data.jpa.repository.JpaRepository;\n" +
+                "import com.example." + projectName.toLowerCase() + ".models.*;\n" +
+                "import org.springframework.stereotype.Repository;\n" +
+                "import java.util.*;\n" +
+                "import java.time.*;\n\n" +
+                "@Repository\n" +
+                "public interface " + entityName + "Repository extends JpaRepository<" + entityName + ", Long> {\n" +
+                base + "}\n";
     }
 
     private static List<Param> parseParameters(String rawParams, String contextCode) {
@@ -184,5 +357,6 @@ public class SpringAIRepository {
         }
     }
 
-    private record Param(String type, String name) {}
+    private record Param(String type, String name) {
+    }
 }
