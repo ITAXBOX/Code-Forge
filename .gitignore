@@ -39,5 +39,5 @@ build/
 .vscode/
 
 ### Next.js Template###
-.next
-.node_modules
+Code Forge Dashboard/.next
+Code Forge Dashboard/node_modules
