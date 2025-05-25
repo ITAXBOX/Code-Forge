@@ -356,7 +356,7 @@ public class ThePrompt {
             
             Generate 4-6 methods for %6$s that:
             - Solve real business needs
-            - USE ONLY DECLARED ATTRIBUTES
+            - USE ONLY DECLARED ATTRIBUTES ( User doesn't have "active" attribute, so don't use it)
             - Include proper validation
             - No comments
             - Don't use Streams or Lambdas
