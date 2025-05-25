@@ -1,7 +1,7 @@
 package DrMuhamadMubarak.TheFuture.generator.service;
 
 import DrMuhamadMubarak.TheFuture.generator.dto.AttributeDTO;
-import DrMuhamadMubarak.TheFuture.springboot.SpringEntitiesAttributes;
+import DrMuhamadMubarak.TheFuture.backend.springboot.SpringEntitiesAttributes;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;

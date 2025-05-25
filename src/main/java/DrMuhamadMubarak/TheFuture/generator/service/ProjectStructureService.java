@@ -1,6 +1,6 @@
 package DrMuhamadMubarak.TheFuture.generator.service;
 
-import DrMuhamadMubarak.TheFuture.springboot.SpringStructure;
+import DrMuhamadMubarak.TheFuture.backend.springboot.SpringStructure;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;

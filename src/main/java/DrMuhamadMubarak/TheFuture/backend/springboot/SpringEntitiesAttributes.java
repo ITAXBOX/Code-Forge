@@ -1,4 +1,4 @@
-package DrMuhamadMubarak.TheFuture.springboot;
+package DrMuhamadMubarak.TheFuture.backend.springboot;
 
 import DrMuhamadMubarak.TheFuture.generator.dto.AttributeDTO;
 import org.springframework.util.StringUtils;
