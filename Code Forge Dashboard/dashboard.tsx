@@ -233,10 +233,10 @@ export default function Dashboard() {
   const renderHomePage = () => (
     <div className="flex flex-col items-center justify-center h-[80vh] text-center">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-2">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-500 to-blue-600 bg-clip-text text-transparent mb-2">
           ENTITY MANAGER
         </h1>
-        <p className="text-slate-400 max-w-md mx-auto">
+        <p className="text-gray-600 max-w-md mx-auto">
           Generate complete backend applications with AI, including entity
           definitions, CRUD endpoints, and custom behavior.
         </p>
@@ -252,7 +252,7 @@ export default function Dashboard() {
         </Button>
         <Button
           variant="outline"
-          className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 px-8 py-6"
+          className="border-cyan-500 text-cyan-600 hover:bg-cyan-50 px-8 py-6"
           onClick={() => setCurrentPage("register")}
         >
           <UserPlus className="mr-2 h-5 w-5" />
@@ -283,9 +283,9 @@ export default function Dashboard() {
   // Render login page
   const renderLoginPage = () => (
     <div className="flex justify-center items-center h-[80vh]">
-      <Card className="w-full max-w-md bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+      <Card className="w-full max-w-md bg-white border-gray-200 backdrop-blur-sm shadow-lg">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+          <CardTitle className="text-2xl text-center bg-gradient-to-r from-cyan-500 to-blue-600 bg-clip-text text-transparent">
             Login to Code Forge
           </CardTitle>
         </CardHeader>
@@ -295,13 +295,13 @@ export default function Dashboard() {
             <Input
               id="email"
               placeholder="your.email@example.com"
-              className="bg-slate-800/50 border-slate-700 focus:border-cyan-500"
+              className="bg-gray-50 border-gray-300 focus:border-cyan-500"
             />
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Button variant="link" className="text-xs text-cyan-400 px-0">
+              <Button variant="link" className="text-xs text-cyan-600 px-0">
                 Forgot password?
               </Button>
             </div>
@@ -309,7 +309,7 @@ export default function Dashboard() {
               id="password"
               type="password"
               placeholder="••••••••"
-              className="bg-slate-800/50 border-slate-700 focus:border-cyan-500"
+              className="bg-gray-50 border-gray-300 focus:border-cyan-500"
             />
           </div>
         </CardContent>
@@ -320,11 +320,11 @@ export default function Dashboard() {
           >
             Login
           </Button>
-          <div className="text-center text-sm text-slate-500">
+          <div className="text-center text-sm text-gray-500">
             Don't have an account?{" "}
             <Button
               variant="link"
-              className="text-cyan-400 p-0"
+              className="text-cyan-600 p-0"
               onClick={() => setCurrentPage("register")}
             >
               Register
@@ -332,7 +332,7 @@ export default function Dashboard() {
           </div>
           <Button
             variant="outline"
-            className="w-full border-slate-700 text-slate-400 hover:bg-slate-800"
+            className="w-full border-gray-300 text-gray-600 hover:bg-gray-50"
             onClick={() => setCurrentPage("home")}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -346,9 +346,9 @@ export default function Dashboard() {
   // Render register page
   const renderRegisterPage = () => (
     <div className="flex justify-center items-center h-[80vh]">
-      <Card className="w-full max-w-md bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+      <Card className="w-full max-w-md bg-white border-gray-200 backdrop-blur-sm shadow-lg">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+          <CardTitle className="text-2xl text-center bg-gradient-to-r from-cyan-500 to-blue-600 bg-clip-text text-transparent">
             Create an Account
           </CardTitle>
         </CardHeader>
@@ -358,7 +358,7 @@ export default function Dashboard() {
             <Input
               id="name"
               placeholder="John Doe"
-              className="bg-slate-800/50 border-slate-700 focus:border-cyan-500"
+              className="bg-gray-50 border-gray-300 focus:border-cyan-500"
             />
           </div>
           <div className="space-y-2">
@@ -366,7 +366,7 @@ export default function Dashboard() {
             <Input
               id="email"
               placeholder="your.email@example.com"
-              className="bg-slate-800/50 border-slate-700 focus:border-cyan-500"
+              className="bg-gray-50 border-gray-300 focus:border-cyan-500"
             />
           </div>
           <div className="space-y-2">
@@ -375,7 +375,7 @@ export default function Dashboard() {
               id="password"
               type="password"
               placeholder="••••••••"
-              className="bg-slate-800/50 border-slate-700 focus:border-cyan-500"
+              className="bg-gray-50 border-gray-300 focus:border-cyan-500"
             />
           </div>
           <div className="space-y-2">
@@ -384,7 +384,7 @@ export default function Dashboard() {
               id="confirm-password"
               type="password"
               placeholder="••••••••"
-              className="bg-slate-800/50 border-slate-700 focus:border-cyan-500"
+              className="bg-gray-50 border-gray-300 focus:border-cyan-500"
             />
           </div>
         </CardContent>
@@ -395,11 +395,11 @@ export default function Dashboard() {
           >
             Register
           </Button>
-          <div className="text-center text-sm text-slate-500">
+          <div className="text-center text-sm text-gray-500">
             Already have an account?{" "}
             <Button
               variant="link"
-              className="text-cyan-400 p-0"
+              className="text-cyan-600 p-0"
               onClick={() => setCurrentPage("login")}
             >
               Login
@@ -407,7 +407,7 @@ export default function Dashboard() {
           </div>
           <Button
             variant="outline"
-            className="w-full border-slate-700 text-slate-400 hover:bg-slate-800"
+            className="w-full border-gray-300 text-gray-600 hover:bg-gray-50"
             onClick={() => setCurrentPage("home")}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -423,22 +423,22 @@ export default function Dashboard() {
     <div className="grid grid-cols-12 gap-6">
       {/* Sidebar */}
       <div className="col-span-12 md:col-span-3 lg:col-span-2">
-        <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm h-full">
+        <Card className="bg-white border-gray-200 backdrop-blur-sm h-full shadow-sm">
           <CardContent className="p-4">
             <div className="mb-6">
-              <div className="text-xs text-slate-500 mb-2 font-mono">
+              <div className="text-xs text-gray-500 mb-2 font-mono">
                 PROJECT
               </div>
-              <div className="text-sm font-medium text-slate-200 mb-1">
+              <div className="text-sm font-medium text-gray-900 mb-1">
                 E-Commerce API
               </div>
-              <div className="text-xs text-slate-500">Spring Boot / Java</div>
+              <div className="text-xs text-gray-500">Spring Boot / Java</div>
             </div>
 
-            <Separator className="my-4 bg-slate-700/50" />
+            <Separator className="my-4 bg-gray-200" />
 
             <div className="mb-4">
-              <div className="text-xs text-slate-500 mb-2 font-mono">
+              <div className="text-xs text-gray-500 mb-2 font-mono">
                 ENTITIES
               </div>
               <nav className="space-y-1">
@@ -448,8 +448,8 @@ export default function Dashboard() {
                     variant="ghost"
                     className={`w-full justify-start ${
                       selectedEntity === entity.name
-                        ? "bg-slate-800/70 text-cyan-400"
-                        : "text-slate-400 hover:text-slate-100"
+                        ? "bg-cyan-50 text-cyan-600"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                     }`}
                     onClick={() => {
                       setSelectedEntity(entity.name);
@@ -463,16 +463,16 @@ export default function Dashboard() {
               </nav>
             </div>
 
-            <Separator className="my-4 bg-slate-700/50" />
+            <Separator className="my-4 bg-gray-200" />
 
             <div>
-              <div className="text-xs text-slate-500 mb-2 font-mono">
+              <div className="text-xs text-gray-500 mb-2 font-mono">
                 ACTIONS
               </div>
               <nav className="space-y-1">
                 <Button
                   variant="ghost"
-                  className="w-full justify-start text-slate-400 hover:text-slate-100"
+                  className="w-full justify-start text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                   onClick={() => setCurrentPage("home")}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
@@ -487,17 +487,17 @@ export default function Dashboard() {
       {/* Main content */}
       <div className="col-span-12 md:col-span-9 lg:col-span-10">
         {selectedEntity ? (
-          <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
-            <CardHeader className="border-b border-slate-700/50 pb-3">
+          <Card className="bg-white border-gray-200 backdrop-blur-sm shadow-sm">
+            <CardHeader className="border-b border-gray-200 pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-slate-100 flex items-center">
-                  <Database className="mr-2 h-5 w-5 text-cyan-500" />
+                <CardTitle className="text-gray-900 flex items-center">
+                  <Database className="mr-2 h-5 w-5 text-cyan-600" />
                   {selectedEntity} Entity
                 </CardTitle>
                 <div className="flex items-center space-x-2">
                   <Badge
                     variant="outline"
-                    className="bg-slate-800/50 text-cyan-400 border-cyan-500/50 text-xs"
+                    className="bg-cyan-50 text-cyan-600 border-cyan-200 text-xs"
                   >
                     API v1.0
                   </Badge>
@@ -510,40 +510,40 @@ export default function Dashboard() {
                 value={selectedTab}
                 onValueChange={(value) => setSelectedTab(value as any)}
               >
-                <TabsList className="bg-slate-800/50 p-1 mb-6">
+                <TabsList className="bg-gray-100 p-1 mb-6">
                   <TabsTrigger
                     value="list"
-                    className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
+                    className="data-[state=active]:bg-white data-[state=active]:text-cyan-600"
                   >
                     List
                   </TabsTrigger>
                   <TabsTrigger
                     value="create"
-                    className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
+                    className="data-[state=active]:bg-white data-[state=active]:text-cyan-600"
                   >
                     Create
                   </TabsTrigger>
                   <TabsTrigger
                     value="detail"
-                    className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
+                    className="data-[state=active]:bg-white data-[state=active]:text-cyan-600"
                   >
                     Detail
                   </TabsTrigger>
                   <TabsTrigger
                     value="update"
-                    className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
+                    className="data-[state=active]:bg-white data-[state=active]:text-cyan-600"
                   >
                     Update
                   </TabsTrigger>
                   <TabsTrigger
                     value="delete"
-                    className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
+                    className="data-[state=active]:bg-white data-[state=active]:text-cyan-600"
                   >
                     Delete
                   </TabsTrigger>
                   <TabsTrigger
                     value="custom"
-                    className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
+                    className="data-[state=active]:bg-white data-[state=active]:text-cyan-600"
                   >
                     Custom
                   </TabsTrigger>
@@ -551,31 +551,31 @@ export default function Dashboard() {
 
                 <TabsContent value="list" className="mt-0">
                   <div className="flex justify-between items-center mb-4">
-                    <div className="text-sm text-slate-400">
+                    <div className="text-sm text-gray-600">
                       Endpoint:{" "}
-                      <span className="text-cyan-400 font-mono">
+                      <span className="text-cyan-600 font-mono">
                         GET /api/{selectedEntity.toLowerCase()}
                       </span>
                     </div>
                     <div className="flex space-x-2">
                       <div className="relative">
-                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-slate-500" />
+                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
                         <Input
                           placeholder="Search..."
-                          className="pl-8 bg-slate-800/50 border-slate-700 w-64"
+                          className="pl-8 bg-gray-50 border-gray-300 w-64"
                         />
                       </div>
                       <Button
                         variant="outline"
-                        className="border-slate-700 text-slate-400"
+                        className="border-gray-300 text-gray-600"
                       >
                         <RefreshCw className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
 
-                  <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 overflow-hidden">
-                    <div className="grid grid-cols-12 text-xs text-slate-400 p-3 border-b border-slate-700/50 bg-slate-800/50">
+                  <div className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+                    <div className="grid grid-cols-12 text-xs text-gray-600 p-3 border-b border-gray-200 bg-gray-100">
                       <div className="col-span-1">ID</div>
                       <div className="col-span-3">Name</div>
                       <div className="col-span-3">Description</div>
@@ -584,29 +584,29 @@ export default function Dashboard() {
                       <div className="col-span-2 text-right">Actions</div>
                     </div>
 
-                    <div className="divide-y divide-slate-700/30">
+                    <div className="divide-y divide-gray-200">
                       {Array.from({ length: 5 }).map((_, index) => (
                         <div
                           key={index}
-                          className="grid grid-cols-12 py-3 px-3 text-sm hover:bg-slate-800/50"
+                          className="grid grid-cols-12 py-3 px-3 text-sm hover:bg-gray-50"
                         >
-                          <div className="col-span-1 text-slate-500">
+                          <div className="col-span-1 text-gray-500">
                             {index + 1}
                           </div>
-                          <div className="col-span-3 text-slate-300">
+                          <div className="col-span-3 text-gray-900">
                             {selectedEntity} {index + 1}
                           </div>
-                          <div className="col-span-3 text-slate-400 truncate">
+                          <div className="col-span-3 text-gray-600 truncate">
                             Sample description for{" "}
                             {selectedEntity.toLowerCase()} {index + 1}
                           </div>
-                          <div className="col-span-2 text-slate-500">
+                          <div className="col-span-2 text-gray-500">
                             2023-05-{10 + index}
                           </div>
                           <div className="col-span-1">
                             <Badge
                               variant="outline"
-                              className="bg-green-500/10 text-green-400 border-green-500/30 text-xs"
+                              className="bg-green-50 text-green-600 border-green-200 text-xs"
                             >
                               Active
                             </Badge>
@@ -615,21 +615,21 @@ export default function Dashboard() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7 text-slate-400"
+                              className="h-7 w-7 text-gray-600"
                             >
                               <Eye className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7 text-slate-400"
+                              className="h-7 w-7 text-gray-600"
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7 text-slate-400"
+                              className="h-7 w-7 text-gray-600"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -640,42 +640,42 @@ export default function Dashboard() {
                   </div>
 
                   <div className="flex justify-between items-center mt-4">
-                    <div className="text-sm text-slate-500">
+                    <div className="text-sm text-gray-500">
                       Showing 5 of 24 items
                     </div>
                     <div className="flex space-x-1">
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-slate-700 text-slate-400"
+                        className="border-gray-300 text-gray-600"
                       >
                         <ArrowLeft className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-slate-700 bg-slate-800 text-cyan-400"
+                        className="border-gray-300 bg-cyan-50 text-cyan-600"
                       >
                         1
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-slate-700 text-slate-400"
+                        className="border-gray-300 text-gray-600"
                       >
                         2
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-slate-700 text-slate-400"
+                        className="border-gray-300 text-gray-600"
                       >
                         3
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-slate-700 text-slate-400"
+                        className="border-gray-300 text-gray-600"
                       >
                         <ArrowRight className="h-4 w-4" />
                       </Button>
@@ -684,21 +684,21 @@ export default function Dashboard() {
                 </TabsContent>
 
                 <TabsContent value="create" className="mt-0">
-                  <div className="text-sm text-slate-400 mb-4">
+                  <div className="text-sm text-gray-600 mb-4">
                     Endpoint:{" "}
-                    <span className="text-cyan-400 font-mono">
+                    <span className="text-cyan-600 font-mono">
                       POST /api/{selectedEntity.toLowerCase()}
                     </span>
                   </div>
 
-                  <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 p-6">
+                  <div className="bg-gray-50 rounded-lg border border-gray-200 p-6">
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="create-id">ID</Label>
                         <Input
                           id="create-id"
                           placeholder="Enter ID"
-                          className="bg-slate-800/50 border-slate-700"
+                          className="bg-white border-gray-300"
                         />
                       </div>
 
@@ -707,7 +707,7 @@ export default function Dashboard() {
                         <Input
                           id="name"
                           placeholder="Enter name"
-                          className="bg-slate-800/50 border-slate-700"
+                          className="bg-white border-gray-300"
                         />
                       </div>
 
@@ -716,7 +716,7 @@ export default function Dashboard() {
                         <Textarea
                           id="description"
                           placeholder="Enter description"
-                          className="bg-slate-800/50 border-slate-700 min-h-[100px]"
+                          className="bg-white border-gray-300 min-h-[100px]"
                         />
                       </div>
                     </div>
@@ -724,7 +724,7 @@ export default function Dashboard() {
                     <div className="mt-6 flex justify-end space-x-2">
                       <Button
                         variant="outline"
-                        className="border-slate-700 text-slate-400"
+                        className="border-gray-300 text-gray-600"
                       >
                         Cancel
                       </Button>
@@ -737,78 +737,78 @@ export default function Dashboard() {
                 </TabsContent>
 
                 <TabsContent value="detail" className="mt-0">
-                  <div className="text-sm text-slate-400 mb-4">
+                  <div className="text-sm text-gray-600 mb-4">
                     Endpoint:{" "}
-                    <span className="text-cyan-400 font-mono">
+                    <span className="text-cyan-600 font-mono">
                       GET /api/{selectedEntity.toLowerCase()}/1
                     </span>
                   </div>
 
-                  <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 p-6">
+                  <div className="bg-gray-50 rounded-lg border border-gray-200 p-6">
                     <div className="flex justify-between items-center mb-4">
                       <div className="flex items-center space-x-4">
-                        <div className="h-12 w-12 rounded-full bg-cyan-500/20 flex items-center justify-center">
-                          <Database className="h-6 w-6 text-cyan-500" />
+                        <div className="h-12 w-12 rounded-full bg-cyan-100 flex items-center justify-center">
+                          <Database className="h-6 w-6 text-cyan-600" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-medium text-slate-200">
+                          <h3 className="text-lg font-medium text-gray-900">
                             {selectedEntity} 1
                           </h3>
-                          <p className="text-sm text-slate-500">
+                          <p className="text-sm text-gray-500">
                             Created on 2023-05-10
                           </p>
                         </div>
                       </div>
                       <Badge
                         variant="outline"
-                        className="bg-green-500/10 text-green-400 border-green-500/30"
+                        className="bg-green-50 text-green-600 border-green-200"
                       >
                         Active
                       </Badge>
                     </div>
 
-                    <Separator className="my-4 bg-slate-700/50" />
+                    <Separator className="my-4 bg-gray-200" />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <h4 className="text-sm font-medium text-slate-400 mb-2">
+                        <h4 className="text-sm font-medium text-gray-600 mb-2">
                           Details
                         </h4>
                         <div className="space-y-3">
                           <div className="flex justify-between">
-                            <span className="text-sm text-slate-500">ID:</span>
-                            <span className="text-sm text-slate-300">1</span>
+                            <span className="text-sm text-gray-500">ID:</span>
+                            <span className="text-sm text-gray-900">1</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-sm text-slate-500">
+                            <span className="text-sm text-gray-500">
                               Name:
                             </span>
-                            <span className="text-sm text-slate-300">
+                            <span className="text-sm text-gray-900">
                               {selectedEntity} 1
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-sm text-slate-500">
+                            <span className="text-sm text-gray-500">
                               Description:
                             </span>
-                            <span className="text-sm text-slate-300">
+                            <span className="text-sm text-gray-900">
                               Sample description for{" "}
                               {selectedEntity.toLowerCase()} 1
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-sm text-slate-500">
+                            <span className="text-sm text-gray-500">
                               Category:
                             </span>
-                            <span className="text-sm text-slate-300">
+                            <span className="text-sm text-gray-900">
                               Category 1
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-sm text-slate-500">
+                            <span className="text-sm text-gray-500">
                               Status:
                             </span>
-                            <span className="text-sm text-green-400">
+                            <span className="text-sm text-green-600">
                               Active
                             </span>
                           </div>
@@ -816,54 +816,54 @@ export default function Dashboard() {
                       </div>
 
                       <div>
-                        <h4 className="text-sm font-medium text-slate-400 mb-2">
+                        <h4 className="text-sm font-medium text-gray-600 mb-2">
                           Metadata
                         </h4>
                         <div className="space-y-3">
                           <div className="flex justify-between">
-                            <span className="text-sm text-slate-500">
+                            <span className="text-sm text-gray-500">
                               Created At:
                             </span>
-                            <span className="text-sm text-slate-300">
+                            <span className="text-sm text-gray-900">
                               2023-05-10 14:30:45
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-sm text-slate-500">
+                            <span className="text-sm text-gray-500">
                               Updated At:
                             </span>
-                            <span className="text-sm text-slate-300">
+                            <span className="text-sm text-gray-900">
                               2023-05-15 09:12:33
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-sm text-slate-500">
+                            <span className="text-sm text-gray-500">
                               Created By:
                             </span>
-                            <span className="text-sm text-slate-300">
+                            <span className="text-sm text-gray-900">
                               admin@example.com
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-sm text-slate-500">
+                            <span className="text-sm text-gray-500">
                               Version:
                             </span>
-                            <span className="text-sm text-slate-300">1.2</span>
+                            <span className="text-sm text-gray-900">1.2</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-sm text-slate-500">
+                            <span className="text-sm text-gray-500">
                               Tags:
                             </span>
                             <div className="flex space-x-1">
                               <Badge
                                 variant="outline"
-                                className="bg-slate-800/50 text-slate-300 border-slate-700 text-xs"
+                                className="bg-gray-100 text-gray-700 border-gray-300 text-xs"
                               >
                                 tag1
                               </Badge>
                               <Badge
                                 variant="outline"
-                                className="bg-slate-800/50 text-slate-300 border-slate-700 text-xs"
+                                className="bg-gray-100 text-gray-700 border-gray-300 text-xs"
                               >
                                 tag2
                               </Badge>
@@ -876,20 +876,20 @@ export default function Dashboard() {
                     <div className="mt-6 flex justify-end space-x-2">
                       <Button
                         variant="outline"
-                        className="border-slate-700 text-slate-400"
+                        className="border-gray-300 text-gray-600"
                       >
                         Back
                       </Button>
                       <Button
                         variant="outline"
-                        className="border-slate-700 text-cyan-400"
+                        className="border-gray-300 text-cyan-600"
                       >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit
                       </Button>
                       <Button
                         variant="outline"
-                        className="border-slate-700 text-red-400"
+                        className="border-gray-300 text-red-600"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete
@@ -899,21 +899,21 @@ export default function Dashboard() {
                 </TabsContent>
 
                 <TabsContent value="update" className="mt-0">
-                  <div className="text-sm text-slate-400 mb-4">
+                  <div className="text-sm text-gray-600 mb-4">
                     Endpoint:{" "}
-                    <span className="text-cyan-400 font-mono">
+                    <span className="text-cyan-600 font-mono">
                       PUT /api/{selectedEntity.toLowerCase()}/1
                     </span>
                   </div>
 
-                  <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 p-6">
+                  <div className="bg-gray-50 rounded-lg border border-gray-200 p-6">
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="update-id">ID</Label>
                         <Input
                           id="update-id"
                           defaultValue="1"
-                          className="bg-slate-800/50 border-slate-700"
+                          className="bg-white border-gray-300"
                         />
                       </div>
 
@@ -922,7 +922,7 @@ export default function Dashboard() {
                         <Input
                           id="update-name"
                           defaultValue={`${selectedEntity} 1`}
-                          className="bg-slate-800/50 border-slate-700"
+                          className="bg-white border-gray-300"
                         />
                       </div>
 
@@ -933,7 +933,7 @@ export default function Dashboard() {
                         <Textarea
                           id="update-description"
                           defaultValue={`Sample description for ${selectedEntity.toLowerCase()} 1`}
-                          className="bg-slate-800/50 border-slate-700 min-h-[100px]"
+                          className="bg-white border-gray-300 min-h-[100px]"
                         />
                       </div>
                     </div>
@@ -941,7 +941,7 @@ export default function Dashboard() {
                     <div className="mt-6 flex justify-end space-x-2">
                       <Button
                         variant="outline"
-                        className="border-slate-700 text-slate-400"
+                        className="border-gray-300 text-gray-600"
                       >
                         Cancel
                       </Button>
@@ -954,47 +954,47 @@ export default function Dashboard() {
                 </TabsContent>
 
                 <TabsContent value="delete" className="mt-0">
-                  <div className="text-sm text-slate-400 mb-4">
+                  <div className="text-sm text-gray-600 mb-4">
                     Endpoint:{" "}
-                    <span className="text-cyan-400 font-mono">
+                    <span className="text-cyan-600 font-mono">
                       DELETE /api/{selectedEntity.toLowerCase()}/1
                     </span>
                   </div>
 
-                  <div className="bg-red-900/10 rounded-lg border border-red-700/30 p-6">
-                    <div className="flex items-center space-x-4 text-red-400 mb-4">
-                      <div className="h-10 w-10 rounded-full bg-red-500/20 flex items-center justify-center">
+                  <div className="bg-red-50 rounded-lg border border-red-200 p-6">
+                    <div className="flex items-center space-x-4 text-red-600 mb-4">
+                      <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
                         <Trash2 className="h-5 w-5" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-medium text-red-300">
+                        <h3 className="text-lg font-medium text-red-700">
                           Confirm Deletion
                         </h3>
-                        <p className="text-sm text-red-400/70">
+                        <p className="text-sm text-red-600">
                           This action cannot be undone. Please confirm.
                         </p>
                       </div>
                     </div>
 
-                    <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 p-4 mb-6">
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label className="text-slate-400">ID</Label>
-                          <div className="bg-slate-800/50 border border-slate-700 rounded-md px-3 py-2 text-slate-300">
+                          <Label className="text-gray-600">ID</Label>
+                          <div className="bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-gray-900">
                             1
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <Label className="text-slate-400">Name</Label>
-                          <div className="bg-slate-800/50 border border-slate-700 rounded-md px-3 py-2 text-slate-300">
+                          <Label className="text-gray-600">Name</Label>
+                          <div className="bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-gray-900">
                             {selectedEntity} 1
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-red-900/20 rounded-lg p-4 mb-6 border border-red-700/30">
-                      <p className="text-sm text-red-300">
+                    <div className="bg-red-100 rounded-lg p-4 mb-6 border border-red-200">
+                      <p className="text-sm text-red-700">
                         Deleting this {selectedEntity.toLowerCase()} will remove
                         all associated data and cannot be recovered. Related
                         entities may also be affected.
@@ -1004,7 +1004,7 @@ export default function Dashboard() {
                     <div className="flex justify-end space-x-2">
                       <Button
                         variant="outline"
-                        className="border-slate-700 text-slate-400"
+                        className="border-gray-300 text-gray-600"
                       >
                         Cancel
                       </Button>
@@ -1020,7 +1020,7 @@ export default function Dashboard() {
                 </TabsContent>
 
                 <TabsContent value="custom" className="mt-0">
-                  <div className="text-sm text-slate-400 mb-4">
+                  <div className="text-sm text-gray-600 mb-4">
                     Custom endpoints for {selectedEntity}
                   </div>
 
@@ -1031,20 +1031,20 @@ export default function Dashboard() {
                       .map((endpoint, index) => (
                         <div
                           key={index}
-                          className="bg-slate-800/30 rounded-lg border border-slate-700/50 overflow-hidden"
+                          className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm"
                         >
-                          <div className="border-b border-slate-700/50 bg-slate-800/50 p-4 flex justify-between items-center">
+                          <div className="border-b border-gray-200 bg-gray-50 p-4 flex justify-between items-center">
                             <div className="flex items-center space-x-3">
                               <Badge
                                 className={
                                   endpoint.startsWith("GET")
-                                    ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
-                                    : "bg-green-500/20 text-green-400 border-green-500/30"
+                                    ? "bg-blue-100 text-blue-600 border-blue-200"
+                                    : "bg-green-100 text-green-600 border-green-200"
                                 }
                               >
                                 {endpoint.split(" ")[0]}
                               </Badge>
-                              <span className="text-slate-200 font-mono text-sm">
+                              <span className="text-gray-900 font-mono text-sm">
                                 /api/{selectedEntity.toLowerCase()}
                                 {endpoint.split(" ")[1]}
                               </span>
@@ -1053,10 +1053,10 @@ export default function Dashboard() {
                           <div className="p-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                               <div className="space-y-3">
-                                <h4 className="text-sm font-medium text-slate-400">
+                                <h4 className="text-sm font-medium text-gray-600">
                                   Description
                                 </h4>
-                                <p className="text-sm text-slate-300">
+                                <p className="text-sm text-gray-900">
                                   {endpoint.includes("search") &&
                                     "Search for specific entities based on criteria"}
                                   {endpoint.includes("featured") &&
@@ -1075,11 +1075,11 @@ export default function Dashboard() {
                                     "Get items with low inventory levels"}
                                 </p>
 
-                                <h4 className="text-sm font-medium text-slate-400 mt-4">
+                                <h4 className="text-sm font-medium text-gray-600 mt-4">
                                   Parameters
                                 </h4>
-                                <div className="bg-slate-800/50 rounded-md border border-slate-700 p-3">
-                                  <code className="text-xs text-slate-300 font-mono">
+                                <div className="bg-gray-50 rounded-md border border-gray-300 p-3">
+                                  <code className="text-xs text-gray-700 font-mono">
                                     {endpoint.includes("search") &&
                                       "?query=string&limit=10&offset=0"}
                                     {endpoint.includes("featured") &&
@@ -1101,11 +1101,11 @@ export default function Dashboard() {
                               </div>
 
                               <div className="space-y-3">
-                                <h4 className="text-sm font-medium text-slate-400">
+                                <h4 className="text-sm font-medium text-gray-600">
                                   Response
                                 </h4>
-                                <div className="bg-slate-800/50 rounded-md border border-slate-700 p-3 h-[200px] overflow-auto">
-                                  <pre className="text-xs text-slate-300 font-mono">
+                                <div className="bg-gray-50 rounded-md border border-gray-300 p-3 h-[200px] overflow-auto">
+                                  <pre className="text-xs text-gray-700 font-mono">
                                     {endpoint.includes("GET")
                                       ? JSON.stringify(
                                           {
@@ -1160,15 +1160,15 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         ) : (
-          <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+          <Card className="bg-white border-gray-200 backdrop-blur-sm shadow-sm">
             <CardContent className="p-12 flex flex-col items-center justify-center text-center">
-              <div className="h-24 w-24 rounded-full bg-slate-800/50 flex items-center justify-center mb-6">
-                <Database className="h-12 w-12 text-cyan-500/50" />
+              <div className="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center mb-6">
+                <Database className="h-12 w-12 text-cyan-500" />
               </div>
-              <h2 className="text-2xl font-medium text-slate-300 mb-2">
+              <h2 className="text-2xl font-medium text-gray-900 mb-2">
                 Select an Entity
               </h2>
-              <p className="text-slate-500 max-w-md mb-6">
+              <p className="text-gray-600 max-w-md mb-6">
                 Choose an entity from the sidebar to view and manage its
                 properties, endpoints, and data.
               </p>
@@ -1177,7 +1177,7 @@ export default function Dashboard() {
                   <Button
                     key={entity.name}
                     variant="outline"
-                    className="border-slate-700 text-slate-400 hover:border-cyan-500/50 hover:text-cyan-400 h-auto py-4 px-6"
+                    className="border-gray-300 text-gray-600 hover:border-cyan-500 hover:text-cyan-600 hover:bg-cyan-50 h-auto py-4 px-6 flex-col"
                     onClick={() => {
                       setSelectedEntity(entity.name);
                       setSelectedTab("list");
@@ -1197,8 +1197,8 @@ export default function Dashboard() {
 
   // Render the current page
   return (
-    <div className="min-h-screen dark">
-      <div className="relative dark:bg-slate-950 min-h-screen">
+    <div className="min-h-screen">
+      <div className="relative bg-white min-h-screen">
         {/* Particle canvas */}
         <canvas
           suppressHydrationWarning
@@ -1207,18 +1207,18 @@ export default function Dashboard() {
         />
 
         {/* Header */}
-        <header className="relative z-10 border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm">
+        <header className="relative z-10 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
           <div className="container mx-auto px-4 py-3 flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Code className="h-6 w-6 text-cyan-500" />
-              <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-gradient-to-r from-cyan-500 to-blue-600 bg-clip-text text-transparent">
                 CODE FORGE
               </span>
             </div>
 
             <div className="flex items-center space-x-4">
               {mounted && (
-                <div className="text-sm text-slate-400">
+                <div className="text-sm text-gray-600">
                   {mounted && formatDate(currentTime)}{" "}
                   {mounted && formatTime(currentTime)}
                 </div>
@@ -1243,12 +1243,12 @@ export default function Dashboard() {
 // @ts-ignore
 function FeatureCard({ icon: Icon, title, description }) {
   return (
-    <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm rounded-lg p-6 flex flex-col items-center text-center">
-      <div className="h-12 w-12 rounded-full bg-cyan-500/20 flex items-center justify-center mb-4">
-        <Icon className="h-6 w-6 text-cyan-500" />
+    <div className="bg-white border border-gray-200 backdrop-blur-sm rounded-lg p-6 flex flex-col items-center text-center shadow-sm">
+      <div className="h-12 w-12 rounded-full bg-cyan-100 flex items-center justify-center mb-4">
+        <Icon className="h-6 w-6 text-cyan-600" />
       </div>
-      <h3 className="text-lg font-medium text-slate-200 mb-2">{title}</h3>
-      <p className="text-sm text-slate-400">{description}</p>
+      <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
+      <p className="text-sm text-gray-600">{description}</p>
     </div>
   );
 }
