@@ -1,0 +1,1254 @@
+"use client";
+
+import { useEffect, useState, useRef } from "react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Code,
+  Database,
+  Edit,
+  Eye,
+  FileCode,
+  LogIn,
+  LogOut,
+  RefreshCw,
+  Save,
+  Search,
+  Trash2,
+  UserPlus,
+  Sun,
+  Moon,
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+
+export default function Dashboard() {
+  const [currentPage, setCurrentPage] = useState<
+    "home" | "login" | "register" | "dashboard"
+  >("home");
+  const [selectedEntity, setSelectedEntity] = useState<string | null>(null);
+  const [selectedTab, setSelectedTab] = useState<
+    "list" | "create" | "detail" | "update" | "delete" | "custom"
+  >("list");
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentTime, setCurrentTime] = useState(() => new Date());
+  const [mounted, setMounted] = useState(false);
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Mock entities data
+  const entities = [
+    {
+      name: "User",
+      endpoints: ["GET", "POST", "PUT", "DELETE", "GET /search"],
+    },
+    {
+      name: "Product",
+      endpoints: [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "GET /featured",
+        "POST /discount",
+      ],
+    },
+    {
+      name: "Order",
+      endpoints: [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "POST /process",
+        "GET /history",
+      ],
+    },
+    { name: "Category", endpoints: ["GET", "POST", "PUT", "DELETE"] },
+    {
+      name: "Payment",
+      endpoints: ["GET", "POST", "GET /verify", "POST /refund"],
+    },
+    { name: "Inventory", endpoints: ["GET", "PUT", "GET /low-stock"] },
+  ];
+
+  // Simulate data loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Update time
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Particle effect
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+    const particles: Particle[] = [];
+    const particleCount = 100;
+
+    class Particle {
+      x: number;
+      y: number;
+      size: number;
+      speedX: number;
+      speedY: number;
+      color: string;
+
+      constructor() {
+        // @ts-ignore
+        this.x = Math.random() * canvas.width;
+        // @ts-ignore
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 3 + 1;
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.speedY = (Math.random() - 0.5) * 0.5;
+        this.color = `rgba(${Math.floor(Math.random() * 100) + 100}, ${
+          Math.floor(Math.random() * 100) + 150
+        }, ${Math.floor(Math.random() * 55) + 200}, ${
+          Math.random() * 0.5 + 0.2
+        })`;
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        // @ts-ignore
+        if (this.x > canvas.width) this.x = 0;
+        if (this.x < 0) {
+          // @ts-ignore
+          this.x = canvas.width;
+        }
+        // @ts-ignore
+        if (this.y > canvas.height) this.y = 0;
+        if (this.y < 0) {
+          // @ts-ignore
+          this.y = canvas.height;
+        }
+      }
+
+      draw() {
+        if (!ctx) return;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+
+    function animate() {
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (const particle of particles) {
+        particle.update();
+        particle.draw();
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    const handleResize = () => {
+      if (!canvas) return;
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  // Format time
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString("en-US", {
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+  };
+
+  // Format date
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  // Render home page
+  const renderHomePage = () => (
+    <div className="flex flex-col items-center justify-center h-[80vh] text-center">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-2">
+          ENTITY MANAGER
+        </h1>
+        <p className="text-slate-400 max-w-md mx-auto">
+          Generate complete backend applications with AI, including entity
+          definitions, CRUD endpoints, and custom behavior.
+        </p>
+      </div>
+
+      <div className="flex space-x-4">
+        <Button
+          className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-6"
+          onClick={() => setCurrentPage("login")}
+        >
+          <LogIn className="mr-2 h-5 w-5" />
+          Login
+        </Button>
+        <Button
+          variant="outline"
+          className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 px-8 py-6"
+          onClick={() => setCurrentPage("register")}
+        >
+          <UserPlus className="mr-2 h-5 w-5" />
+          Register
+        </Button>
+      </div>
+
+      <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl">
+        <FeatureCard
+          icon={Database}
+          title="Data Management"
+          description="Easily manage and organize your application data"
+        />
+        <FeatureCard
+          icon={RefreshCw}
+          title="API Integration"
+          description="Connect with powerful APIs and external services"
+        />
+        <FeatureCard
+          icon={FileCode}
+          title="User Authentication"
+          description="Secure access control for your application users"
+        />
+      </div>
+    </div>
+  );
+
+  // Render login page
+  const renderLoginPage = () => (
+    <div className="flex justify-center items-center h-[80vh]">
+      <Card className="w-full max-w-md bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl text-center bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+            Login to Code Forge
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              placeholder="your.email@example.com"
+              className="bg-slate-800/50 border-slate-700 focus:border-cyan-500"
+            />
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Password</Label>
+              <Button variant="link" className="text-xs text-cyan-400 px-0">
+                Forgot password?
+              </Button>
+            </div>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              className="bg-slate-800/50 border-slate-700 focus:border-cyan-500"
+            />
+          </div>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-4">
+          <Button
+            className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
+            onClick={() => setCurrentPage("dashboard")}
+          >
+            Login
+          </Button>
+          <div className="text-center text-sm text-slate-500">
+            Don't have an account?{" "}
+            <Button
+              variant="link"
+              className="text-cyan-400 p-0"
+              onClick={() => setCurrentPage("register")}
+            >
+              Register
+            </Button>
+          </div>
+          <Button
+            variant="outline"
+            className="w-full border-slate-700 text-slate-400 hover:bg-slate-800"
+            onClick={() => setCurrentPage("home")}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Home
+          </Button>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+
+  // Render register page
+  const renderRegisterPage = () => (
+    <div className="flex justify-center items-center h-[80vh]">
+      <Card className="w-full max-w-md bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl text-center bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+            Create an Account
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Full Name</Label>
+            <Input
+              id="name"
+              placeholder="John Doe"
+              className="bg-slate-800/50 border-slate-700 focus:border-cyan-500"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              placeholder="your.email@example.com"
+              className="bg-slate-800/50 border-slate-700 focus:border-cyan-500"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              className="bg-slate-800/50 border-slate-700 focus:border-cyan-500"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirm-password">Confirm Password</Label>
+            <Input
+              id="confirm-password"
+              type="password"
+              placeholder="••••••••"
+              className="bg-slate-800/50 border-slate-700 focus:border-cyan-500"
+            />
+          </div>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-4">
+          <Button
+            className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
+            onClick={() => setCurrentPage("dashboard")}
+          >
+            Register
+          </Button>
+          <div className="text-center text-sm text-slate-500">
+            Already have an account?{" "}
+            <Button
+              variant="link"
+              className="text-cyan-400 p-0"
+              onClick={() => setCurrentPage("login")}
+            >
+              Login
+            </Button>
+          </div>
+          <Button
+            variant="outline"
+            className="w-full border-slate-700 text-slate-400 hover:bg-slate-800"
+            onClick={() => setCurrentPage("home")}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Home
+          </Button>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+
+  // Render dashboard
+  const renderDashboard = () => (
+    <div className="grid grid-cols-12 gap-6">
+      {/* Sidebar */}
+      <div className="col-span-12 md:col-span-3 lg:col-span-2">
+        <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm h-full">
+          <CardContent className="p-4">
+            <div className="mb-6">
+              <div className="text-xs text-slate-500 mb-2 font-mono">
+                PROJECT
+              </div>
+              <div className="text-sm font-medium text-slate-200 mb-1">
+                E-Commerce API
+              </div>
+              <div className="text-xs text-slate-500">Spring Boot / Java</div>
+            </div>
+
+            <Separator className="my-4 bg-slate-700/50" />
+
+            <div className="mb-4">
+              <div className="text-xs text-slate-500 mb-2 font-mono">
+                ENTITIES
+              </div>
+              <nav className="space-y-1">
+                {entities.map((entity) => (
+                  <Button
+                    key={entity.name}
+                    variant="ghost"
+                    className={`w-full justify-start ${
+                      selectedEntity === entity.name
+                        ? "bg-slate-800/70 text-cyan-400"
+                        : "text-slate-400 hover:text-slate-100"
+                    }`}
+                    onClick={() => {
+                      setSelectedEntity(entity.name);
+                      setSelectedTab("list");
+                    }}
+                  >
+                    <Database className="mr-2 h-4 w-4" />
+                    {entity.name}
+                  </Button>
+                ))}
+              </nav>
+            </div>
+
+            <Separator className="my-4 bg-slate-700/50" />
+
+            <div>
+              <div className="text-xs text-slate-500 mb-2 font-mono">
+                ACTIONS
+              </div>
+              <nav className="space-y-1">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-slate-400 hover:text-slate-100"
+                  onClick={() => setCurrentPage("home")}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </Button>
+              </nav>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main content */}
+      <div className="col-span-12 md:col-span-9 lg:col-span-10">
+        {selectedEntity ? (
+          <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+            <CardHeader className="border-b border-slate-700/50 pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-slate-100 flex items-center">
+                  <Database className="mr-2 h-5 w-5 text-cyan-500" />
+                  {selectedEntity} Entity
+                </CardTitle>
+                <div className="flex items-center space-x-2">
+                  <Badge
+                    variant="outline"
+                    className="bg-slate-800/50 text-cyan-400 border-cyan-500/50 text-xs"
+                  >
+                    API v1.0
+                  </Badge>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <Tabs
+                defaultValue="list"
+                value={selectedTab}
+                onValueChange={(value) => setSelectedTab(value as any)}
+              >
+                <TabsList className="bg-slate-800/50 p-1 mb-6">
+                  <TabsTrigger
+                    value="list"
+                    className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
+                  >
+                    List
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="create"
+                    className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
+                  >
+                    Create
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="detail"
+                    className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
+                  >
+                    Detail
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="update"
+                    className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
+                  >
+                    Update
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="delete"
+                    className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
+                  >
+                    Delete
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="custom"
+                    className="data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400"
+                  >
+                    Custom
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="list" className="mt-0">
+                  <div className="flex justify-between items-center mb-4">
+                    <div className="text-sm text-slate-400">
+                      Endpoint:{" "}
+                      <span className="text-cyan-400 font-mono">
+                        GET /api/{selectedEntity.toLowerCase()}
+                      </span>
+                    </div>
+                    <div className="flex space-x-2">
+                      <div className="relative">
+                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-slate-500" />
+                        <Input
+                          placeholder="Search..."
+                          className="pl-8 bg-slate-800/50 border-slate-700 w-64"
+                        />
+                      </div>
+                      <Button
+                        variant="outline"
+                        className="border-slate-700 text-slate-400"
+                      >
+                        <RefreshCw className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 overflow-hidden">
+                    <div className="grid grid-cols-12 text-xs text-slate-400 p-3 border-b border-slate-700/50 bg-slate-800/50">
+                      <div className="col-span-1">ID</div>
+                      <div className="col-span-3">Name</div>
+                      <div className="col-span-3">Description</div>
+                      <div className="col-span-2">Created</div>
+                      <div className="col-span-1">Status</div>
+                      <div className="col-span-2 text-right">Actions</div>
+                    </div>
+
+                    <div className="divide-y divide-slate-700/30">
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <div
+                          key={index}
+                          className="grid grid-cols-12 py-3 px-3 text-sm hover:bg-slate-800/50"
+                        >
+                          <div className="col-span-1 text-slate-500">
+                            {index + 1}
+                          </div>
+                          <div className="col-span-3 text-slate-300">
+                            {selectedEntity} {index + 1}
+                          </div>
+                          <div className="col-span-3 text-slate-400 truncate">
+                            Sample description for{" "}
+                            {selectedEntity.toLowerCase()} {index + 1}
+                          </div>
+                          <div className="col-span-2 text-slate-500">
+                            2023-05-{10 + index}
+                          </div>
+                          <div className="col-span-1">
+                            <Badge
+                              variant="outline"
+                              className="bg-green-500/10 text-green-400 border-green-500/30 text-xs"
+                            >
+                              Active
+                            </Badge>
+                          </div>
+                          <div className="col-span-2 text-right space-x-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-slate-400"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-slate-400"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-slate-400"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center mt-4">
+                    <div className="text-sm text-slate-500">
+                      Showing 5 of 24 items
+                    </div>
+                    <div className="flex space-x-1">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-slate-700 text-slate-400"
+                      >
+                        <ArrowLeft className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-slate-700 bg-slate-800 text-cyan-400"
+                      >
+                        1
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-slate-700 text-slate-400"
+                      >
+                        2
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-slate-700 text-slate-400"
+                      >
+                        3
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-slate-700 text-slate-400"
+                      >
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="create" className="mt-0">
+                  <div className="text-sm text-slate-400 mb-4">
+                    Endpoint:{" "}
+                    <span className="text-cyan-400 font-mono">
+                      POST /api/{selectedEntity.toLowerCase()}
+                    </span>
+                  </div>
+
+                  <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 p-6">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="create-id">ID</Label>
+                        <Input
+                          id="create-id"
+                          placeholder="Enter ID"
+                          className="bg-slate-800/50 border-slate-700"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Name</Label>
+                        <Input
+                          id="name"
+                          placeholder="Enter name"
+                          className="bg-slate-800/50 border-slate-700"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea
+                          id="description"
+                          placeholder="Enter description"
+                          className="bg-slate-800/50 border-slate-700 min-h-[100px]"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-6 flex justify-end space-x-2">
+                      <Button
+                        variant="outline"
+                        className="border-slate-700 text-slate-400"
+                      >
+                        Cancel
+                      </Button>
+                      <Button className="bg-gradient-to-r from-cyan-500 to-blue-600">
+                        <Save className="mr-2 h-4 w-4" />
+                        Create {selectedEntity}
+                      </Button>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="detail" className="mt-0">
+                  <div className="text-sm text-slate-400 mb-4">
+                    Endpoint:{" "}
+                    <span className="text-cyan-400 font-mono">
+                      GET /api/{selectedEntity.toLowerCase()}/1
+                    </span>
+                  </div>
+
+                  <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 p-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <div className="flex items-center space-x-4">
+                        <div className="h-12 w-12 rounded-full bg-cyan-500/20 flex items-center justify-center">
+                          <Database className="h-6 w-6 text-cyan-500" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-medium text-slate-200">
+                            {selectedEntity} 1
+                          </h3>
+                          <p className="text-sm text-slate-500">
+                            Created on 2023-05-10
+                          </p>
+                        </div>
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className="bg-green-500/10 text-green-400 border-green-500/30"
+                      >
+                        Active
+                      </Badge>
+                    </div>
+
+                    <Separator className="my-4 bg-slate-700/50" />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <h4 className="text-sm font-medium text-slate-400 mb-2">
+                          Details
+                        </h4>
+                        <div className="space-y-3">
+                          <div className="flex justify-between">
+                            <span className="text-sm text-slate-500">ID:</span>
+                            <span className="text-sm text-slate-300">1</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm text-slate-500">
+                              Name:
+                            </span>
+                            <span className="text-sm text-slate-300">
+                              {selectedEntity} 1
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm text-slate-500">
+                              Description:
+                            </span>
+                            <span className="text-sm text-slate-300">
+                              Sample description for{" "}
+                              {selectedEntity.toLowerCase()} 1
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm text-slate-500">
+                              Category:
+                            </span>
+                            <span className="text-sm text-slate-300">
+                              Category 1
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm text-slate-500">
+                              Status:
+                            </span>
+                            <span className="text-sm text-green-400">
+                              Active
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h4 className="text-sm font-medium text-slate-400 mb-2">
+                          Metadata
+                        </h4>
+                        <div className="space-y-3">
+                          <div className="flex justify-between">
+                            <span className="text-sm text-slate-500">
+                              Created At:
+                            </span>
+                            <span className="text-sm text-slate-300">
+                              2023-05-10 14:30:45
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm text-slate-500">
+                              Updated At:
+                            </span>
+                            <span className="text-sm text-slate-300">
+                              2023-05-15 09:12:33
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm text-slate-500">
+                              Created By:
+                            </span>
+                            <span className="text-sm text-slate-300">
+                              admin@example.com
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm text-slate-500">
+                              Version:
+                            </span>
+                            <span className="text-sm text-slate-300">1.2</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm text-slate-500">
+                              Tags:
+                            </span>
+                            <div className="flex space-x-1">
+                              <Badge
+                                variant="outline"
+                                className="bg-slate-800/50 text-slate-300 border-slate-700 text-xs"
+                              >
+                                tag1
+                              </Badge>
+                              <Badge
+                                variant="outline"
+                                className="bg-slate-800/50 text-slate-300 border-slate-700 text-xs"
+                              >
+                                tag2
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 flex justify-end space-x-2">
+                      <Button
+                        variant="outline"
+                        className="border-slate-700 text-slate-400"
+                      >
+                        Back
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="border-slate-700 text-cyan-400"
+                      >
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="border-slate-700 text-red-400"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="update" className="mt-0">
+                  <div className="text-sm text-slate-400 mb-4">
+                    Endpoint:{" "}
+                    <span className="text-cyan-400 font-mono">
+                      PUT /api/{selectedEntity.toLowerCase()}/1
+                    </span>
+                  </div>
+
+                  <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 p-6">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="update-id">ID</Label>
+                        <Input
+                          id="update-id"
+                          defaultValue="1"
+                          className="bg-slate-800/50 border-slate-700"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="update-name">Name</Label>
+                        <Input
+                          id="update-name"
+                          defaultValue={`${selectedEntity} 1`}
+                          className="bg-slate-800/50 border-slate-700"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="update-description">
+                          Description
+                        </Label>
+                        <Textarea
+                          id="update-description"
+                          defaultValue={`Sample description for ${selectedEntity.toLowerCase()} 1`}
+                          className="bg-slate-800/50 border-slate-700 min-h-[100px]"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-6 flex justify-end space-x-2">
+                      <Button
+                        variant="outline"
+                        className="border-slate-700 text-slate-400"
+                      >
+                        Cancel
+                      </Button>
+                      <Button className="bg-gradient-to-r from-cyan-500 to-blue-600">
+                        <Save className="mr-2 h-4 w-4" />
+                        Update {selectedEntity}
+                      </Button>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="delete" className="mt-0">
+                  <div className="text-sm text-slate-400 mb-4">
+                    Endpoint:{" "}
+                    <span className="text-cyan-400 font-mono">
+                      DELETE /api/{selectedEntity.toLowerCase()}/1
+                    </span>
+                  </div>
+
+                  <div className="bg-red-900/10 rounded-lg border border-red-700/30 p-6">
+                    <div className="flex items-center space-x-4 text-red-400 mb-4">
+                      <div className="h-10 w-10 rounded-full bg-red-500/20 flex items-center justify-center">
+                        <Trash2 className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-medium text-red-300">
+                          Confirm Deletion
+                        </h3>
+                        <p className="text-sm text-red-400/70">
+                          This action cannot be undone. Please confirm.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-800/30 rounded-lg border border-slate-700/50 p-4 mb-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-slate-400">ID</Label>
+                          <div className="bg-slate-800/50 border border-slate-700 rounded-md px-3 py-2 text-slate-300">
+                            1
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-slate-400">Name</Label>
+                          <div className="bg-slate-800/50 border border-slate-700 rounded-md px-3 py-2 text-slate-300">
+                            {selectedEntity} 1
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-red-900/20 rounded-lg p-4 mb-6 border border-red-700/30">
+                      <p className="text-sm text-red-300">
+                        Deleting this {selectedEntity.toLowerCase()} will remove
+                        all associated data and cannot be recovered. Related
+                        entities may also be affected.
+                      </p>
+                    </div>
+
+                    <div className="flex justify-end space-x-2">
+                      <Button
+                        variant="outline"
+                        className="border-slate-700 text-slate-400"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        className="bg-red-600 hover:bg-red-700"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete Permanently
+                      </Button>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="custom" className="mt-0">
+                  <div className="text-sm text-slate-400 mb-4">
+                    Custom endpoints for {selectedEntity}
+                  </div>
+
+                  <div className="space-y-4">
+                    {entities
+                      .find((e) => e.name === selectedEntity)
+                      ?.endpoints.filter((e) => e.includes("/"))
+                      .map((endpoint, index) => (
+                        <div
+                          key={index}
+                          className="bg-slate-800/30 rounded-lg border border-slate-700/50 overflow-hidden"
+                        >
+                          <div className="border-b border-slate-700/50 bg-slate-800/50 p-4 flex justify-between items-center">
+                            <div className="flex items-center space-x-3">
+                              <Badge
+                                className={
+                                  endpoint.startsWith("GET")
+                                    ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
+                                    : "bg-green-500/20 text-green-400 border-green-500/30"
+                                }
+                              >
+                                {endpoint.split(" ")[0]}
+                              </Badge>
+                              <span className="text-slate-200 font-mono text-sm">
+                                /api/{selectedEntity.toLowerCase()}
+                                {endpoint.split(" ")[1]}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="p-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div className="space-y-3">
+                                <h4 className="text-sm font-medium text-slate-400">
+                                  Description
+                                </h4>
+                                <p className="text-sm text-slate-300">
+                                  {endpoint.includes("search") &&
+                                    "Search for specific entities based on criteria"}
+                                  {endpoint.includes("featured") &&
+                                    "Get featured or highlighted entities"}
+                                  {endpoint.includes("process") &&
+                                    "Process or execute an action on the entity"}
+                                  {endpoint.includes("history") &&
+                                    "Get historical data or activity log"}
+                                  {endpoint.includes("verify") &&
+                                    "Verify or validate the entity"}
+                                  {endpoint.includes("refund") &&
+                                    "Process a refund or reversal"}
+                                  {endpoint.includes("discount") &&
+                                    "Apply a discount or special pricing"}
+                                  {endpoint.includes("low-stock") &&
+                                    "Get items with low inventory levels"}
+                                </p>
+
+                                <h4 className="text-sm font-medium text-slate-400 mt-4">
+                                  Parameters
+                                </h4>
+                                <div className="bg-slate-800/50 rounded-md border border-slate-700 p-3">
+                                  <code className="text-xs text-slate-300 font-mono">
+                                    {endpoint.includes("search") &&
+                                      "?query=string&limit=10&offset=0"}
+                                    {endpoint.includes("featured") &&
+                                      "?limit=5&category=string"}
+                                    {endpoint.includes("process") &&
+                                      '{ "status": "processing" }'}
+                                    {endpoint.includes("history") &&
+                                      "?from=date&to=date"}
+                                    {endpoint.includes("verify") &&
+                                      "?token=string"}
+                                    {endpoint.includes("refund") &&
+                                      '{ "amount": number, "reason": "string" }'}
+                                    {endpoint.includes("discount") &&
+                                      '{ "percentage": number, "code": "string" }'}
+                                    {endpoint.includes("low-stock") &&
+                                      "?threshold=10"}
+                                  </code>
+                                </div>
+                              </div>
+
+                              <div className="space-y-3">
+                                <h4 className="text-sm font-medium text-slate-400">
+                                  Response
+                                </h4>
+                                <div className="bg-slate-800/50 rounded-md border border-slate-700 p-3 h-[200px] overflow-auto">
+                                  <pre className="text-xs text-slate-300 font-mono">
+                                    {endpoint.includes("GET")
+                                      ? JSON.stringify(
+                                          {
+                                            data: [
+                                              {
+                                                id: 1,
+                                                name: `${selectedEntity} 1`,
+                                              },
+                                              {
+                                                id: 2,
+                                                name: `${selectedEntity} 2`,
+                                              },
+                                            ],
+                                            meta: {
+                                              total: 24,
+                                              page: 1,
+                                              limit: 10,
+                                            },
+                                          },
+                                          null,
+                                          2
+                                        )
+                                      : JSON.stringify(
+                                          {
+                                            success: true,
+                                            message:
+                                              "Operation completed successfully",
+                                            data: {
+                                              id: 1,
+                                              name: `${selectedEntity} 1`,
+                                            },
+                                          },
+                                          null,
+                                          2
+                                        )}
+                                  </pre>
+                                </div>
+
+                                <div className="flex justify-end mt-4">
+                                  <Button className="bg-gradient-to-r from-cyan-500 to-blue-600">
+                                    Test Endpoint
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+            <CardContent className="p-12 flex flex-col items-center justify-center text-center">
+              <div className="h-24 w-24 rounded-full bg-slate-800/50 flex items-center justify-center mb-6">
+                <Database className="h-12 w-12 text-cyan-500/50" />
+              </div>
+              <h2 className="text-2xl font-medium text-slate-300 mb-2">
+                Select an Entity
+              </h2>
+              <p className="text-slate-500 max-w-md mb-6">
+                Choose an entity from the sidebar to view and manage its
+                properties, endpoints, and data.
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-w-2xl">
+                {entities.slice(0, 6).map((entity) => (
+                  <Button
+                    key={entity.name}
+                    variant="outline"
+                    className="border-slate-700 text-slate-400 hover:border-cyan-500/50 hover:text-cyan-400 h-auto py-4 px-6"
+                    onClick={() => {
+                      setSelectedEntity(entity.name);
+                      setSelectedTab("list");
+                    }}
+                  >
+                    <Database className="h-5 w-5 mb-2" />
+                    <span>{entity.name}</span>
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+
+  // Render the current page
+  return (
+    <div className="min-h-screen dark">
+      <div className="relative dark:bg-slate-950 min-h-screen">
+        {/* Particle canvas */}
+        <canvas
+          suppressHydrationWarning
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full pointer-events-none"
+        />
+
+        {/* Header */}
+        <header className="relative z-10 border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm">
+          <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Code className="h-6 w-6 text-cyan-500" />
+              <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                CODE FORGE
+              </span>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              {mounted && (
+                <div className="text-sm text-slate-400">
+                  {mounted && formatDate(currentTime)}{" "}
+                  {mounted && formatTime(currentTime)}
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
+
+        {/* Main content */}
+        <main className="relative z-10 container mx-auto px-4 py-8">
+          {currentPage === "home" && renderHomePage()}
+          {currentPage === "login" && renderLoginPage()}
+          {currentPage === "register" && renderRegisterPage()}
+          {currentPage === "dashboard" && renderDashboard()}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+// Feature card component for the home page
+// @ts-ignore
+function FeatureCard({ icon: Icon, title, description }) {
+  return (
+    <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm rounded-lg p-6 flex flex-col items-center text-center">
+      <div className="h-12 w-12 rounded-full bg-cyan-500/20 flex items-center justify-center mb-4">
+        <Icon className="h-6 w-6 text-cyan-500" />
+      </div>
+      <h3 className="text-lg font-medium text-slate-200 mb-2">{title}</h3>
+      <p className="text-sm text-slate-400">{description}</p>
+    </div>
+  );
+}
