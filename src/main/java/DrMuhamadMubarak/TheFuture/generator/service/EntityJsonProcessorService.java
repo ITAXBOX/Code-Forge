@@ -17,6 +17,7 @@ import java.util.List;
 public class EntityJsonProcessorService {
 
     private final EntityCodeGeneratorService entityCodeGeneratorService;
+    private final FrontendService frontendService;
     private final AttributeStorageService attributeStorageService;
     private final BehaviorService behaviorService;
     private final EntityContext entityContext;
@@ -116,5 +117,8 @@ public class EntityJsonProcessorService {
         entityCodeGeneratorService.generateAuthenticationControllerClass(projectName);
 
         entityCodeGeneratorService.generateUtils(projectName);
+
+        if (AI)
+            frontendService.createFrontendFiles(projectName);
     }
 }
