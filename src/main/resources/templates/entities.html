@@ -390,7 +390,7 @@
             border: none;
         }
 
-        .openai-text {
+        .deepseek-text {
             background: linear-gradient(to right, var(--primary), var(--accent));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -425,7 +425,7 @@
             <h2>AI-Powered Project Generation</h2>
             <p class="option-description">Let our AI analyze your project requirements and automatically generate the
                 entire project, including entities, attributes, relationships, and security, using <span
-                        class="openai-text">OpenAI</span>.</p>
+                        class="deepseek-text">DeepSeek</span>.</p>
             <form id="auto-generate-form" th:action="@{/generate-entities-from-prompt}" method="post">
                 <input type="hidden" id="projectNamePrompt" name="projectName" th:value="${projectName}"/>
                 <button type="submit" class="btn btn-primary">
