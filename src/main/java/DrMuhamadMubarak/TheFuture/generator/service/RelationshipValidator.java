@@ -56,7 +56,7 @@ public class RelationshipValidator {
 
                         // Find the related entity
                         ObjectNode relatedEntityNode = entityMap.get(relatedEntityName);
-                        if (relatedEntityNode != null) {
+                        if (relatedEntityNode != null && !relatedEntityName.equalsIgnoreCase("Role")) {
                             ensureComplementaryRelationship(
                                     relatedEntityNode,
                                     entityName,
