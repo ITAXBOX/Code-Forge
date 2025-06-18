@@ -1,6 +1,6 @@
 package DrMuhamadMubarak.TheFuture.frontend.nextjs.service;
 
-import DrMuhamadMubarak.TheFuture.frontend.nextjs.model.EntityInfo;
+import DrMuhamadMubarak.TheFuture.frontend.nextjs.metadata.EntityInfo;
 
 import java.io.BufferedReader;
 import java.io.File;

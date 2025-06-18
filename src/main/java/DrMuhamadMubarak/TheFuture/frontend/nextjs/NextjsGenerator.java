@@ -1,6 +1,6 @@
 package DrMuhamadMubarak.TheFuture.frontend.nextjs;
 
-import DrMuhamadMubarak.TheFuture.frontend.nextjs.model.EntityInfo;
+import DrMuhamadMubarak.TheFuture.frontend.nextjs.metadata.EntityInfo;
 import DrMuhamadMubarak.TheFuture.frontend.nextjs.service.ApiGeneratorService;
 import DrMuhamadMubarak.TheFuture.frontend.nextjs.service.EntityExtractorService;
 import DrMuhamadMubarak.TheFuture.frontend.nextjs.service.NextjsFileService;

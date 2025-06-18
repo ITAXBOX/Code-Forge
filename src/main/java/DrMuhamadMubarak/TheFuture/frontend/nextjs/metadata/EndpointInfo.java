@@ -1,4 +1,4 @@
-package DrMuhamadMubarak.TheFuture.frontend.nextjs.model;
+package DrMuhamadMubarak.TheFuture.frontend.nextjs.metadata;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

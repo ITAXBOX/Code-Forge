@@ -1,7 +1,7 @@
 package DrMuhamadMubarak.TheFuture.frontend.nextjs.service;
 
-import DrMuhamadMubarak.TheFuture.frontend.nextjs.model.EntityInfo;
-import DrMuhamadMubarak.TheFuture.frontend.nextjs.model.EndpointInfo;
+import DrMuhamadMubarak.TheFuture.frontend.nextjs.metadata.EntityInfo;
+import DrMuhamadMubarak.TheFuture.frontend.nextjs.metadata.EndpointInfo;
 
 import java.io.File;
 import java.io.IOException;
