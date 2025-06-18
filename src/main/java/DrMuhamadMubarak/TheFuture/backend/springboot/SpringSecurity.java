@@ -45,6 +45,11 @@ public class SpringSecurity {
                 import org.springframework.security.crypto.password.PasswordEncoder;
                 import org.springframework.security.web.SecurityFilterChain;
                 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+                import org.springframework.web.cors.CorsConfiguration;
+                import org.springframework.web.cors.CorsConfigurationSource;
+                import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+                
+                import java.util.List;
                 
                 @Configuration
                 @EnableWebSecurity
@@ -58,6 +63,7 @@ public class SpringSecurity {
                     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                         http
                                 .csrf(AbstractHttpConfigurer::disable)
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .authorizeHttpRequests(auth -> auth
                                         .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
@@ -69,6 +75,31 @@ public class SpringSecurity {
                                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
                 
                         return http.build();
+                    }
+                
+                    @Bean
+                    public CorsConfigurationSource corsConfigurationSource() {
+                        CorsConfiguration config = new CorsConfiguration();
+                
+                        // Specific origins instead of wildcard - required when allowCredentials is true
+                        config.setAllowedOrigins(List.of(
+                                "http://localhost:3000",
+                                "http://127.0.0.1:3000"
+                        ));
+                
+                        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                        config.setAllowedHeaders(List.of("Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With"));
+                
+                        // Allow credentials - important for sending/receiving cookies (JWT tokens)
+                        config.setAllowCredentials(true);
+                
+                        // Expose the Authorization header to the frontend
+                        config.setExposedHeaders(List.of("Authorization"));
+                        config.setMaxAge(3600L);
+                
+                        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                        source.registerCorsConfiguration("/**", config);
+                        return source;
                     }
                 
                     @Bean
