@@ -43,6 +43,7 @@ public class SpringEntities {
                     import jakarta.persistence.*;
                     import java.time.*;
                     import java.util.*;
+                    import java.math.*;
                     
                     @Getter
                     @Setter

@@ -7,7 +7,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static DrMuhamadMubarak.TheFuture.utils.StringUtils.capitalizeFirstLetter;
 
@@ -81,6 +83,10 @@ public class SpringService {
         String className = entityName + "BehaviorService";
         String packagePath = projectName.toLowerCase();
         String basePackage = "com.example." + projectName.toLowerCase();
+        String cleanedBehaviorMethods = Arrays.stream(behaviorMethods.split("\\r?\\n"))
+                .filter(line -> !line.startsWith("Here are the method implementations for ") &&
+                        !line.startsWith("Here are the method implementations:"))
+                .collect(Collectors.joining("\n"));
 
         String classCode = """
                 package %s.behaviorservices;
@@ -107,7 +113,7 @@ public class SpringService {
                 basePackage,
                 basePackage,
                 className,
-                behaviorMethods
+                cleanedBehaviorMethods
         );
 
         String baseDir = "./" + projectName + "/src/main/java/com/example/" + packagePath + "/behaviorservices";
