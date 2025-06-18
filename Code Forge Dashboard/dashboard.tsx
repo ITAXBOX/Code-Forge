@@ -55,6 +55,123 @@ export default function Dashboard() {
   const [currentTime, setCurrentTime] = useState(() => new Date());
   const [mounted, setMounted] = useState(false);
 
+  // Auth form state
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [registerEmail, setRegisterEmail] = useState("");
+  const [registerUsername, setRegisterUsername] = useState("");
+  const [registerPassword, setRegisterPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [authMessage, setAuthMessage] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // API base URL
+  const API_BASE_URL = "http://localhost:8081/api/auth";
+
+  // Function to handle login
+  const handleLogin = async () => {
+    if (!loginEmail || !loginPassword) {
+      setAuthError("Please fill in all fields");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setAuthError("");
+    setAuthMessage("");
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: loginEmail,
+          password: loginPassword,
+        }),
+        credentials: "include", // Important to include cookies
+      });
+
+      if (response.ok) {
+        setAuthMessage("Login successful!");
+        setIsAuthenticated(true);
+        setCurrentPage("dashboard");
+      } else {
+        setAuthError("Email or password is incorrect");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setAuthError("Failed to connect to the server. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Function to handle registration
+  const handleRegister = async () => {
+    if (!registerUsername || !registerEmail || !registerPassword || !confirmPassword) {
+      setAuthError("Please fill in all fields");
+      return;
+    }
+
+    if (registerPassword !== confirmPassword) {
+      setAuthError("Passwords do not match");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setAuthError("");
+    setAuthMessage("");
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: registerUsername,
+          email: registerEmail,
+          password: registerPassword,
+        }),
+      });
+
+      if (response.ok) {
+        setAuthMessage("Registration successful! Please log in.");
+        setCurrentPage("login");
+      } else {
+        const errorData = await response.text();
+        setAuthError(errorData || "Registration failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      setAuthError("Failed to connect to the server. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Function to handle logout
+  const handleLogout = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/logout`, {
+        method: "POST",
+        credentials: "include", // Important to include cookies
+      });
+
+      if (response.ok) {
+        setIsAuthenticated(false);
+        setCurrentPage("home");
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Mock entities data
@@ -296,6 +413,8 @@ export default function Dashboard() {
               id="email"
               placeholder="your.email@example.com"
               className="bg-gray-50 border-gray-300 focus:border-cyan-500"
+              value={loginEmail}
+              onChange={(e) => setLoginEmail(e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -310,16 +429,29 @@ export default function Dashboard() {
               type="password"
               placeholder="••••••••"
               className="bg-gray-50 border-gray-300 focus:border-cyan-500"
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
             />
           </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <Button
             className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
-            onClick={() => setCurrentPage("dashboard")}
+            onClick={handleLogin}
+            disabled={isSubmitting}
           >
-            Login
+            {isSubmitting ? 'Logging in...' : 'Login'}
           </Button>
+          {authMessage && (
+            <div className="text-center text-sm text-green-600">
+              {authMessage}
+            </div>
+          )}
+          {authError && (
+            <div className="text-center text-sm text-red-600">
+              {authError}
+            </div>
+          )}
           <div className="text-center text-sm text-gray-500">
             Don't have an account?{" "}
             <Button
@@ -354,19 +486,23 @@ export default function Dashboard() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input
-              id="name"
-              placeholder="John Doe"
-              className="bg-gray-50 border-gray-300 focus:border-cyan-500"
-            />
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               placeholder="your.email@example.com"
               className="bg-gray-50 border-gray-300 focus:border-cyan-500"
+              value={registerEmail}
+              onChange={(e) => setRegisterEmail(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="username">Username</Label>
+            <Input
+              id="username"
+              placeholder="Enter a username"
+              className="bg-gray-50 border-gray-300 focus:border-cyan-500"
+              value={registerUsername}
+              onChange={(e) => setRegisterUsername(e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -376,6 +512,8 @@ export default function Dashboard() {
               type="password"
               placeholder="••••••••"
               className="bg-gray-50 border-gray-300 focus:border-cyan-500"
+              value={registerPassword}
+              onChange={(e) => setRegisterPassword(e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -385,16 +523,29 @@ export default function Dashboard() {
               type="password"
               placeholder="••••••••"
               className="bg-gray-50 border-gray-300 focus:border-cyan-500"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <Button
             className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
-            onClick={() => setCurrentPage("dashboard")}
+            onClick={handleRegister}
+            disabled={isSubmitting}
           >
-            Register
+            {isSubmitting ? 'Registering...' : 'Register'}
           </Button>
+          {authMessage && (
+            <div className="text-center text-sm text-green-600">
+              {authMessage}
+            </div>
+          )}
+          {authError && (
+            <div className="text-center text-sm text-red-600">
+              {authError}
+            </div>
+          )}
           <div className="text-center text-sm text-gray-500">
             Already have an account?{" "}
             <Button
@@ -473,7 +624,7 @@ export default function Dashboard() {
                 <Button
                   variant="ghost"
                   className="w-full justify-start text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                  onClick={() => setCurrentPage("home")}
+                  onClick={handleLogout}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
                   Logout

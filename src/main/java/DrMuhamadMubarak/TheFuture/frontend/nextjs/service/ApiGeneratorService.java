@@ -42,7 +42,7 @@ public class ApiGeneratorService {
                 import axios from 'axios';
                 
                 const apiClient = axios.create({
-                  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080',
+                  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081',
                   headers: {
                     'Content-Type': 'application/json'
                   }
