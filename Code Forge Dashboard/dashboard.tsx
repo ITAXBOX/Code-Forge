@@ -420,9 +420,6 @@ export default function Dashboard() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Button variant="link" className="text-xs text-cyan-600 px-0">
-                Forgot password?
-              </Button>
             </div>
             <Input
               id="password"
