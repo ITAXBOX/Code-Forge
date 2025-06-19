@@ -121,22 +121,28 @@ public class SpringAIRepository {
     private static Map<String, String> analyzeRepositoryMethodUsage(String code, String repoVar, String entityName) {
         Map<String, String> returnTypes = new HashMap<>();
 
-        // Pattern to capture service method return type and repository method usage
+        // Pattern to capture repository method usage in a broader context
         Pattern pattern = Pattern.compile(
-                "@Transactional\\s+public\\s+([\\w<>\\s,]+)\\s+\\w+\\([^)]*\\)\\s*\\{([^}]*?)" +
-                        Pattern.quote(repoVar) + "\\.(\\w+)\\([^)]*\\)([^}]*)}");
+                "(?:(?:Optional|List|Collection|Set)<[^>]*>|[\\w<>,\\s]+)\\s+\\w+\\s*=\\s*" +
+                Pattern.quote(repoVar) + "\\.(\\w+)\\([^)]*\\)|" +
+                Pattern.quote(repoVar) + "\\.(\\w+)\\([^)]*\\)\\.(?:isPresent|get|orElse|stream|collect|size|isEmpty|forEach)|" +
+                "return\\s+" + Pattern.quote(repoVar) + "\\.(\\w+)\\([^)]*\\)|" +
+                "for\\s*\\([^)]*\\s*:\\s*" + Pattern.quote(repoVar) + "\\.(\\w+)\\([^)]*\\)\\)"
+        );
 
         Matcher matcher = pattern.matcher(code);
-
         while (matcher.find()) {
-            String serviceReturnType = matcher.group(1).trim();
-            String beforeMethodCall = matcher.group(2);
-            String repoMethodName = matcher.group(3);
-            String afterMethodCall = matcher.group(4);
+            String repoMethodName = matcher.group(1) != null ? matcher.group(1) :
+                                   (matcher.group(2) != null ? matcher.group(2) :
+                                   (matcher.group(3) != null ? matcher.group(3) : matcher.group(4)));
 
-            String returnType = determineReturnType(serviceReturnType, beforeMethodCall + afterMethodCall,
-                    repoMethodName, entityName);
-            returnTypes.put(repoMethodName, returnType);
+            // The context of the usage helps determine the expected return type
+            String methodContext = matcher.group(0);
+            String contextualReturnType = inferReturnTypeFromContext(methodContext, repoMethodName, entityName);
+
+            if (contextualReturnType != null) {
+                returnTypes.put(repoMethodName, contextualReturnType);
+            }
         }
 
         // Look for repository methods outside @Transactional methods too
@@ -154,46 +160,59 @@ public class SpringAIRepository {
         return returnTypes;
     }
 
-    private static String determineReturnType(String serviceReturnType, String methodBody,
-                                              String repoMethodName, String entityName) {
-        // Check if the method name tells us the return type
-        String inferredType = inferReturnTypeFromMethodName(repoMethodName, entityName);
-        if (inferredType != null) {
-            return inferredType;
-        }
+    /**
+     * Infers the return type of repository method based on how it's used in the service code.
+     * This is critical for ensuring the repository interface matches the expectation of the service.
+     */
+    private static String inferReturnTypeFromContext(String methodContext, String methodName, String entityName) {
+        // Check for Optional usage
+        boolean usesOptional = methodContext.contains("Optional<") ||
+                               methodContext.contains(".isPresent()") ||
+                               methodContext.contains(".get()") ||
+                               methodContext.contains(".orElse") ||
+                               methodContext.contains(".orElseGet") ||
+                               methodContext.contains(".orElseThrow");
 
-        // Check if service returns a list or collection type
-        boolean serviceReturnsList = serviceReturnType.startsWith("List<") ||
-                serviceReturnType.startsWith("Collection<") ||
-                serviceReturnType.contains("Iterable<");
+        // Check for List/Collection usage
+        boolean usesList = methodContext.contains("List<") ||
+                           methodContext.contains("Collection<") ||
+                           methodContext.contains(".stream()") ||
+                           methodContext.contains(".forEach") ||
+                           methodContext.contains(".collect(") ||
+                           methodContext.contains(".size()") ||
+                           methodContext.contains(".isEmpty()") ||
+                           methodContext.contains("for (") ||
+                           methodContext.contains("for(");
 
-        // Check if method body uses collection operations
-        boolean usesCollectionOps = methodBody.contains(".addAll(") ||
-                methodBody.contains("new ArrayList<") ||
-                methodBody.contains("Arrays.asList(") ||
-                methodBody.contains(".add(") ||
-                methodBody.contains("stream().") ||
-                methodBody.contains(".forEach") ||
-                methodBody.contains(".collect(");
+        // Check for direct return which indicates matching return types
+        boolean isDirectReturn = methodContext.startsWith("return");
 
-        if (serviceReturnsList || usesCollectionOps) {
-            return "List<" + entityName + ">";
-        }
-
-        // Check for boolean methods
-        if (serviceReturnType.equals("boolean") || methodBody.contains("return true") ||
-                methodBody.contains("return false")) {
+        // Special case for boolean methods
+        if (methodName.startsWith("existsBy") || methodName.startsWith("exists") ||
+            methodContext.contains("boolean")) {
             return "boolean";
         }
 
-        // Check for count methods
-        if (serviceReturnType.equals("long") || serviceReturnType.equals("int") ||
-                serviceReturnType.equals("Integer") || serviceReturnType.equals("Long")) {
+        // Special case for count methods
+        if (methodName.startsWith("countBy") || methodName.startsWith("count") ||
+            methodContext.contains("Long") || methodContext.contains("Integer") ||
+            methodContext.contains("long") || methodContext.contains("int")) {
             return "Long";
         }
 
-        // Default to Optional for singular entity returns
-        return "Optional<" + entityName + ">";
+        // Determine return type based on the usage context
+        if (usesOptional && !usesList) {
+            return "Optional<" + entityName + ">";
+        } else if (usesList) {
+            return "List<" + entityName + ">";
+        } else if (isDirectReturn) {
+            // If directly returned, check method name patterns first
+            String inferredType = inferReturnTypeFromMethodName(methodName, entityName);
+
+            return Objects.requireNonNullElseGet(inferredType, () -> "Optional<" + entityName + ">");
+        }
+        // If we can't determine from context, use method name patterns
+        return inferReturnTypeFromMethodName(methodName, entityName);
     }
 
     private static String inferReturnTypeFromMethodName(String methodName, String entityName) {
