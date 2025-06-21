@@ -60,7 +60,7 @@ public class AIProjectController {
 
             // Step 3: Process the validated JSON and generate the project
             return entityJsonProcessorService.processJsonAndGenerateEntities(true, projectName, validatedEntitiesJson, model,
-                    frontendType, backendType, databaseType, "Project Generated Successfully Using OpenAI.");
+                    frontendType, backendType, databaseType, "Project Generated Successfully Using DeepSeek.");
         } catch (Exception e) {
             model.addAttribute("message", "An error occurred while generating JSON from prompt: " + e.getMessage());
             return "error";
