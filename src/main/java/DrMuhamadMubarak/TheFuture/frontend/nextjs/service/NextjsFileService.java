@@ -77,18 +77,70 @@ public class NextjsFileService {
      * Generates the customized dashboard file
      */
     public void generateDashboard(String projectName, String templateDir, String outputDir, List<EntityInfo> entities) throws IOException {
+        System.out.println("Generating dashboard for project: " + projectName);
+
         // Read dashboard template
-        String dashboardTemplate = new String(Files.readAllBytes(Paths.get(templateDir, "dashboard.tsx")));
+        Path templatePath = Paths.get(templateDir, "dashboard.tsx");
+        String dashboardTemplate = new String(Files.readAllBytes(templatePath));
+        System.out.println("Template file size: " + dashboardTemplate.length() + " bytes");
 
         // Clean entities to only include base entity names without behavior entries
         List<EntityInfo> cleanEntities = cleanDuplicateEntities(entities);
+        System.out.println("Found " + cleanEntities.size() + " clean entities");
 
-        // Replace mock entities with actual entities from backend
+        // Generate entities code
         String entitiesCode = generateEntitiesCode(cleanEntities);
-        dashboardTemplate = dashboardTemplate.replaceAll(
-                "// Mock entities data\\s+const entities = \\[(.|\\n)*?];",
-            "// Entities data from backend\n  const entities = " + entitiesCode + ";"
-        );
+
+        // Replacement with the same indentation
+        String replacement = "  // Entities data from backend\n  const entities = " + entitiesCode;
+
+        // Check for the empty entities array pattern
+        if (dashboardTemplate.contains("// Mock entities data")) {
+            System.out.println("Found mock entities marker in the template");
+
+            // Pattern for empty entities array
+            String emptyEntitiesPattern = "  // Mock entities data\\s+const entities = \\[ \\]";
+
+            // Check if we have the empty entities array
+            if (dashboardTemplate.matches("(?s).*" + emptyEntitiesPattern + ".*")) {
+                System.out.println("Found empty entities array in template");
+                dashboardTemplate = dashboardTemplate.replaceAll(emptyEntitiesPattern, replacement);
+                System.out.println("Replaced empty entities array with actual entities");
+            } else {
+                // Try to match with any content inside brackets
+                String anyContentEntitiesPattern = "(?s)  // Mock entities data\\s+const entities = \\[.*?\\]";
+                String updatedTemplate = dashboardTemplate.replaceAll(anyContentEntitiesPattern, replacement);
+
+                // Check if replacement worked
+                if (!updatedTemplate.equals(dashboardTemplate)) {
+                    dashboardTemplate = updatedTemplate;
+                    System.out.println("Successfully replaced entities array with actual entities");
+                } else {
+                    System.out.println("Warning: Pattern matched but no replacement occurred");
+
+                    // Try a direct string manipulation approach
+                    int startIndex = dashboardTemplate.indexOf("  // Mock entities data");
+                    if (startIndex >= 0) {
+                        int constEntitiesIndex = dashboardTemplate.indexOf("const entities =", startIndex);
+                        if (constEntitiesIndex >= 0) {
+                            int openBracketIndex = dashboardTemplate.indexOf("[", constEntitiesIndex);
+                            if (openBracketIndex >= 0) {
+                                int closeBracketIndex = dashboardTemplate.indexOf("]", openBracketIndex);
+                                if (closeBracketIndex >= 0) {
+                                    // Replace the entire section
+                                    String before = dashboardTemplate.substring(0, startIndex);
+                                    String after = dashboardTemplate.substring(closeBracketIndex + 1);
+                                    dashboardTemplate = before + replacement + after;
+                                    System.out.println("Used direct string manipulation to replace entities");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            System.out.println("Warning: Mock entities marker not found in template");
+        }
 
         // Replace project name
         dashboardTemplate = dashboardTemplate.replace("E-Commerce API", projectName + " API");
@@ -97,7 +149,7 @@ public class NextjsFileService {
         // Replace "ENTITY MANAGER" with the project name
         dashboardTemplate = dashboardTemplate.replace("ENTITY MANAGER", projectName.toUpperCase() + " DASHBOARD");
 
-        // Replace description text under the title - using regex with Pattern.DOT ALL to match across multiple lines
+        // Replace description text under the title
         dashboardTemplate = dashboardTemplate.replaceAll(
             "(?s)<p className=\"text-gray-600 max-w-md mx-auto\">\\s*Generate complete backend applications with AI, including entity\\s*definitions, CRUD endpoints, and custom behavior\\.\\s*</p>",
             "<p className=\"text-gray-600 max-w-md mx-auto\">The Art of CodeForge is Crafted Here</p>"
@@ -106,6 +158,7 @@ public class NextjsFileService {
         // Write the generated dashboard file
         Path dashboardPath = Paths.get(outputDir, "dashboard.tsx");
         Files.write(dashboardPath, dashboardTemplate.getBytes());
+        System.out.println("Dashboard file generated at: " + dashboardPath);
     }
 
     /**
