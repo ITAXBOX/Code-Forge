@@ -191,6 +191,10 @@ public class NextjsFileService {
                 continue;
             }
 
+            // Skip authentication-related entities
+            if (entityName.equalsIgnoreCase("Authentication"))
+                continue;
+
             // Only add if not already in the map
             if (!uniqueEntities.containsKey(entityName)) {
                 uniqueEntities.put(entityName, entity);
