@@ -2,6 +2,7 @@ package DrMuhamadMubarak.TheFuture.codeforge.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -18,6 +19,7 @@ public class ProjectAnalytics {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", unique = true)
+    @Setter
     private Project project;
 
     @Column(nullable = false)
