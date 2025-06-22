@@ -4,12 +4,11 @@ import DrMuhamadMubarak.TheFuture.generator.enums.BackendType;
 import DrMuhamadMubarak.TheFuture.generator.enums.DatabaseType;
 import DrMuhamadMubarak.TheFuture.generator.enums.FrontendType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(
@@ -17,13 +16,18 @@ import java.util.List;
         indexes = @Index(name = "idx_project_name", columnList = "name")
 )
 @Getter
+@Setter
 public class Project {
     @Id
     @GeneratedValue
     private Long id;
 
     @Column(nullable = false, unique = true)
+    @Size(min = 3, max = 50, message = "Project name must be between 3-50 characters")
     private String name;
+
+    @Column(length = 500)
+    private String description;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -37,19 +41,6 @@ public class Project {
     @Column(nullable = false)
     private DatabaseType databaseType;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Commit> commits = new ArrayList<>();
-
-    public void addCommit(Commit commit) {
-        commits.add(commit);
-        commit.setProject(this); // Keep bidirectional sync
-    }
-
-    public void removeCommit(Commit commit) {
-        commits.remove(commit);
-        commit.setProject(null);
-    }
-
     @OneToOne(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     @Setter
     private ProjectAnalytics analytics;
@@ -57,15 +48,16 @@ public class Project {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Project(String name, FrontendType frontendType, BackendType backendType, DatabaseType databaseType) {
+    public Project(String name, String description, FrontendType frontendType, BackendType backendType, DatabaseType databaseType) {
         this.name = name;
+        this.description = description;
         this.frontendType = frontendType;
         this.backendType = backendType;
         this.databaseType = databaseType;
-        this.commits = new ArrayList<>();
     }
 
-    protected Project() {} // Default constructor for JPA
+    protected Project() {
+    } // Default constructor for JPA
 
     @PrePersist
     protected void onCreate() {
