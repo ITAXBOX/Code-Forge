@@ -7,6 +7,10 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Table(name = "project_analytics", indexes = {
+    @Index(name = "idx_project_analytics_last_requested", columnList = "lastRequestedAt"),
+    @Index(name = "idx_project_analytics_request_count", columnList = "requestCount")
+})
 public class ProjectAnalytics {
     @Id
     @GeneratedValue
@@ -16,12 +20,14 @@ public class ProjectAnalytics {
     @JoinColumn(name = "project_id", unique = true)
     private Project project;
 
+    @Column(nullable = false)
     private int requestCount;
     private LocalDateTime lastRequestedAt;
 
     @PrePersist
     protected void onCreate() {
         lastRequestedAt = LocalDateTime.now();
+        requestCount = 0;
     }
 
     @PreUpdate
@@ -29,4 +35,3 @@ public class ProjectAnalytics {
         lastRequestedAt = LocalDateTime.now();
     }
 }
-

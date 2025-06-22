@@ -8,7 +8,10 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@Table(name = "Commits")
+@Table(name = "Commits", indexes = {
+    @Index(name = "idx_commit_hash", columnList = "commitHash", unique = true),
+    @Index(name = "idx_committed_at", columnList = "committedAt")
+})
 public class Commit {
     @Id
     @GeneratedValue
@@ -20,6 +23,7 @@ public class Commit {
     @Column(nullable = false)
     private String commitHash;
 
+    @Column(nullable = false)
     private LocalDateTime committedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,5 +45,3 @@ public class Commit {
         committedAt = LocalDateTime.now();
     }
 }
-
-
