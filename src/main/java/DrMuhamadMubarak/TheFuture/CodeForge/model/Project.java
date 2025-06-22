@@ -1,4 +1,4 @@
-package DrMuhamadMubarak.TheFuture.generator.model;
+package DrMuhamadMubarak.TheFuture.codeforge.model;
 
 import DrMuhamadMubarak.TheFuture.generator.enums.BackendType;
 import DrMuhamadMubarak.TheFuture.generator.enums.DatabaseType;

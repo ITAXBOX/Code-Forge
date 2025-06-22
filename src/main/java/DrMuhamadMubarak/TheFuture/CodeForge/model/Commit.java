@@ -1,4 +1,4 @@
-package DrMuhamadMubarak.TheFuture.generator.model;
+package DrMuhamadMubarak.TheFuture.codeforge.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
