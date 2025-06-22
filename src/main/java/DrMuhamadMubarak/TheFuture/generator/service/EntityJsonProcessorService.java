@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -50,6 +51,7 @@ public class EntityJsonProcessorService {
 
             processEntities(AI, projectName, entitiesNode, model);
             model.addAttribute("message", successMessage);
+            copyProjectToProjectsDirectory(projectName);
             return "result";
         } catch (IOException e) {
             model.addAttribute("message", "An error occurred while processing JSON: " + e.getMessage());
@@ -177,6 +179,67 @@ public class EntityJsonProcessorService {
             Files.write(path, String.join(System.lineSeparator(), processedLines).getBytes());
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void copyProjectToProjectsDirectory(String projectName) {
+        try {
+            Path sourcePath = Paths.get("./" + projectName);
+            Path projectsDir = Paths.get("./Projects");
+            Path targetPath = projectsDir.resolve(projectName);
+
+            // Create Projects directory if it doesn't exist
+            if (!Files.exists(projectsDir)) {
+                Files.createDirectory(projectsDir);
+            }
+
+            // Delete the target directory if it already exists
+            if (Files.exists(targetPath)) {
+                deleteDirectory(targetPath);
+            }
+
+            // Copy the project directory to the Projects directory
+            copyDirectory(sourcePath, targetPath);
+
+            // Delete the original project directory after successful copy
+            deleteDirectory(sourcePath);
+
+            System.out.println("Project '" + projectName + "' successfully copied to Projects directory and original directory deleted");
+        } catch (IOException e) {
+            System.err.println("Failed to copy project to Projects directory: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void copyDirectory(Path source, Path target) throws IOException {
+        Files.walk(source)
+                .forEach(sourcePath -> {
+                    try {
+                        Path targetPath = target.resolve(source.relativize(sourcePath));
+                        if (Files.isDirectory(sourcePath)) {
+                            if (!Files.exists(targetPath)) {
+                                Files.createDirectory(targetPath);
+                            }
+                        } else {
+                            Files.copy(sourcePath, targetPath);
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+    }
+
+    private void deleteDirectory(Path path) throws IOException {
+        if (Files.exists(path)) {
+            Files.walk(path)
+                    .sorted(Comparator.reverseOrder()) // Sort in reverse order to delete files before directories
+                    .forEach(p -> {
+                        try {
+                            Files.delete(p);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
         }
     }
 }
