@@ -193,7 +193,46 @@ export default function Dashboard() {
 
       if (response.ok) {
         const data = await response.json()
-        setEntityData(Array.isArray(data) ? data : [])
+        // Ensure data is an array and map the fields to match entity attributes if needed
+        const formattedData = Array.isArray(data)
+          ? data.map(item => {
+              // For each item, ensure it has properties that match our expected attribute names
+              const entityDef = entities.find(e => e.name === selectedEntity);
+              if (entityDef) {
+                // Create a normalized item with expected field names
+                const normalizedItem = { ...item };
+
+                // Handle cases where API returns differently named fields or nested objects
+                entityDef.attributes.forEach(attr => {
+                  // If the field doesn't exist directly, try to find it in a different case or nested object
+                  if (normalizedItem[attr.name] === undefined) {
+                    // Check for camelCase, snake_case and PascalCase variations
+                    const pascalCase = attr.name.charAt(0).toUpperCase() + attr.name.slice(1);
+                    const snakeCase = attr.name.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+
+                    if (item[pascalCase] !== undefined) {
+                      normalizedItem[attr.name] = item[pascalCase];
+                    } else if (item[snakeCase] !== undefined) {
+                      normalizedItem[attr.name] = item[snakeCase];
+                    } else {
+                      // Try to find in nested objects (common for relationships)
+                      Object.keys(item).forEach(key => {
+                        if (typeof item[key] === 'object' && item[key] !== null) {
+                          if (item[key][attr.name] !== undefined) {
+                            normalizedItem[attr.name] = item[key][attr.name];
+                          }
+                        }
+                      });
+                    }
+                  }
+                });
+                return normalizedItem;
+              }
+              return item;
+            })
+          : [];
+
+        setEntityData(formattedData);
       } else {
         setEntityError("Failed to fetch data")
       }
@@ -478,9 +517,21 @@ export default function Dashboard() {
 
   // Filter entity data based on search
   const filteredEntityData = entityData.filter(
-      (item) =>
-          item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.description?.toLowerCase().includes(searchQuery.toLowerCase()),
+    (item) => {
+      // Special handling for User entity
+      if (selectedEntity === "User") {
+        return (
+          (item.username && item.username.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (item.email && item.email.toLowerCase().includes(searchQuery.toLowerCase()))
+        );
+      }
+
+      // Default handling for other entities
+      return (
+        (item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
+    }
   )
 
   // Render home page
@@ -842,10 +893,13 @@ export default function Dashboard() {
 
                       <div className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
                         <div className="grid grid-cols-12 text-xs text-gray-600 p-3 border-b border-gray-200 bg-gray-100">
+                          {/* Dynamically generate column headers based on entity attributes */}
                           <div className="col-span-1">ID</div>
-                          <div className="col-span-3">Name</div>
-                          <div className="col-span-4">Description</div>
-                          <div className="col-span-2">Status</div>
+                          {selectedEntity && entities.find(e => e.name === selectedEntity)?.attributes.slice(0, 3).map((attr, index) => (
+                            <div key={attr.name} className={`col-span-${index === 0 ? 3 : 2}`}>
+                              {attr.name.charAt(0).toUpperCase() + attr.name.slice(1)}
+                            </div>
+                          ))}
                           <div className="col-span-2 text-right">Actions</div>
                         </div>
 
@@ -858,15 +912,14 @@ export default function Dashboard() {
                               filteredEntityData.map((item) => (
                                   <div key={item.id} className="grid grid-cols-12 py-3 px-3 text-sm hover:bg-gray-50">
                                     <div className="col-span-1 text-gray-500">{item.id}</div>
-                                    <div className="col-span-3 text-gray-900">{item.name}</div>
-                                    <div className="col-span-4 text-gray-600 truncate">
-                                      {item.description || "No description"}
-                                    </div>
-                                    <div className="col-span-2">
-                                      <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200 text-xs">
-                                        Active
-                                      </Badge>
-                                    </div>
+                                    {/* Dynamically display entity attributes */}
+                                    {selectedEntity && entities.find(e => e.name === selectedEntity)?.attributes.slice(0, 3).map((attr, index) => (
+                                      <div key={attr.name} className={`col-span-${index === 0 ? 3 : 2} text-gray-900 truncate`}>
+                                        {item[attr.name] !== undefined && item[attr.name] !== null
+                                          ? String(item[attr.name])
+                                          : `No ${attr.name}`}
+                                      </div>
+                                    ))}
                                     <div className="col-span-2 text-right space-x-1">
                                       <Button
                                           variant="ghost"
