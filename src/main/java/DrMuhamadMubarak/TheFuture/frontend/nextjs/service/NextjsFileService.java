@@ -195,6 +195,23 @@ public class NextjsFileService {
             EntityInfo entity = entities.get(i);
             sb.append("    {\n");
             sb.append("      name: \"").append(entity.getName()).append("\",\n");
+
+            // Add entity attributes for use in the List component
+            sb.append("      attributes: [\n");
+            for (int j = 0; j < entity.getAttributes().size(); j++) {
+                var attribute = entity.getAttributes().get(j);
+                sb.append("        {\n");
+                sb.append("          name: \"").append(attribute.getName()).append("\",\n");
+                sb.append("          type: \"").append(attribute.getType()).append("\"\n");
+                sb.append("        }");
+                if (j < entity.getAttributes().size() - 1) {
+                    sb.append(",");
+                }
+                sb.append("\n");
+            }
+            sb.append("      ],\n");
+
+            // Add endpoints
             sb.append("      endpoints: [");
 
             List<String> formattedEndpoints = new ArrayList<>();
