@@ -48,7 +48,8 @@ public class EntityJsonProcessorService {
             model.addAttribute("backendType", backend);
             model.addAttribute("databaseType", database);
             model.addAttribute("entityNames", entityNames);
-
+            if(AI)
+                model.addAttribute("fromJsonProcessor", true);
             processEntities(AI, projectName, entitiesNode, model);
             model.addAttribute("message", successMessage);
             copyProjectToProjectsDirectory(projectName);
