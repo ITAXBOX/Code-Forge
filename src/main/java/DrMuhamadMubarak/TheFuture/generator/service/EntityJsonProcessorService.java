@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,6 +80,9 @@ public class EntityJsonProcessorService {
                 attributeStorageService.addAttributesToEntity(projectName, entityName, attribute);
             }
 
+            // Remove empty lines between braces in the model file
+            removeEmptyLinesInModelFile(projectName, entityName);
+
             entityCodeGeneratorService.generateServiceClass(projectName, entityName, attributeStorageService.getAttributes());
             entityCodeGeneratorService.generateControllerClass(projectName, entityName);
 
@@ -120,5 +126,57 @@ public class EntityJsonProcessorService {
 
         if (AI)
             frontendService.createFrontendFiles(projectName);
+    }
+
+    private void removeEmptyLinesInModelFile(String projectName, String entityName) {
+        try {
+            String baseDir = "./" + projectName + "/src/main/java/com/example/" + projectName.toLowerCase() + "/models";
+            String className = Character.toUpperCase(entityName.charAt(0)) + entityName.substring(1);
+            String filePath = baseDir + "/" + className + ".java";
+
+            // Read the file content
+            Path path = Paths.get(filePath);
+            List<String> lines = Files.readAllLines(path);
+            List<String> processedLines = new ArrayList<>();
+
+            boolean insideClassBody = false;
+
+            for (String line : lines) {
+                String trimmedLine = line.trim();
+
+                // Check if we're entering the class body
+                if (trimmedLine.contains("public class") && trimmedLine.contains("{")) {
+                    insideClassBody = true;
+                    processedLines.add(line);
+                    continue;
+                }
+
+                // Check if we're exiting the class body
+                if (trimmedLine.equals("}") && insideClassBody) {
+                    insideClassBody = false;
+                    processedLines.add(line);
+                    continue;
+                }
+
+                // Process lines inside class body
+                if (insideClassBody) {
+                    // Skip empty lines
+                    if (trimmedLine.isEmpty()) {
+                        continue;
+                    }
+
+                    // Add non-empty lines
+                    processedLines.add(line);
+                } else {
+                    // Add lines outside class body as is
+                    processedLines.add(line);
+                }
+            }
+
+            // Write the processed content back to the file
+            Files.write(path, String.join(System.lineSeparator(), processedLines).getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
