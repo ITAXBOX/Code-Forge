@@ -16,9 +16,13 @@ public class EntityInfo {
     @Setter
     private String baseEndpoint;
 
+    // New field to store entity attributes
+    private final List<EntityAttributeInfo> attributes;
+
     public EntityInfo(String name) {
         this.name = name;
         this.endpoints = new ArrayList<>();
+        this.attributes = new ArrayList<>();
         this.baseEndpoint = "/api/" + name.toLowerCase() + "s";
     }
 
@@ -30,4 +34,8 @@ public class EntityInfo {
         endpoints.add(new EndpointInfo(method, path, isCustomBehavior));
     }
 
+    // New method to add an attribute
+    public void addAttribute(String name, String type) {
+        attributes.add(new EntityAttributeInfo(name, type));
+    }
 }
