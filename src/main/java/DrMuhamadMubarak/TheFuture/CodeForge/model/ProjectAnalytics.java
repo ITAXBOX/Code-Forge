@@ -26,6 +26,11 @@ public class ProjectAnalytics {
     private int requestCount;
     private LocalDateTime lastRequestedAt;
 
+    public void incrementRequestCount() {
+        this.requestCount++;
+        this.lastRequestedAt = LocalDateTime.now();
+    }
+
     @PrePersist
     protected void onCreate() {
         lastRequestedAt = LocalDateTime.now();
