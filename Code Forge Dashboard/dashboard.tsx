@@ -893,9 +893,8 @@ export default function Dashboard() {
 
                       <div className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
                         <div className="grid grid-cols-12 text-xs text-gray-600 p-3 border-b border-gray-200 bg-gray-100">
-                          {/* Dynamically generate column headers based on entity attributes */}
-                          <div className="col-span-1">ID</div>
-                          {selectedEntity && entities.find(e => e.name === selectedEntity)?.attributes.slice(0, 3).map((attr, index) => (
+                          {/* Show only entity attributes as column headers */}
+                          {selectedEntity && entities.find(e => e.name === selectedEntity)?.attributes.map((attr, index) => (
                             <div key={attr.name} className={`col-span-${index === 0 ? 3 : 2}`}>
                               {attr.name.charAt(0).toUpperCase() + attr.name.slice(1)}
                             </div>
@@ -911,9 +910,8 @@ export default function Dashboard() {
                           ) : (
                               filteredEntityData.map((item) => (
                                   <div key={item.id} className="grid grid-cols-12 py-3 px-3 text-sm hover:bg-gray-50">
-                                    <div className="col-span-1 text-gray-500">{item.id}</div>
-                                    {/* Dynamically display entity attributes */}
-                                    {selectedEntity && entities.find(e => e.name === selectedEntity)?.attributes.slice(0, 3).map((attr, index) => (
+                                    {/* Show only entity attributes as row data */}
+                                    {selectedEntity && entities.find(e => e.name === selectedEntity)?.attributes.map((attr, index) => (
                                       <div key={attr.name} className={`col-span-${index === 0 ? 3 : 2} text-gray-900 truncate`}>
                                         {item[attr.name] !== undefined && item[attr.name] !== null
                                           ? String(item[attr.name])
@@ -973,34 +971,46 @@ export default function Dashboard() {
 
                       <div className="bg-gray-50 rounded-lg border border-gray-200 p-6">
                         <div className="space-y-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="create-name">Name *</Label>
-                            <Input
-                                id="create-name"
-                                placeholder="Enter name"
-                                className="bg-white border-gray-300"
-                                value={createForm.name}
-                                onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="create-description">Description</Label>
-                            <Textarea
-                                id="create-description"
-                                placeholder="Enter description"
-                                className="bg-white border-gray-300 min-h-[100px]"
-                                value={createForm.description}
-                                onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })}
-                            />
-                          </div>
+                          {/* Dynamically generate form fields based on entity attributes */}
+                          {selectedEntity && entities.find(e => e.name === selectedEntity)?.attributes.map((attr) => (
+                            <div key={attr.name} className="space-y-2">
+                              <Label htmlFor={`create-${attr.name}`}>{attr.name.charAt(0).toUpperCase() + attr.name.slice(1)} {attr.required && '*'}</Label>
+                              {attr.type === 'text' || attr.type === 'textarea' ? (
+                                <Textarea
+                                  id={`create-${attr.name}`}
+                                  placeholder={`Enter ${attr.name}`}
+                                  className="bg-white border-gray-300 min-h-[100px]"
+                                  value={createForm[attr.name] || ''}
+                                  onChange={(e) => setCreateForm({ ...createForm, [attr.name]: e.target.value })}
+                                />
+                              ) : (
+                                <Input
+                                  id={`create-${attr.name}`}
+                                  placeholder={`Enter ${attr.name}`}
+                                  className="bg-white border-gray-300"
+                                  value={createForm[attr.name] || ''}
+                                  onChange={(e) => setCreateForm({ ...createForm, [attr.name]: e.target.value })}
+                                  type={attr.type === 'number' ? 'number' : 'text'}
+                                />
+                              )}
+                            </div>
+                          ))}
                         </div>
 
                         <div className="mt-6 flex justify-end space-x-2">
                           <Button
                               variant="outline"
                               className="border-gray-300 text-gray-600"
-                              onClick={() => setCreateForm({ name: "", description: "" })}
+                              onClick={() => {
+                                // Reset form with empty values for all fields
+                                const emptyForm = {};
+                                if (selectedEntity) {
+                                  entities.find(e => e.name === selectedEntity)?.attributes.forEach(attr => {
+                                    emptyForm[attr.name] = '';
+                                  });
+                                }
+                                setCreateForm(emptyForm as EntityData);
+                              }}
                           >
                             Clear
                           </Button>
@@ -1034,7 +1044,7 @@ export default function Dashboard() {
                                   <Database className="h-6 w-6 text-cyan-600" />
                                 </div>
                                 <div>
-                                  <h3 className="text-lg font-medium text-gray-900">{selectedEntityData.name}</h3>
+                                  <h3 className="text-lg font-medium text-gray-900">{selectedEntity}</h3>
                                   <p className="text-sm text-gray-500">ID: {selectedEntityData.id}</p>
                                 </div>
                               </div>
@@ -1047,39 +1057,37 @@ export default function Dashboard() {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                               <div>
-                                <h4 className="text-sm font-medium text-gray-600 mb-2">Details</h4>
+                                <h4 className="text-sm font-medium text-gray-600 mb-2">Entity Details</h4>
+                                <div className="space-y-3">
+                                  {/* Display all entity attributes */}
+                                  {selectedEntity && entities.find(e => e.name === selectedEntity)?.attributes.map((attr) => (
+                                    <div key={attr.name} className="flex justify-between">
+                                      <span className="text-sm text-gray-500 capitalize">{attr.name}:</span>
+                                      <span className="text-sm text-gray-900">
+                                        {selectedEntityData[attr.name] !== undefined && selectedEntityData[attr.name] !== null
+                                          ? String(selectedEntityData[attr.name])
+                                          : `No ${attr.name}`}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <div>
+                                <h4 className="text-sm font-medium text-gray-600 mb-2">System Information</h4>
                                 <div className="space-y-3">
                                   <div className="flex justify-between">
                                     <span className="text-sm text-gray-500">ID:</span>
                                     <span className="text-sm text-gray-900">{selectedEntityData.id}</span>
                                   </div>
                                   <div className="flex justify-between">
-                                    <span className="text-sm text-gray-500">Name:</span>
-                                    <span className="text-sm text-gray-900">{selectedEntityData.name}</span>
+                                    <span className="text-sm text-gray-500">Created:</span>
+                                    <span className="text-sm text-gray-900">{selectedEntityData.createdAt || 'N/A'}</span>
                                   </div>
                                   <div className="flex justify-between">
-                                    <span className="text-sm text-gray-500">Description:</span>
-                                    <span className="text-sm text-gray-900">
-                                {selectedEntityData.description || "No description"}
-                              </span>
+                                    <span className="text-sm text-gray-500">Last Updated:</span>
+                                    <span className="text-sm text-gray-900">{selectedEntityData.updatedAt || 'N/A'}</span>
                                   </div>
-                                </div>
-                              </div>
-
-                              <div>
-                                <h4 className="text-sm font-medium text-gray-600 mb-2">Additional Data</h4>
-                                <div className="space-y-3">
-                                  {Object.entries(selectedEntityData).map(([key, value]) => {
-                                    if (key !== "id" && key !== "name" && key !== "description") {
-                                      return (
-                                          <div key={key} className="flex justify-between">
-                                            <span className="text-sm text-gray-500 capitalize">{key}:</span>
-                                            <span className="text-sm text-gray-900">{String(value)}</span>
-                                          </div>
-                                      )
-                                    }
-                                    return null
-                                  })}
                                 </div>
                               </div>
                             </div>
@@ -1130,25 +1138,30 @@ export default function Dashboard() {
                                 />
                               </div>
 
-                              <div className="space-y-2">
-                                <Label htmlFor="update-name">Name *</Label>
-                                <Input
-                                    id="update-name"
-                                    className="bg-white border-gray-300"
-                                    value={updateForm.name}
-                                    onChange={(e) => setUpdateForm({ ...updateForm, name: e.target.value })}
-                                />
-                              </div>
-
-                              <div className="space-y-2">
-                                <Label htmlFor="update-description">Description</Label>
-                                <Textarea
-                                    id="update-description"
-                                    className="bg-white border-gray-300 min-h-[100px]"
-                                    value={updateForm.description || ""}
-                                    onChange={(e) => setUpdateForm({ ...updateForm, description: e.target.value })}
-                                />
-                              </div>
+                              {/* Dynamically generate form fields based on entity attributes */}
+                              {selectedEntity && entities.find(e => e.name === selectedEntity)?.attributes.map((attr) => (
+                                <div key={attr.name} className="space-y-2">
+                                  <Label htmlFor={`update-${attr.name}`}>{attr.name.charAt(0).toUpperCase() + attr.name.slice(1)} {attr.required && '*'}</Label>
+                                  {attr.type === 'text' || attr.type === 'textarea' ? (
+                                    <Textarea
+                                      id={`update-${attr.name}`}
+                                      placeholder={`Enter ${attr.name}`}
+                                      className="bg-white border-gray-300 min-h-[100px]"
+                                      value={updateForm[attr.name] || ''}
+                                      onChange={(e) => setUpdateForm({ ...updateForm, [attr.name]: e.target.value })}
+                                    />
+                                  ) : (
+                                    <Input
+                                      id={`update-${attr.name}`}
+                                      placeholder={`Enter ${attr.name}`}
+                                      className="bg-white border-gray-300"
+                                      value={updateForm[attr.name] || ''}
+                                      onChange={(e) => setUpdateForm({ ...updateForm, [attr.name]: e.target.value })}
+                                      type={attr.type === 'number' ? 'number' : 'text'}
+                                    />
+                                  )}
+                                </div>
+                              ))}
                             </div>
 
                             <div className="mt-6 flex justify-end space-x-2">
