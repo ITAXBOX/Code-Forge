@@ -40,7 +40,7 @@ public class ProjectStructureController {
         }
         try {
             if(projectService.isProjectExists(projectName)) {
-                projectAnalyticsService.recordProjectAccess(projectService.getProjectByName(projectName).getId());
+                projectAnalyticsService.recordProjectAccess(projectService.getProjectByName(projectName));
                 model.addAttribute("message", "Project with this name already exists.");
                 return "leaderboard";
             }

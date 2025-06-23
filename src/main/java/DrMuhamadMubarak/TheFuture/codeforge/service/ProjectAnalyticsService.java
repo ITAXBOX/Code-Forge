@@ -29,8 +29,7 @@ public class ProjectAnalyticsService {
         return project.getAnalytics();
     }
 
-    public void recordProjectAccess(Long projectId) {
-        Project project = projectService.getProjectById(projectId);
+    public void recordProjectAccess(Project project) {
         ProjectAnalytics analytics = project.getAnalytics();
 
         if (analytics == null) {
