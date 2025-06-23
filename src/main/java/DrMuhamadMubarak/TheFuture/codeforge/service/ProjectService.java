@@ -1,8 +1,8 @@
 package DrMuhamadMubarak.TheFuture.codeforge.service;
 
 import DrMuhamadMubarak.TheFuture.codeforge.builder.ProjectBuilder;
-import DrMuhamadMubarak.TheFuture.codeforge.dto.request.ProjectCreateRequestDTO;
-import DrMuhamadMubarak.TheFuture.codeforge.dto.request.ProjectUpdateRequestDTO;
+import DrMuhamadMubarak.TheFuture.codeforge.dto.ProjectCreateDTO;
+import DrMuhamadMubarak.TheFuture.codeforge.dto.ProjectUpdateDTO;
 import DrMuhamadMubarak.TheFuture.codeforge.model.Project;
 import DrMuhamadMubarak.TheFuture.codeforge.model.ProjectAnalytics;
 import DrMuhamadMubarak.TheFuture.codeforge.repository.ProjectRepository;
@@ -20,17 +20,11 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
 
     @Transactional
-    public void createProject(ProjectCreateRequestDTO request) {
+    public void createProject(ProjectCreateDTO request) {
         if (projectRepository.existsByName((request.getName()))) {
             throw new IllegalArgumentException("Project name already exists");
         }
-        Project project = ProjectBuilder.projectBuilder(
-                request.getName(),
-                request.getDescription(),
-                request.getFrontendType(),
-                request.getBackendType(),
-                request.getDatabaseType()
-        );
+        Project project = ProjectBuilder.projectBuilder(request.getName(), request.getDescription(), request.getFrontendType(), request.getBackendType(), request.getDatabaseType());
         ProjectAnalytics analytics = new ProjectAnalytics();
         project.setAnalytics(analytics);
         analytics.setProject(project);
@@ -38,16 +32,19 @@ public class ProjectService {
     }
 
     public Project getProjectById(Long id) {
-        return projectRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + id));
+        return projectRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + id));
     }
 
     public List<Project> getAllProjects() {
-        return (List<Project>) projectRepository.findAll();
+        return projectRepository.findAll();
+    }
+
+    public long countProjects() {
+        return projectRepository.count();
     }
 
     @Transactional
-    public Project updateProject(Long id, ProjectUpdateRequestDTO request) {
+    public void updateProject(Long id, ProjectUpdateDTO request) {
         Project project = getProjectById(id);
         if (request.getName() != null && !request.getName().equals(project.getName())) {
             if (projectRepository.existsByName(request.getName())) {
@@ -58,7 +55,7 @@ public class ProjectService {
         if (request.getDescription() != null) {
             project.setDescription(request.getDescription());
         }
-        return projectRepository.save(project);
+        projectRepository.save(project);
     }
 
     public void deleteProject(Long id) {
