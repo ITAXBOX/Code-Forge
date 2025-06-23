@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Code Forge: The Leaderboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -64,24 +63,14 @@
         }
 
         @keyframes gradientShift {
-            0%, 100% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
         @keyframes float {
-            0%, 100% {
-                transform: translateY(0px) rotate(0deg);
-            }
-            33% {
-                transform: translateY(-30px) rotate(1deg);
-            }
-            66% {
-                transform: translateY(30px) rotate(-1deg);
-            }
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(1deg); }
+            66% { transform: translateY(30px) rotate(-1deg); }
         }
 
         /* Particles */
@@ -139,12 +128,8 @@
         }
 
         @keyframes titleGlow {
-            from {
-                filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.5));
-            }
-            to {
-                filter: drop-shadow(0 0 30px rgba(118, 75, 162, 0.8));
-            }
+            from { filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.5)); }
+            to { filter: drop-shadow(0 0 30px rgba(118, 75, 162, 0.8)); }
         }
 
         .header p {
@@ -409,12 +394,8 @@
         }
 
         @keyframes goldGlow {
-            from {
-                box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-            }
-            to {
-                box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
-            }
+            from { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+            to { box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
         }
 
         .project-info {
@@ -510,12 +491,8 @@
         }
 
         @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Error State */
@@ -994,8 +971,7 @@
             </div>
             <div class="form-group">
                 <label for="description" class="form-label">Project Description</label>
-                <textarea id="description" name="description" class="form-input" rows="3"
-                          placeholder="Enter project description"></textarea>
+                <textarea id="description" name="description" class="form-input" rows="3" placeholder="Enter project description"></textarea>
             </div>
             <div class="form-group">
                 <label for="frontendType" class="form-label">Frontend Framework</label>
@@ -1046,13 +1022,11 @@
             <input type="hidden" id="editProjectId" name="id">
             <div class="form-group">
                 <label for="editName" class="form-label">Project Name</label>
-                <input type="text" id="editName" name="name" class="form-input" placeholder="Enter project name"
-                       required>
+                <input type="text" id="editName" name="name" class="form-input" placeholder="Enter project name" required>
             </div>
             <div class="form-group">
                 <label for="editDescription" class="form-label">Project Description</label>
-                <textarea id="editDescription" name="description" class="form-input" rows="3"
-                          placeholder="Enter project description"></textarea>
+                <textarea id="editDescription" name="description" class="form-input" rows="3" placeholder="Enter project description"></textarea>
             </div>
             <div class="form-group">
                 <label for="editFrontendType" class="form-label">Frontend Framework</label>
@@ -1141,8 +1115,27 @@
     const confirmDeleteProjectEl = document.getElementById('confirmDeleteProject');
     const confirmDialogEl = document.getElementById('confirmDialog');
 
+    // Helper function to get a valid project ID
+    function getProjectId(project, index) {
+        // Try multiple possible ID fields and fallback to index
+        return project.id || project.projectId || project._id || `temp_${index}`;
+    }
+
+    // Helper function to find project by ID with multiple fallbacks
+    function findProjectById(projectId) {
+        return allProjects.find(p => {
+            const pid = getProjectId(p, allProjects.indexOf(p));
+            return pid == projectId;
+        });
+    }
+
+    // Make functions accessible globally
+    window.openAddModal = openAddModal;
+    window.openEditModal = openEditModal;
+    window.openDeleteModal = openDeleteModal;
+
     // Initialize
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         createParticles();
         loadLeaderboardData();
         setupEventListeners();
@@ -1191,52 +1184,83 @@
         });
     }
 
-    // Make functions accessible globally for HTML onclick attributes
-    window.openAddModal = openAddModal;
-    window.openEditModal = openEditModal;
-    window.openDeleteModal = openDeleteModal;
-
     // Open Add Project Modal
     function openAddModal() {
+        console.log('Opening Add Modal');
         // Reset form
         addProjectFormEl.reset();
-
         // Show modal
         toggleModal(addProjectModalEl, true);
     }
 
     // Open Edit Project Modal
     function openEditModal(projectId) {
-        // Find project
-        const project = allProjects.find(p => p.id === projectId);
-        if (!project) {
-            console.error('Project not found:', projectId);
+        console.log('Opening Edit Modal for ID:', projectId);
+
+        if (!projectId || projectId === 'undefined') {
+            console.error('Invalid project ID provided:', projectId);
+            alert('Error: Invalid project ID');
             return;
         }
 
-        // Populate form with correct field names
-        document.getElementById('editProjectId').value = project.id;
-        document.getElementById('editName').value = project.projectName || project.name || '';
-        document.getElementById('editDescription').value = project.projectDescription || project.description || '';
-        document.getElementById('editFrontendType').value = project.frontendType;
-        document.getElementById('editBackendType').value = project.backendType;
-        document.getElementById('editDatabaseType').value = project.databaseType;
+        // Find project using the helper function
+        const project = findProjectById(projectId);
+        if (!project) {
+            console.error('Project not found for ID:', projectId);
+            console.log('Available projects:', allProjects.map((p, i) => ({
+                originalId: p.id,
+                projectId: p.projectId,
+                _id: p._id,
+                calculatedId: getProjectId(p, i),
+                name: p.projectName || p.name
+            })));
+            alert(`Error: Project not found with ID: ${projectId}`);
+            return;
+        }
 
-        // Show modal
-        toggleModal(editProjectModalEl, true);
+        console.log('Found project for editing:', project);
+
+        try {
+            // Populate form with correct field names
+            document.getElementById('editProjectId').value = getProjectId(project, allProjects.indexOf(project));
+            document.getElementById('editName').value = project.projectName || project.name || '';
+            document.getElementById('editDescription').value = project.projectDescription || project.description || '';
+            document.getElementById('editFrontendType').value = project.frontendType || '';
+            document.getElementById('editBackendType').value = project.backendType || '';
+            document.getElementById('editDatabaseType').value = project.databaseType || '';
+
+            console.log('Form populated successfully');
+
+            // Show modal
+            toggleModal(editProjectModalEl, true);
+        } catch (error) {
+            console.error('Error populating edit form:', error);
+            alert('Error opening edit modal: ' + error.message);
+        }
     }
 
     // Open Delete Project Modal
     function openDeleteModal(projectId) {
-        // Find project
-        const project = allProjects.find(p => p.id === projectId);
-        if (!project) {
-            console.error('Project not found:', projectId);
+        console.log('Opening Delete Modal for ID:', projectId);
+
+        if (!projectId || projectId === 'undefined') {
+            console.error('Invalid project ID provided for deletion:', projectId);
+            alert('Error: Invalid project ID');
             return;
         }
 
+        // Find project using the helper function
+        const project = findProjectById(projectId);
+        if (!project) {
+            console.error('Project not found for deletion, ID:', projectId);
+            alert(`Error: Project not found with ID: ${projectId}`);
+            return;
+        }
+
+        console.log('Found project for deletion:', project);
+
         // Store project to delete
-        currentProjectToDelete = project.id;
+        currentProjectToDelete = getProjectId(project, allProjects.indexOf(project));
 
         // Show confirmation dialog
         confirmDialogEl.classList.add('active');
@@ -1284,11 +1308,23 @@
         try {
             // Load dashboard analytics
             const dashboardResponse = await fetch(`${API_BASE_URL}/analytics/dashboard`);
+            if (!dashboardResponse.ok) {
+                throw new Error(`Dashboard API error: ${dashboardResponse.status}`);
+            }
             const dashboardData = await dashboardResponse.json();
 
             // Load total projects count
             const countResponse = await fetch(`${API_BASE_URL}/projects/count`);
+            if (!countResponse.ok) {
+                throw new Error(`Count API error: ${countResponse.status}`);
+            }
             const totalCount = await countResponse.json();
+
+            console.log('Data loaded successfully:', {
+                dashboardData: dashboardData,
+                totalCount: totalCount,
+                topProjectsCount: dashboardData.topProjects ? dashboardData.topProjects.length : 0
+            });
 
             // Update stats
             updateStats(dashboardData, totalCount);
@@ -1297,8 +1333,13 @@
             if (dashboardData.topProjects && dashboardData.topProjects.length > 0) {
                 allProjects = dashboardData.topProjects.sort((a, b) => b.requestCount - a.requestCount);
                 filteredProjects = [...allProjects];
+
+                console.log('Projects loaded:', allProjects.length);
+                console.log('Sample project structure:', allProjects[0]);
+
                 updateLeaderboard();
             } else {
+                console.log('No projects found');
                 showEmptyState();
             }
 
@@ -1349,47 +1390,58 @@
             return;
         }
 
+        console.log('Updating leaderboard with', filteredProjects.length, 'projects');
+
         const leaderboardHTML = filteredProjects.map((project, index) => {
             const rank = index + 1;
             const rankClass = getRankClass(rank);
             const badgeClass = getRankBadgeClass(rank);
+            const projectId = getProjectId(project, index);
+            const projectName = project.projectName || project.name || 'Unnamed Project';
+
+            console.log(`Rendering project ${index}:`, {
+                originalId: project.id,
+                calculatedId: projectId,
+                name: projectName,
+                rank: rank
+            });
 
             return `
-        <div class="leaderboard-item ${rankClass} fade-in" data-project-id="${project.id || ''}" style="animation-delay: ${index * 0.1}s">
-            <div class="item-header">
-                <div class="rank-badge ${badgeClass}">
-                    ${rank <= 3 ? getRankEmoji(rank) : rank}
-                </div>
-                <div class="project-info">
-                    <h3 class="project-name">${project.projectName || project.name || 'Unnamed Project'}</h3>
-                    <p class="project-description">${project.projectDescription || project.description || 'No description available'}</p>
-                    <div class="tech-stack">
-                        <span class="tech-badge">${formatTechName(project.frontendType)}</span>
-                        <span class="tech-badge">${formatTechName(project.backendType)}</span>
-                        <span class="tech-badge">${formatTechName(project.databaseType)}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="project-stats">
-                <div class="stat-box">
-                    <div class="stat-value">${project.requestCount}</div>
-                    <div class="stat-name">Requests</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value">${formatDate(project.lastRequestedAt)}</div>
-                    <div class="stat-name">Last Active</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value">${getActivityScore(project.requestCount)}</div>
-                    <div class="stat-name">Score</div>
-                </div>
-            </div>
-            <div class="project-actions">
-                <button class="action-btn edit-btn tooltip" data-tooltip="Edit" onclick="openEditModal('${project.id || ''}')">✏️</button>
-                <button class="action-btn delete-btn tooltip" data-tooltip="Delete" onclick="openDeleteModal('${project.id || ''}')">🗑️</button>
-            </div>
-        </div>
-      `;
+      <div class="leaderboard-item ${rankClass} fade-in" data-project-id="${projectId}" style="animation-delay: ${index * 0.1}s">
+          <div class="item-header">
+              <div class="rank-badge ${badgeClass}">
+                  ${rank <= 3 ? getRankEmoji(rank) : rank}
+              </div>
+              <div class="project-info">
+                  <h3 class="project-name">${projectName}</h3>
+                  <p class="project-description">${project.projectDescription || project.description || 'No description available'}</p>
+                  <div class="tech-stack">
+                      <span class="tech-badge">${formatTechName(project.frontendType)}</span>
+                      <span class="tech-badge">${formatTechName(project.backendType)}</span>
+                      <span class="tech-badge">${formatTechName(project.databaseType)}</span>
+                  </div>
+              </div>
+          </div>
+          <div class="project-stats">
+              <div class="stat-box">
+                  <div class="stat-value">${project.requestCount}</div>
+                  <div class="stat-name">Requests</div>
+              </div>
+              <div class="stat-box">
+                  <div class="stat-value">${formatDate(project.lastRequestedAt)}</div>
+                  <div class="stat-name">Last Active</div>
+              </div>
+              <div class="stat-box">
+                  <div class="stat-value">${getActivityScore(project.requestCount)}</div>
+                  <div class="stat-name">Score</div>
+              </div>
+          </div>
+          <div class="project-actions">
+              <button class="action-btn edit-btn tooltip" data-tooltip="Edit" onclick="openEditModal('${projectId}')">✏️</button>
+              <button class="action-btn delete-btn tooltip" data-tooltip="Delete" onclick="openDeleteModal('${projectId}')">🗑️</button>
+          </div>
+      </div>
+    `;
         }).join('');
 
         leaderboardGridEl.innerHTML = leaderboardHTML;
@@ -1400,47 +1452,37 @@
                 window.observeElements();
             }
         }, 100);
+
+        console.log('Leaderboard updated successfully');
     }
 
     // Get rank class
     function getRankClass(rank) {
-        switch (rank) {
-            case 1:
-                return 'rank-1';
-            case 2:
-                return 'rank-2';
-            case 3:
-                return 'rank-3';
-            default:
-                return '';
+        switch(rank) {
+            case 1: return 'rank-1';
+            case 2: return 'rank-2';
+            case 3: return 'rank-3';
+            default: return '';
         }
     }
 
     // Get rank badge class
     function getRankBadgeClass(rank) {
-        switch (rank) {
-            case 1:
-                return 'gold';
-            case 2:
-                return 'silver';
-            case 3:
-                return 'bronze';
-            default:
-                return '';
+        switch(rank) {
+            case 1: return 'gold';
+            case 2: return 'silver';
+            case 3: return 'bronze';
+            default: return '';
         }
     }
 
     // Get rank emoji
     function getRankEmoji(rank) {
-        switch (rank) {
-            case 1:
-                return '🥇';
-            case 2:
-                return '🥈';
-            case 3:
-                return '🥉';
-            default:
-                return rank;
+        switch(rank) {
+            case 1: return '🥇';
+            case 2: return '🥈';
+            case 3: return '🥉';
+            default: return rank;
         }
     }
 
@@ -1477,6 +1519,7 @@
     async function handleRefresh() {
         if (isLoading) return;
 
+        console.log('Refreshing data');
         refreshTextEl.textContent = 'Refreshing...';
         refreshBtnEl.style.transform = 'rotate(360deg)';
 
@@ -1491,6 +1534,7 @@
     // Handle add project
     async function handleAddProject(event) {
         event.preventDefault();
+        console.log('Adding new project');
 
         const formData = new FormData(addProjectFormEl);
         const newProject = {
@@ -1500,6 +1544,8 @@
             backendType: formData.get('backendType'),
             databaseType: formData.get('databaseType')
         };
+
+        console.log('New project data:', newProject);
 
         try {
             const response = await fetch(`${API_BASE_URL}/projects`, {
@@ -1513,7 +1559,7 @@
             if (!response.ok) throw new Error('Network response was not ok');
 
             const result = await response.json();
-            console.log('Project created:', result);
+            console.log('Project created successfully:', result);
 
             // Close modal and reload data
             toggleModal(addProjectModalEl, false);
@@ -1527,6 +1573,7 @@
     // Handle edit project
     async function handleEditProject(event) {
         event.preventDefault();
+        console.log('Updating project');
 
         const formData = new FormData(editProjectFormEl);
         const updatedProject = {
@@ -1537,6 +1584,8 @@
             backendType: formData.get('backendType'),
             databaseType: formData.get('databaseType')
         };
+
+        console.log('Updated project data:', updatedProject);
 
         try {
             const response = await fetch(`${API_BASE_URL}/projects/${updatedProject.id}`, {
@@ -1550,7 +1599,7 @@
             if (!response.ok) throw new Error('Network response was not ok');
 
             const result = await response.json();
-            console.log('Project updated:', result);
+            console.log('Project updated successfully:', result);
 
             // Close modal and reload data
             toggleModal(editProjectModalEl, false);
@@ -1565,6 +1614,8 @@
     async function handleDeleteProject() {
         if (!currentProjectToDelete) return;
 
+        console.log('Deleting project:', currentProjectToDelete);
+
         try {
             const response = await fetch(`${API_BASE_URL}/projects/${currentProjectToDelete}`, {
                 method: 'DELETE'
@@ -1572,7 +1623,7 @@
 
             if (!response.ok) throw new Error('Network response was not ok');
 
-            console.log('Project deleted:', currentProjectToDelete);
+            console.log('Project deleted successfully:', currentProjectToDelete);
 
             // Close modal and reload data
             toggleModal(deleteProjectModalEl, false);
@@ -1587,6 +1638,8 @@
 
     // Toggle modal visibility
     function toggleModal(modalEl, isVisible) {
+        console.log(`Toggling modal ${modalEl.id}:`, isVisible);
+
         if (isVisible) {
             modalEl.classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -1604,34 +1657,34 @@
     // Show loading state
     function showLoading() {
         leaderboardGridEl.innerHTML = `
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>Loading amazing projects...</p>
-                </div>
-            `;
+              <div class="loading">
+                  <div class="spinner"></div>
+                  <p>Loading amazing projects...</p>
+              </div>
+          `;
     }
 
     // Show error state
     function showError(message) {
         leaderboardGridEl.innerHTML = `
-                <div class="error">
-                    <h3>⚠️ Oops!</h3>
-                    <p>${message}</p>
-                    <button class="refresh-btn" onclick="loadLeaderboardData()" style="margin-top: 1rem;">
-                        Try Again
-                    </button>
-                </div>
-            `;
+              <div class="error">
+                  <h3>⚠️ Oops!</h3>
+                  <p>${message}</p>
+                  <button class="refresh-btn" onclick="loadLeaderboardData()" style="margin-top: 1rem;">
+                      Try Again
+                  </button>
+              </div>
+          `;
     }
 
     // Show empty state
     function showEmptyState() {
         leaderboardGridEl.innerHTML = `
-                <div class="empty-state">
-                    <h3>🚀 No Projects Yet</h3>
-                    <p>Be the first to create an amazing project and claim the top spot!</p>
-                </div>
-            `;
+              <div class="empty-state">
+                  <h3>🚀 No Projects Yet</h3>
+                  <p>Be the first to create an amazing project and claim the top spot!</p>
+              </div>
+          `;
     }
 
     // Format technology names
@@ -1661,15 +1714,15 @@
             const newCursor = document.createElement('div');
             newCursor.className = 'cursor';
             newCursor.style.cssText = `
-                    position: fixed;
-                    width: 20px;
-                    height: 20px;
-                    background: radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, transparent 70%);
-                    border-radius: 50%;
-                    pointer-events: none;
-                    z-index: 9999;
-                    transition: transform 0.1s ease;
-                `;
+                  position: fixed;
+                  width: 20px;
+                  height: 20px;
+                  background: radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, transparent 70%);
+                  border-radius: 50%;
+                  pointer-events: none;
+                  z-index: 9999;
+                  transition: transform 0.1s ease;
+              `;
             document.body.appendChild(newCursor);
         }
 
@@ -1681,7 +1734,7 @@
     // Add keyboard shortcuts
     document.addEventListener('keydown', (e) => {
         if (e.ctrlKey || e.metaKey) {
-            switch (e.key) {
+            switch(e.key) {
                 case 'r':
                     e.preventDefault();
                     handleRefresh();
@@ -1695,7 +1748,7 @@
 
         if (e.key === 'Escape') {
             searchInputEl.value = '';
-            handleSearch({target: {value: ''}});
+            handleSearch({ target: { value: '' } });
             searchInputEl.blur();
         }
     });
