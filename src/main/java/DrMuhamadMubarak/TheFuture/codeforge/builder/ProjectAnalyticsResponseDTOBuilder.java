@@ -4,11 +4,24 @@ import DrMuhamadMubarak.TheFuture.codeforge.dto.response.ProjectAnalyticsRespons
 import DrMuhamadMubarak.TheFuture.codeforge.model.ProjectAnalytics;
 
 public class ProjectAnalyticsResponseDTOBuilder {
-    public static ProjectAnalyticsResponseDTO projectAnalyticsResponseDTObuilder(ProjectAnalytics projectAnalytics)
-    {
-        return ProjectAnalyticsResponseDTO.builder().
-                requestCount(projectAnalytics.getRequestCount()).
-                lastRequestedAt(projectAnalytics.getLastRequestedAt()).
-                build();
+    public static ProjectAnalyticsResponseDTO projectAnalyticsResponseDTObuilder(ProjectAnalytics projectAnalytics) {
+        // If project analytics has no associated project (shouldn't happen normally)
+        if (projectAnalytics.getProject() == null) {
+            return ProjectAnalyticsResponseDTO.builder()
+                    .requestCount(projectAnalytics.getRequestCount())
+                    .lastRequestedAt(projectAnalytics.getLastRequestedAt())
+                    .build();
+        }
+        // Include both analytics and project data in the response
+        return ProjectAnalyticsResponseDTO.builder()
+                .projectId(projectAnalytics.getProject().getId())
+                .projectName(projectAnalytics.getProject().getName())
+                .projectDescription(projectAnalytics.getProject().getDescription())
+                .frontendType(projectAnalytics.getProject().getFrontendType())
+                .backendType(projectAnalytics.getProject().getBackendType())
+                .databaseType(projectAnalytics.getProject().getDatabaseType())
+                .requestCount(projectAnalytics.getRequestCount())
+                .lastRequestedAt(projectAnalytics.getLastRequestedAt())
+                .build();
     }
 }
