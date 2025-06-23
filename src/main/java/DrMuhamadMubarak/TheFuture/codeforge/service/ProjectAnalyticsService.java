@@ -42,8 +42,16 @@ public class ProjectAnalyticsService {
         analyticsRepository.save(analytics);
     }
 
+    /**
+     * Gets the top N projects by request count.
+     * Uses an optimized query that eagerly fetches the associated Project data
+     * to avoid N+1 query problems....
+     *
+     * @param limit the maximum number of projects to return
+     * @return list of ProjectAnalytics with eagerly loaded Project data
+     */
     public List<ProjectAnalytics> getTopProjects(int limit) {
-        return analyticsRepository.findTopNByOrderByRequestCountDesc(PageRequest.of(0, limit));
+        return analyticsRepository.findTopProjectsWithDetails(PageRequest.of(0, limit));
     }
 
     // Get most popular frontend frameworks
