@@ -1,5 +1,6 @@
 package DrMuhamadMubarak.TheFuture.generator.controller;
 
+import DrMuhamadMubarak.TheFuture.codeforge.service.ProjectAnalyticsService;
 import DrMuhamadMubarak.TheFuture.codeforge.service.ProjectService;
 import DrMuhamadMubarak.TheFuture.generator.enums.BackendType;
 import DrMuhamadMubarak.TheFuture.generator.enums.DatabaseType;
@@ -21,6 +22,7 @@ public class ProjectStructureController {
 
     private final ProjectStructureService projectStructureService;
     private final ProjectService projectService;
+    private final ProjectAnalyticsService projectAnalyticsService;
 
     @PostMapping("/generate")
     public String generateProjectStructure(
@@ -38,6 +40,7 @@ public class ProjectStructureController {
         }
         try {
             if(projectService.isProjectExists(projectName)) {
+                projectAnalyticsService.recordProjectAccess(projectService.getProjectByName(projectName).getId());
                 model.addAttribute("message", "Project with this name already exists.");
                 return "leaderboard";
             }

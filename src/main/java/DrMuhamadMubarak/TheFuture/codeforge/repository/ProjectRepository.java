@@ -24,6 +24,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     boolean existsByName(@NotBlank @Size(min = 3, max = 50) String name);
 
+    Project findByName(String projectName);
+
     // Projections for the query results
     interface FrontendTypeCount {
         FrontendType getFrontendType();

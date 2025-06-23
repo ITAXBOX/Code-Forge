@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.net.ssl.SSLSession;
 import java.util.List;
 
 @Service
@@ -67,5 +68,13 @@ public class ProjectService {
 
     public boolean isProjectExists(String projectName) {
         return projectRepository.existsByName(projectName);
+    }
+
+    public Project getProjectByName(String projectName) {
+        Project project = projectRepository.findByName(projectName);
+        if (project == null) {
+            throw new EntityNotFoundException("Project not found with name: " + projectName);
+        }
+        return project;
     }
 }
