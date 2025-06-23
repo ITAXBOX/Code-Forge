@@ -8,9 +8,6 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 
 public interface ProjectAnalyticsRepository extends CrudRepository<ProjectAnalytics, Long> {
-
-    List<ProjectAnalytics> findTopNByOrderByRequestCountDesc(PageRequest of);
-
     /**
      * Retrieves top project analytics by request count with eagerly fetched associated projects
      * to avoid N+1 query problem.
