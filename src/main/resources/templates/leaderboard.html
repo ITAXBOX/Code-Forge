@@ -139,6 +139,55 @@
             margin: 0 auto;
         }
 
+        /* Notification Message */
+        .notification {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            padding: 1.2rem 2rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: notificationFadeIn 0.5s ease-out forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .notification::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: notificationShimmer 2s infinite;
+        }
+
+        .notification-message {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        @keyframes notificationFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes notificationShimmer {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(100%); }
+        }
+
         /* Stats Bar */
         .stats-bar {
             display: flex;
@@ -300,6 +349,36 @@
             transform: translateY(0);
         }
 
+        /* Home Button */
+        .home-btn {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(67, 233, 123, 0.4);
+        }
+
+        .home-btn:active {
+            transform: translateY(0);
+        }
+
+        .home-btn-container {
+            margin: 2rem auto;
+            text-align: center;
+        }
         /* Leaderboard Grid */
         .leaderboard-grid {
             display: grid;
@@ -914,6 +993,14 @@
     <p>Discover the most innovative and active projects in our ecosystem</p>
 </header>
 
+<!-- Notification Message Display -->
+<div th:if="${message}" class="notification">
+    <div class="notification-message">
+        <strong>✨ Your project is already build! ✨</strong>
+        <p th:text="${message}"></p>
+    </div>
+</div>
+
 <div class="stats-bar" id="statsBar">
     <div class="stat-item">
         <div class="stat-number" id="totalProjects">-</div>
@@ -954,6 +1041,13 @@
             <div class="spinner"></div>
             <p>Loading amazing projects...</p>
         </div>
+    </div>
+
+    <!-- Home Button -->
+    <div class="home-btn-container">
+        <button class="home-btn" id="homeBtn">
+            <span>🏠 Go Back to Home Page</span>
+        </button>
     </div>
 </div>
 
@@ -1171,6 +1265,7 @@
         addProjectFormEl.addEventListener('submit', handleAddProject);
         editProjectFormEl.addEventListener('submit', handleEditProject);
         confirmDeleteProjectEl.addEventListener('click', handleDeleteProject);
+        document.getElementById('homeBtn').addEventListener('click', () => window.location.href = '/');
 
         // Close modals when clicking outside
         addProjectModalEl.addEventListener('click', (e) => {
