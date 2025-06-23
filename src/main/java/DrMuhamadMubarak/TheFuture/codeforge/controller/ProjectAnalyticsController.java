@@ -6,44 +6,48 @@ import DrMuhamadMubarak.TheFuture.generator.enums.BackendType;
 import DrMuhamadMubarak.TheFuture.generator.enums.DatabaseType;
 import DrMuhamadMubarak.TheFuture.generator.enums.FrontendType;
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Controller
-@RequestMapping("/analytics")
+@RestController
+@RequestMapping("/api/analytics")
 @AllArgsConstructor
+@CrossOrigin(origins = "*")
 public class ProjectAnalyticsController {
 
     private final ProjectAnalyticsService analyticsService;
 
     @GetMapping("/dashboard")
-    public void getDashboard(Model model) {
+    public ResponseEntity<Map<String, Object>> getDashboard() {
+        // Create a response map to hold all dashboard data
+        Map<String, Object> dashboardData = new HashMap<>();
+
         // Get top 5 projects
         List<ProjectAnalytics> topProjects = analyticsService.getTopProjects(5);
-        model.addAttribute("topProjects", topProjects);
+        dashboardData.put("topProjects", topProjects);
 
         // Get top frontend framework
         Map<FrontendType, Long> topFrontendFrameworks = analyticsService.getTopFrontendFrameworks(1);
-        model.addAttribute("topFrontendFrameworks", topFrontendFrameworks);
+        dashboardData.put("topFrontendFrameworks", topFrontendFrameworks);
 
         // Get top backend framework
         Map<BackendType, Long> topBackendFrameworks = analyticsService.getTopBackendFrameworks(1);
-        model.addAttribute("topBackendFrameworks", topBackendFrameworks);
+        dashboardData.put("topBackendFrameworks", topBackendFrameworks);
 
         // Get top database
         Map<DatabaseType, Long> topDatabases = analyticsService.getTopDatabaseTypes(1);
-        model.addAttribute("topDatabases", topDatabases);
+        dashboardData.put("topDatabases", topDatabases);
+
+        return ResponseEntity.ok(dashboardData);
     }
 
     @GetMapping("/project/{id}")
-    public void getProjectAnalytics(@PathVariable Long id, Model model) {
+    public ResponseEntity<ProjectAnalytics> getProjectAnalytics(@PathVariable Long id) {
         ProjectAnalytics analytics = analyticsService.getProjectAnalytics(id);
-        model.addAttribute("analytics", analytics);
+        return ResponseEntity.ok(analytics);
     }
 }

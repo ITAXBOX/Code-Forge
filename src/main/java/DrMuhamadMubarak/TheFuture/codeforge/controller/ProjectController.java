@@ -1,72 +1,57 @@
 package DrMuhamadMubarak.TheFuture.codeforge.controller;
 
-import DrMuhamadMubarak.TheFuture.codeforge.builder.ProjectCreateRequestBuilder;
 import DrMuhamadMubarak.TheFuture.codeforge.dto.ProjectCreateDTO;
 import DrMuhamadMubarak.TheFuture.codeforge.dto.ProjectUpdateDTO;
 import DrMuhamadMubarak.TheFuture.codeforge.model.Project;
 import DrMuhamadMubarak.TheFuture.codeforge.service.ProjectService;
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
-@RequestMapping("/projects")
+@RestController
+@RequestMapping("/api/projects")
 @AllArgsConstructor
+@CrossOrigin(origins = "*")
 public class ProjectController {
 
     private final ProjectService projectService;
 
     @GetMapping
-    public void getAllProjects(Model model) {
+    public ResponseEntity<List<Project>> getAllProjects() {
         List<Project> projects = projectService.getAllProjects();
-        model.addAttribute("projects", projects);
+        return ResponseEntity.ok(projects);
     }
 
     @GetMapping("/{id}")
-    public void getProjectDetails(@PathVariable Long id, Model model) {
+    public ResponseEntity<Project> getProjectDetails(@PathVariable Long id) {
         Project project = projectService.getProjectById(id);
-        model.addAttribute("project", project);
-    }
-
-    @GetMapping("/new")
-    public void showCreateForm(Model model) {
-        model.addAttribute("project", new ProjectCreateDTO());
+        return ResponseEntity.ok(project);
     }
 
     @PostMapping
-    public void createProject(@ModelAttribute ProjectCreateDTO request) {
-        projectService.createProject(request);
+    public ResponseEntity<Project> createProject(@RequestBody ProjectCreateDTO request) {
+        Project createdProject = projectService.createProject(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdProject);
     }
 
-    @GetMapping("/{id}/edit")
-    public void showEditForm(@PathVariable Long id, Model model) {
-        Project project = projectService.getProjectById(id);
-        ProjectCreateDTO dto = ProjectCreateRequestBuilder.projectCreateRequestDTOBuilder(
-                project.getName(),
-                project.getDescription(),
-                project.getFrontendType(),
-                project.getBackendType(),
-                project.getDatabaseType()
-        );
-        model.addAttribute("project", dto);
+    @PutMapping("/{id}")
+    public ResponseEntity<Project> updateProject(@PathVariable Long id, @RequestBody ProjectUpdateDTO request) {
+        Project updatedProject = projectService.updateProject(id, request);
+        return ResponseEntity.ok(updatedProject);
     }
 
-    @PostMapping("/{id}")
-    public void updateProject(@PathVariable Long id, @ModelAttribute ProjectUpdateDTO request) {
-        projectService.updateProject(id, request);
-    }
-
-    @GetMapping("/{id}/delete")
-    public void deleteProject(@PathVariable Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/count")
-    @ResponseBody
-    public long countProjects() {
-        return projectService.countProjects();
+    public ResponseEntity<Long> countProjects() {
+        long count = projectService.countProjects();
+        return ResponseEntity.ok(count);
     }
 }
