@@ -29,7 +29,7 @@ public class ProjectAnalyticsService {
         return project.getAnalytics();
     }
 
-    public ProjectAnalytics recordProjectAccess(Long projectId) {
+    public void recordProjectAccess(Long projectId) {
         Project project = projectService.getProjectById(projectId);
         ProjectAnalytics analytics = project.getAnalytics();
 
@@ -39,7 +39,7 @@ public class ProjectAnalyticsService {
         }
 
         analytics.incrementRequestCount();
-        return analyticsRepository.save(analytics);
+        analyticsRepository.save(analytics);
     }
 
     public List<ProjectAnalytics> getTopProjects(int limit) {
@@ -48,16 +48,16 @@ public class ProjectAnalyticsService {
 
     // Get most popular frontend frameworks
     public Map<FrontendType, Long> getTopFrontendFrameworks(int limit) {
-        return projectRepository.countProjectsByFrontendType().stream().sorted((a, b) -> Long.compare(b.getCount(), a.getCount())).limit(limit).collect(Collectors.toMap(ProjectRepository.FrontendTypeCount::getFrontendType, ProjectRepository.FrontendTypeCount::getCount, (a, b) -> a, LinkedHashMap::new));
+        return projectRepository.countProjectsByFrontendType().stream().sorted((a, b) -> Long.compare(b.getCount(), a.getCount())).limit(limit).collect(Collectors.toMap(ProjectRepository.FrontendTypeCount::getFrontendType, ProjectRepository.FrontendTypeCount::getCount, (a, _) -> a, LinkedHashMap::new));
     }
 
     // Get most popular backend frameworks
     public Map<BackendType, Long> getTopBackendFrameworks(int limit) {
-        return projectRepository.countProjectsByBackendType().stream().sorted((a, b) -> Long.compare(b.getCount(), a.getCount())).limit(limit).collect(Collectors.toMap(ProjectRepository.BackendTypeCount::getBackendType, ProjectRepository.BackendTypeCount::getCount, (a, b) -> a, LinkedHashMap::new));
+        return projectRepository.countProjectsByBackendType().stream().sorted((a, b) -> Long.compare(b.getCount(), a.getCount())).limit(limit).collect(Collectors.toMap(ProjectRepository.BackendTypeCount::getBackendType, ProjectRepository.BackendTypeCount::getCount, (a, _) -> a, LinkedHashMap::new));
     }
 
     // Get most popular databases
     public Map<DatabaseType, Long> getTopDatabaseTypes(int limit) {
-        return projectRepository.countProjectsByDatabaseType().stream().sorted((a, b) -> Long.compare(b.getCount(), a.getCount())).limit(limit).collect(Collectors.toMap(ProjectRepository.DatabaseTypeCount::getDatabaseType, ProjectRepository.DatabaseTypeCount::getCount, (a, b) -> a, LinkedHashMap::new));
+        return projectRepository.countProjectsByDatabaseType().stream().sorted((a, b) -> Long.compare(b.getCount(), a.getCount())).limit(limit).collect(Collectors.toMap(ProjectRepository.DatabaseTypeCount::getDatabaseType, ProjectRepository.DatabaseTypeCount::getCount, (a, _) -> a, LinkedHashMap::new));
     }
 }
