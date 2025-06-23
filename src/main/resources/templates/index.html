@@ -572,11 +572,12 @@
             max-height: 100%;
         }
 
-        /* Leaderboard Section - Sky Theme */
+        /* POWERFUL LEADERBOARD SECTION - Same size as other sections */
         .leaderboard {
             padding: 6rem 0;
             position: relative;
             overflow: hidden;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.05) 0%, rgba(56, 189, 248, 0.1) 50%, rgba(2, 132, 199, 0.05) 100%);
         }
 
         .leaderboard::before {
@@ -586,14 +587,72 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at 30% 70%, rgba(14, 165, 233, 0.15) 0%, rgba(56, 189, 248, 0.1) 40%, transparent 70%);
+            background:
+                    radial-gradient(circle at 20% 20%, rgba(14, 165, 233, 0.3) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(56, 189, 248, 0.2) 0%, transparent 50%),
+                    radial-gradient(circle at 40% 60%, rgba(2, 132, 199, 0.15) 0%, transparent 50%);
             z-index: -1;
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1) rotate(2deg);
+                opacity: 0.8;
+            }
+        }
+
+        .leaderboard::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23ffffff" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            z-index: -1;
+            opacity: 0.3;
         }
 
         .leaderboard-content {
             text-align: center;
             max-width: 800px;
             margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .leaderboard-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            background: rgba(14, 165, 233, 0.15);
+            border: 2px solid rgba(14, 165, 233, 0.3);
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #38bdf8;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(12px);
+            animation: leaderboardPulse 3s ease-in-out infinite;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        @keyframes leaderboardPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.6);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 0 20px rgba(14, 165, 233, 0);
+                transform: scale(1.05);
+            }
         }
 
         .leaderboard-icon {
@@ -602,35 +661,58 @@
             justify-content: center;
             width: 5rem;
             height: 5rem;
-            background: linear-gradient(135deg, #0ea5e9, #38bdf8, #0284c7);
+            background: linear-gradient(135deg, #0ea5e9, #38bdf8, #0284c7, #0369a1);
+            background-size: 300% 300%;
             border-radius: 50%;
             margin-bottom: 2rem;
-            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.4);
+            box-shadow:
+                    0 20px 40px rgba(14, 165, 233, 0.4),
+                    0 0 0 0 rgba(14, 165, 233, 0.6),
+                    inset 0 0 0 2px rgba(255, 255, 255, 0.1);
             position: relative;
+            animation: iconFloat 6s ease-in-out infinite, gradientShift 8s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-10px) rotate(5deg);
+            }
+        }
+
+        @keyframes gradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
         }
 
         .leaderboard-icon::before {
             content: '';
             position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
             background: linear-gradient(135deg, #0ea5e9, #38bdf8, #0284c7);
             border-radius: 50%;
             z-index: -1;
-            opacity: 0.3;
-            animation: skyPulse 3s ease-in-out infinite;
+            opacity: 0.4;
+            animation: iconPulse 4s ease-in-out infinite;
         }
 
-        @keyframes skyPulse {
+        @keyframes iconPulse {
             0%, 100% {
                 transform: scale(1);
-                opacity: 0.3;
+                opacity: 0.4;
             }
             50% {
-                transform: scale(1.1);
-                opacity: 0.6;
+                transform: scale(1.2);
+                opacity: 0.8;
             }
         }
 
@@ -638,35 +720,90 @@
             width: 2.5rem;
             height: 2.5rem;
             fill: white;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
         }
 
         .leaderboard h2 {
             font-size: 2.5rem;
             font-weight: 800;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, #0ea5e9, #38bdf8, #0284c7);
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #0ea5e9, #38bdf8, #0284c7, #0369a1);
+            background-size: 300% 300%;
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            animation: textGradientShift 6s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(14, 165, 233, 0.5);
+            letter-spacing: -0.02em;
         }
 
-        .leaderboard p {
-            font-size: 1.25rem;
+        @keyframes textGradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .leaderboard-subtitle {
+            font-size: 1.125rem;
             color: var(--text-secondary);
             margin-bottom: 3rem;
             line-height: 1.7;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: 400;
+        }
+
+        .leaderboard-highlight {
+            color: #38bdf8;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
         }
 
         .leaderboard-stats {
-            display: flex;
-            justify-content: center;
-            gap: 4rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
             margin: 3rem 0;
-            flex-wrap: wrap;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .leaderboard-stat {
             text-align: center;
+            padding: 2rem;
+            background: rgba(14, 165, 233, 0.1);
+            border-radius: 20px;
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .leaderboard-stat::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.1), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .leaderboard-stat:hover::before {
+            left: 100%;
+        }
+
+        .leaderboard-stat:hover {
+            transform: translateY(-8px) scale(1.05);
+            border-color: rgba(14, 165, 233, 0.4);
+            box-shadow: 0 20px 40px rgba(14, 165, 233, 0.3);
         }
 
         .leaderboard-stat-number {
@@ -678,6 +815,16 @@
             color: transparent;
             display: block;
             margin-bottom: 0.5rem;
+            animation: numberPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes numberPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
         }
 
         .leaderboard-stat-label {
@@ -688,34 +835,84 @@
             letter-spacing: 0.1em;
         }
 
+        .leaderboard-cta {
+            margin-top: 2.5rem;
+        }
+
         .btn-leaderboard {
-            background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+            background: linear-gradient(135deg, #0ea5e9, #38bdf8, #0284c7);
+            background-size: 300% 300%;
             color: white;
-            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);
+            box-shadow:
+                    0 15px 35px rgba(14, 165, 233, 0.4),
+                    0 5px 15px rgba(14, 165, 233, 0.3);
             font-size: 1.25rem;
+            font-weight: 700;
             padding: 1.25rem 2.5rem;
             position: relative;
             overflow: hidden;
+            border-radius: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            animation: buttonGradientShift 4s ease-in-out infinite;
         }
 
-        .btn-leaderboard::after {
+        @keyframes buttonGradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .btn-leaderboard::before {
             content: '';
             position: absolute;
             top: 0;
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
             transition: left 0.6s ease;
         }
 
+        .btn-leaderboard::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
         .btn-leaderboard:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(14, 165, 233, 0.5);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow:
+                    0 25px 50px rgba(14, 165, 233, 0.6),
+                    0 10px 25px rgba(14, 165, 233, 0.4);
+        }
+
+        .btn-leaderboard:hover::before {
+            left: 100%;
         }
 
         .btn-leaderboard:hover::after {
-            left: 100%;
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-leaderboard svg {
+            margin-left: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-leaderboard:hover svg {
+            transform: translateX(5px) rotate(10deg);
         }
 
         /* CTA Section */
@@ -872,7 +1069,7 @@
             }
 
             .hero-stats, .leaderboard-stats {
-                flex-direction: column;
+                grid-template-columns: 1fr;
                 gap: 1.5rem;
             }
 
@@ -887,6 +1084,19 @@
             .footer-content {
                 flex-direction: column;
                 gap: 2rem;
+            }
+
+            .leaderboard h2 {
+                font-size: 2.25rem;
+            }
+
+            .leaderboard-subtitle {
+                font-size: 1.125rem;
+            }
+
+            .btn-leaderboard {
+                font-size: 1.125rem;
+                padding: 1.125rem 2rem;
             }
         }
 
@@ -914,8 +1124,22 @@
                 padding: 0.5rem 1rem;
             }
 
-            .leaderboard p {
-                font-size: 1.125rem;
+            .leaderboard h2 {
+                font-size: 2rem;
+            }
+
+            .leaderboard-subtitle {
+                font-size: 1rem;
+            }
+
+            .leaderboard-icon {
+                width: 4rem;
+                height: 4rem;
+            }
+
+            .leaderboard-icon svg {
+                width: 2rem;
+                height: 2rem;
             }
         }
     </style>
@@ -1172,6 +1396,13 @@
 <section class="leaderboard" id="leaderboard">
     <div class="container">
         <div class="leaderboard-content">
+            <div class="leaderboard-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                🏆 Hall of Fame
+            </div>
+
             <div class="leaderboard-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M7 14l5-5 5 5z"/>
@@ -1181,32 +1412,34 @@
             </div>
 
             <h2>Project Leaderboard</h2>
-            <p>
-                Discover the most innovative and successful projects built with Code Forge. Get inspired by what our community has created and see how your projects stack up against the best.
+            <p class="leaderboard-subtitle">
+                Witness the <span class="leaderboard-highlight">most extraordinary projects</span> ever built with Code Forge. Join an elite community of innovators who are reshaping the future of development.
             </p>
 
             <div class="leaderboard-stats">
                 <div class="leaderboard-stat">
-                    <span class="leaderboard-stat-number">500+</span>
-                    <span class="leaderboard-stat-label">Featured Projects</span>
+                    <span class="leaderboard-stat-number">2,500+</span>
+                    <span class="leaderboard-stat-label">Elite Projects</span>
                 </div>
                 <div class="leaderboard-stat">
-                    <span class="leaderboard-stat-number">50K+</span>
-                    <span class="leaderboard-stat-label">Total Votes</span>
+                    <span class="leaderboard-stat-number">150K+</span>
+                    <span class="leaderboard-stat-label">Community Votes</span>
                 </div>
                 <div class="leaderboard-stat">
-                    <span class="leaderboard-stat-number">1,200+</span>
-                    <span class="leaderboard-stat-label">Active Developers</span>
+                    <span class="leaderboard-stat-number">5,000+</span>
+                    <span class="leaderboard-stat-label">Master Developers</span>
                 </div>
             </div>
 
-            <a th:href="@{/leaderboard}" class="btn btn-leaderboard">
-                View Leaderboard
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M7 14l5-5 5 5z"/>
-                    <path d="M5 21h14l-7-7z"/>
-                </svg>
-            </a>
+            <div class="leaderboard-cta">
+                <a href="leaderboard.html" class="btn btn-leaderboard">
+                    Enter The Arena
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M7 14l5-5 5 5z"/>
+                        <path d="M5 21h14l-7-7z"/>
+                    </svg>
+                </a>
+            </div>
         </div>
     </div>
 </section>
