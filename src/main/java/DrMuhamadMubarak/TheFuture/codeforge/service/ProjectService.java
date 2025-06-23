@@ -19,7 +19,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
 
     @Transactional
-    public Project createProject(ProjectCreateRequestDTO request) {
+    public void createProject(ProjectCreateRequestDTO request) {
         if (projectRepository.existsByName((request.getName()))) {
             throw new IllegalArgumentException("Project name already exists");
         }
@@ -33,7 +33,7 @@ public class ProjectService {
         ProjectAnalytics analytics = new ProjectAnalytics();
         project.setAnalytics(analytics);
         analytics.setProject(project);
-        return projectRepository.save(project);
+        projectRepository.save(project);
     }
 
     public Project getProjectById(Long id) {

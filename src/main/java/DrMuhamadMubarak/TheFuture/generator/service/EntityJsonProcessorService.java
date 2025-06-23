@@ -1,5 +1,8 @@
 package DrMuhamadMubarak.TheFuture.generator.service;
 
+import DrMuhamadMubarak.TheFuture.codeforge.builder.ProjectCreateRequestBuilder;
+import DrMuhamadMubarak.TheFuture.codeforge.dto.request.ProjectCreateRequestDTO;
+import DrMuhamadMubarak.TheFuture.codeforge.service.ProjectService;
 import DrMuhamadMubarak.TheFuture.generator.dto.AttributeDTO;
 import DrMuhamadMubarak.TheFuture.utils.EntityContext;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,6 +28,7 @@ public class EntityJsonProcessorService {
     private final AttributeStorageService attributeStorageService;
     private final BehaviorService behaviorService;
     private final EntityContext entityContext;
+    private final ProjectService projectService;
 
     public String processJsonAndGenerateEntities(boolean AI, String projectName, String json, Model model, String frontend, String backend, String database, String successMessage) {
         try {
@@ -48,11 +52,15 @@ public class EntityJsonProcessorService {
             model.addAttribute("backendType", backend);
             model.addAttribute("databaseType", database);
             model.addAttribute("entityNames", entityNames);
-            if(AI)
+            if (AI)
                 model.addAttribute("fromJsonProcessor", true);
             processEntities(AI, projectName, entitiesNode, model);
             model.addAttribute("message", successMessage);
-            copyProjectToProjectsDirectory(projectName);
+            if (AI) {
+                ProjectCreateRequestDTO dto = ProjectCreateRequestBuilder.ProjectCreateRequestDTOBuilder(projectName,null, frontend, backend, database);
+                projectService.createProject(dto);
+                copyProjectToProjectsDirectory(projectName);
+            }
             return "result";
         } catch (IOException e) {
             model.addAttribute("message", "An error occurred while processing JSON: " + e.getMessage());
