@@ -4,6 +4,9 @@ import DrMuhamadMubarak.TheFuture.codeforge.builder.ProjectCreateRequestBuilder;
 import DrMuhamadMubarak.TheFuture.codeforge.dto.ProjectCreateDTO;
 import DrMuhamadMubarak.TheFuture.codeforge.service.ProjectService;
 import DrMuhamadMubarak.TheFuture.generator.dto.AttributeDTO;
+import DrMuhamadMubarak.TheFuture.generator.enums.BackendType;
+import DrMuhamadMubarak.TheFuture.generator.enums.DatabaseType;
+import DrMuhamadMubarak.TheFuture.generator.enums.FrontendType;
 import DrMuhamadMubarak.TheFuture.utils.EntityContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,12 +55,17 @@ public class EntityJsonProcessorService {
             model.addAttribute("backendType", backend);
             model.addAttribute("databaseType", database);
             model.addAttribute("entityNames", entityNames);
-            if (AI)
-                model.addAttribute("fromJsonProcessor", true);
+            if (AI) model.addAttribute("fromJsonProcessor", true);
             processEntities(AI, projectName, entitiesNode, model);
             model.addAttribute("message", successMessage);
             if (AI) {
-                ProjectCreateDTO dto = ProjectCreateRequestBuilder.projectCreateRequestDTOBuilder(projectName,null, frontend, backend, database);
+                // Parse string values to enums
+                FrontendType frontendType = FrontendType.fromString(frontend);
+                BackendType backendType = BackendType.fromString(backend);
+                DatabaseType databaseType = DatabaseType.fromString(database);
+
+                // Create DTO with parsed enum values
+                ProjectCreateDTO dto = ProjectCreateRequestBuilder.projectCreateRequestDTOBuilder(projectName, projectName, frontendType, backendType, databaseType);
                 projectService.createProject(dto);
                 copyProjectToProjectsDirectory(projectName);
             }
@@ -119,11 +127,7 @@ public class EntityJsonProcessorService {
                     attributes.add(objectMapper.treeToValue(attributeNode, AttributeDTO.class));
                 }
 
-                behaviorService.generateEntityServiceBehaviors(
-                        projectName,
-                        entityName,
-                        attributes
-                );
+                behaviorService.generateEntityServiceBehaviors(projectName, entityName, attributes);
             }
         }
 
@@ -135,8 +139,7 @@ public class EntityJsonProcessorService {
 
         entityCodeGeneratorService.generateUtils(projectName);
 
-        if (AI)
-            frontendService.createFrontendFiles(projectName);
+        if (AI) frontendService.createFrontendFiles(projectName);
     }
 
     private void removeEmptyLinesInModelFile(String projectName, String entityName) {
@@ -221,27 +224,25 @@ public class EntityJsonProcessorService {
     }
 
     private void copyDirectory(Path source, Path target) throws IOException {
-        Files.walk(source)
-                .forEach(sourcePath -> {
-                    try {
-                        Path targetPath = target.resolve(source.relativize(sourcePath));
-                        if (Files.isDirectory(sourcePath)) {
-                            if (!Files.exists(targetPath)) {
-                                Files.createDirectory(targetPath);
-                            }
-                        } else {
-                            Files.copy(sourcePath, targetPath);
-                        }
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+        Files.walk(source).forEach(sourcePath -> {
+            try {
+                Path targetPath = target.resolve(source.relativize(sourcePath));
+                if (Files.isDirectory(sourcePath)) {
+                    if (!Files.exists(targetPath)) {
+                        Files.createDirectory(targetPath);
                     }
-                });
+                } else {
+                    Files.copy(sourcePath, targetPath);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private void deleteDirectory(Path path) throws IOException {
         if (Files.exists(path)) {
-            Files.walk(path)
-                    .sorted(Comparator.reverseOrder()) // Sort in reverse order to delete files before directories
+            Files.walk(path).sorted(Comparator.reverseOrder()) // Sort in reverse order to delete files before directories
                     .forEach(p -> {
                         try {
                             Files.delete(p);

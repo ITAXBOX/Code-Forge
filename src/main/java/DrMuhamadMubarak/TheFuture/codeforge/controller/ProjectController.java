@@ -47,9 +47,9 @@ public class ProjectController {
         ProjectCreateDTO dto = ProjectCreateRequestBuilder.projectCreateRequestDTOBuilder(
                 project.getName(),
                 project.getDescription(),
-                project.getFrontendType().toString(),
-                project.getBackendType().toString(),
-                project.getDatabaseType().toString()
+                project.getFrontendType(),
+                project.getBackendType(),
+                project.getDatabaseType()
         );
         model.addAttribute("project", dto);
     }

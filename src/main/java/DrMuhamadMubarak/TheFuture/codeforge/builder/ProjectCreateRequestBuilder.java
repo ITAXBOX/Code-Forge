@@ -6,13 +6,13 @@ import DrMuhamadMubarak.TheFuture.generator.enums.DatabaseType;
 import DrMuhamadMubarak.TheFuture.generator.enums.FrontendType;
 
 public class ProjectCreateRequestBuilder {
-    public static ProjectCreateDTO projectCreateRequestDTOBuilder(String name, String description, String frontendType, String backendType, String databaseType) {
+    public static ProjectCreateDTO projectCreateRequestDTOBuilder(String name, String description, FrontendType frontendType, BackendType backendType, DatabaseType databaseType) {
         return ProjectCreateDTO.builder()
                 .name(name)
                 .description(description)
-                .frontendType(FrontendType.valueOf(frontendType))
-                .backendType(BackendType.valueOf(backendType))
-                .databaseType(DatabaseType.valueOf(databaseType))
+                .frontendType(frontendType)
+                .backendType(backendType)
+                .databaseType(databaseType)
                 .build();
     }
 }
