@@ -1,7 +1,9 @@
 package DrMuhamadMubarak.TheFuture.codeforge.controller;
 
-import DrMuhamadMubarak.TheFuture.codeforge.dto.ProjectCreateDTO;
-import DrMuhamadMubarak.TheFuture.codeforge.dto.ProjectUpdateDTO;
+import DrMuhamadMubarak.TheFuture.codeforge.builder.ProjectRequestBuilder;
+import DrMuhamadMubarak.TheFuture.codeforge.dto.request.ProjectCreateDTO;
+import DrMuhamadMubarak.TheFuture.codeforge.dto.request.ProjectUpdateDTO;
+import DrMuhamadMubarak.TheFuture.codeforge.dto.response.ProjectResponseDTO;
 import DrMuhamadMubarak.TheFuture.codeforge.model.Project;
 import DrMuhamadMubarak.TheFuture.codeforge.service.ProjectService;
 import lombok.AllArgsConstructor;
@@ -20,27 +22,33 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @GetMapping
-    public ResponseEntity<List<Project>> getAllProjects() {
+    public ResponseEntity<List<ProjectResponseDTO>> getAllProjects() {
         List<Project> projects = projectService.getAllProjects();
-        return ResponseEntity.ok(projects);
+        List<ProjectResponseDTO> projectResponseDTOS = projects.stream()
+                .map(ProjectRequestBuilder::toResponseDTO)
+                .toList();
+        return ResponseEntity.ok(projectResponseDTOS);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Project> getProjectDetails(@PathVariable Long id) {
+    public ResponseEntity<ProjectResponseDTO> getProjectDetails(@PathVariable Long id) {
         Project project = projectService.getProjectById(id);
-        return ResponseEntity.ok(project);
+        ProjectResponseDTO projectResponseDTO = ProjectRequestBuilder.toResponseDTO(project);
+        return ResponseEntity.ok(projectResponseDTO);
     }
 
     @PostMapping
-    public ResponseEntity<Project> createProject(@RequestBody ProjectCreateDTO request) {
+    public ResponseEntity<ProjectResponseDTO> createProject(@RequestBody ProjectCreateDTO request) {
         Project createdProject = projectService.createProject(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdProject);
+        ProjectResponseDTO createdProjectResponseDTO = ProjectRequestBuilder.toResponseDTO(createdProject);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdProjectResponseDTO);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Project> updateProject(@PathVariable Long id, @RequestBody ProjectUpdateDTO request) {
+    public ResponseEntity<ProjectResponseDTO> updateProject(@PathVariable Long id, @RequestBody ProjectUpdateDTO request) {
         Project updatedProject = projectService.updateProject(id, request);
-        return ResponseEntity.ok(updatedProject);
+        ProjectResponseDTO updatedProjectResponseDTO = ProjectRequestBuilder.toResponseDTO(updatedProject);
+        return ResponseEntity.ok(updatedProjectResponseDTO);
     }
 
     @DeleteMapping("/{id}")
