@@ -1,7 +1,7 @@
 package DrMuhamadMubarak.TheFuture.generator.service;
 
 import DrMuhamadMubarak.TheFuture.codeforge.builder.ProjectCreateRequestBuilder;
-import DrMuhamadMubarak.TheFuture.codeforge.dto.ProjectCreateDTO;
+import DrMuhamadMubarak.TheFuture.codeforge.dto.request.ProjectCreateDTO;
 import DrMuhamadMubarak.TheFuture.codeforge.service.ProjectService;
 import DrMuhamadMubarak.TheFuture.generator.dto.AttributeDTO;
 import DrMuhamadMubarak.TheFuture.generator.enums.BackendType;
