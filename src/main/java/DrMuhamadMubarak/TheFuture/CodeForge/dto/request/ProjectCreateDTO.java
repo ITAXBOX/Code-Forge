@@ -1,4 +1,4 @@
-package DrMuhamadMubarak.TheFuture.codeforge.dto;
+package DrMuhamadMubarak.TheFuture.codeforge.dto.request;
 
 import DrMuhamadMubarak.TheFuture.generator.enums.BackendType;
 import DrMuhamadMubarak.TheFuture.generator.enums.DatabaseType;

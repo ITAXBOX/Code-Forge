@@ -1,4 +1,4 @@
-package DrMuhamadMubarak.TheFuture.codeforge.dto;
+package DrMuhamadMubarak.TheFuture.codeforge.dto.request;
 
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
