@@ -1,8 +1,8 @@
 package DrMuhamadMubarak.TheFuture.codeforge.service;
 
 import DrMuhamadMubarak.TheFuture.codeforge.builder.ProjectBuilder;
-import DrMuhamadMubarak.TheFuture.codeforge.dto.ProjectCreateDTO;
-import DrMuhamadMubarak.TheFuture.codeforge.dto.ProjectUpdateDTO;
+import DrMuhamadMubarak.TheFuture.codeforge.dto.request.ProjectCreateDTO;
+import DrMuhamadMubarak.TheFuture.codeforge.dto.request.ProjectUpdateDTO;
 import DrMuhamadMubarak.TheFuture.codeforge.model.Project;
 import DrMuhamadMubarak.TheFuture.codeforge.model.ProjectAnalytics;
 import DrMuhamadMubarak.TheFuture.codeforge.repository.ProjectRepository;
