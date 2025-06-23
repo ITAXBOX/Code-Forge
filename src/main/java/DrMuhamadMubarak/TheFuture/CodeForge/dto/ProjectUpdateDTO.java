@@ -1,10 +1,10 @@
-package DrMuhamadMubarak.TheFuture.codeforge.dto.request;
+package DrMuhamadMubarak.TheFuture.codeforge.dto;
 
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
-public class ProjectUpdateRequestDTO {
+public class ProjectUpdateDTO {
     @Size(min = 3, max = 50)
     private String name;
 

@@ -1,4 +1,4 @@
-package DrMuhamadMubarak.TheFuture.codeforge.dto.request;
+package DrMuhamadMubarak.TheFuture.codeforge.dto;
 
 import DrMuhamadMubarak.TheFuture.generator.enums.BackendType;
 import DrMuhamadMubarak.TheFuture.generator.enums.DatabaseType;
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProjectCreateRequestDTO {
+public class ProjectCreateDTO {
     @NotBlank
     @Size(min = 3, max = 50)
     private String name;
