@@ -1,5 +1,6 @@
 package DrMuhamadMubarak.TheFuture.generator.controller;
 
+import DrMuhamadMubarak.TheFuture.codeforge.service.ProjectService;
 import DrMuhamadMubarak.TheFuture.generator.enums.BackendType;
 import DrMuhamadMubarak.TheFuture.generator.enums.DatabaseType;
 import DrMuhamadMubarak.TheFuture.generator.enums.FrontendType;
@@ -19,6 +20,7 @@ import java.io.IOException;
 public class ProjectStructureController {
 
     private final ProjectStructureService projectStructureService;
+    private final ProjectService projectService;
 
     @PostMapping("/generate")
     public String generateProjectStructure(
@@ -34,8 +36,11 @@ public class ProjectStructureController {
             model.addAttribute("message", "Invalid project type provided.");
             return "error";
         }
-
         try {
+            if(projectService.isProjectExists(projectName)) {
+                model.addAttribute("message", "Project with this name already exists.");
+                return "leaderboard";
+            }
             projectStructureService.generateProjectStructure(projectName, frontendType, backendType, databaseType);
             model.addAttribute("projectName", projectName);
             model.addAttribute("frontendType", frontendType);
@@ -46,7 +51,6 @@ public class ProjectStructureController {
             model.addAttribute("message", "An error occurred: " + e.getMessage());
             return "error";
         }
-
         return "entities";
     }
 }

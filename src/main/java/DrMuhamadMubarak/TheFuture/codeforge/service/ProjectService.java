@@ -64,4 +64,8 @@ public class ProjectService {
         Project project = getProjectById(id);
         projectRepository.delete(project);
     }
+
+    public boolean isProjectExists(String projectName) {
+        return projectRepository.existsByName(projectName);
+    }
 }
