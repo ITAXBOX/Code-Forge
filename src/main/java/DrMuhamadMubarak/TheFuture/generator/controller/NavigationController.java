@@ -25,6 +25,11 @@ public class NavigationController {
         return "index";
     }
 
+    @GetMapping("/leaderboard")
+    public String leaderboard() {
+        return "leaderboard";
+    }
+
     @GetMapping("/start")
     public String start() {
         return "start";

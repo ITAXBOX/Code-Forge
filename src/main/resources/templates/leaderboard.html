@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Forge: The Leaderboard</title>
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-light: #a78bfa;
+            --primary-dark: #7c3aed;
+            --accent: #06b6d4;
+            --accent-dark: #0891b2;
+            --background: #0f172a;
+            --card: #1e293b;
+            --card-hover: #334155;
+            --text: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --gold: #fbbf24;
+            --silver: #94a3b8;
+            --bronze: #d97706;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gradient-start: #8b5cf6;
+            --gradient-end: #06b6d4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Stars Animation */
+        .stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background-color: #ffffff;
+            border-radius: 50%;
+            animation: twinkle var(--duration) infinite;
+            animation-delay: var(--delay);
+        }
+
+        @keyframes twinkle {
+            0% {
+                opacity: 0;
+                transform: translateY(0);
+            }
+            10% {
+                opacity: var(--opacity);
+            }
+            90% {
+                opacity: var(--opacity);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100px);
+            }
+        }
+
+        /* Header Section */
+        .header {
+            padding: 2rem 0;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            right: 20%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-light), transparent);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, var(--primary-light), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            0% {
+                text-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+            }
+            100% {
+                text-shadow: 0 0 20px rgba(139, 92, 246, 0.6), 0 0 30px rgba(6, 182, 212, 0.4);
+            }
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Stats Grid Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .stat-card {
+            background-color: var(--card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, transparent 70%);
+        }
+
+        .stat-value {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            background: linear-gradient(to right, var(--primary-light), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+        }
+
+        .stat-caption {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 0.25rem;
+        }
+
+        /* Trophies Section */
+        .podium-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 4rem;
+        }
+
+        .podium-title {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--text);
+        }
+
+        .podium {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            width: 100%;
+            max-width: 800px;
+            height: 250px;
+            margin-bottom: 2rem;
+        }
+
+        .position {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 1rem;
+            transition: transform 0.5s ease;
+        }
+
+        .position:hover {
+            transform: translateY(-10px);
+        }
+
+        .position-1 {
+            z-index: 3;
+        }
+
+        .position-2 {
+            z-index: 1;
+        }
+
+        .position-3 {
+            z-index: 2;
+        }
+
+        .pedestal {
+            width: 180px;
+            padding: 1rem;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .pedestal-1 {
+            height: 200px;
+            background: linear-gradient(to bottom, var(--gold), #f7e084);
+            color: #7c6514;
+        }
+
+        .pedestal-2 {
+            height: 150px;
+            background: linear-gradient(to bottom, var(--silver), #cbd5e1);
+            color: #414b56;
+        }
+
+        .pedestal-3 {
+            height: 100px;
+            background: linear-gradient(to bottom, var(--bronze), #fdba74);
+            color: #783e11;
+        }
+
+        .pedestal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(255,255,255,0.3) 0%, transparent 70%);
+            opacity: 0.6;
+        }
+
+        .position-number {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 2rem;
+            font-weight: 900;
+        }
+
+        .trophy {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-card {
+            width: 100%;
+            background-color: var(--card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .project-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .tech-badge {
+            background-color: rgba(139, 92, 246, 0.15);
+            color: var(--primary-light);
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8rem;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .tech-badge.backend {
+            background-color: rgba(6, 182, 212, 0.15);
+            color: var(--accent);
+        }
+
+        .tech-badge.database {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        /* Leaderboard Table Section */
+        .leaderboard-section {
+            margin: 3rem 0;
+        }
+
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .leaderboard-title {
+            font-size: 2rem;
+            font-weight: 600;
+            background: linear-gradient(to right, var(--text), var(--text-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .leaderboard-card {
+            background-color: var(--card);
+            border-radius: 16px;
+            padding: 2rem;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .leaderboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+        }
+
+        .leaderboard {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 0.5rem;
+        }
+
+        .leaderboard th {
+            padding: 1rem;
+            text-align: left;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .leaderboard td {
+            padding: 1.25rem 1rem;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .leaderboard tr {
+            transition: transform 0.2s ease;
+        }
+
+        .leaderboard tr:hover {
+            transform: scale(1.02);
+        }
+
+        .leaderboard tr:hover td {
+            background-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .leaderboard tr td:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+
+        .leaderboard tr td:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .rank {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .rank-1 {
+            background-color: rgba(251, 191, 36, 0.2);
+            color: var(--gold);
+            border: 2px solid var(--gold);
+        }
+
+        .rank-2 {
+            background-color: rgba(148, 163, 184, 0.2);
+            color: var(--silver);
+            border: 2px solid var(--silver);
+        }
+
+        .rank-3 {
+            background-color: rgba(217, 119, 6, 0.2);
+            color: var(--bronze);
+            border: 2px solid var(--bronze);
+        }
+
+        .project-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .project-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            font-size: 1.2rem;
+            margin-right: 1rem;
+        }
+
+        .project-detail {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-detail-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .project-detail-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .requests {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .requests i {
+            margin-right: 0.5rem;
+        }
+
+        .view-btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: rgba(139, 92, 246, 0.1);
+            color: var(--primary-light);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn:hover {
+            background-color: rgba(139, 92, 246, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+        }
+
+        /* Project Details Section */
+        .project-details {
+            background-color: var(--card);
+            border-radius: 16px;
+            margin: 3rem 0;
+            padding: 2rem;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .project-details::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--warning), var(--danger));
+        }
+
+        .project-details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .project-details-title {
+            font-size: 2rem;
+            font-weight: 600;
+            background: linear-gradient(to right, var(--warning), var(--danger));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .project-details-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .project-details-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .details-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .details-section-title {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .details-section-content {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .details-section-content p {
+            margin-bottom: 0.5rem;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 100;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            background-color: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-logo span {
+            font-weight: 400;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--text);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 4rem;
+            padding: 2rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20%;
+            right: 20%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-light), transparent);
+        }
+
+        .footer-content {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 0;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .empty-state-text {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state-subtext {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Media Queries */
+        @media (max-width: 992px) {
+            .project-details-content {
+                grid-template-columns: 1fr;
+            }
+
+            .podium {
+                flex-direction: column;
+                align-items: center;
+                height: auto;
+            }
+
+            .position {
+                margin-bottom: 2rem;
+            }
+
+            .pedestal-1, .pedestal-2, .pedestal-3 {
+                height: 120px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .leaderboard-card {
+                padding: 1rem;
+                overflow-x: auto;
+            }
+
+            .leaderboard th, .leaderboard td {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .project-icon {
+                display: none;
+            }
+
+            .nav-bar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .stat-value {
+                font-size: 2.5rem;
+            }
+
+            .tech-badge {
+                font-size: 0.7rem;
+            }
+
+            .project-details-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Stars Background -->
+    <div class="stars-container" id="stars-container"></div>
+
+    <div class="container">
+        <!-- Navigation Bar -->
+        <div class="nav-bar">
+            <div class="nav-logo">Code<span>Forge</span></div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/analytics/dashboard" class="nav-link active">Leaderboard</a>
+                <a href="#" class="nav-link">Projects</a>
+                <a href="#" class="nav-link">About</a>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="header">
+            <h1>Code Forge Leaderboard</h1>
+            <p>Explore the most popular projects and trending technologies in our platform</p>
+        </header>
+
+        <!-- Main Dashboard Content - Only show when topProjects is available (for /analytics/dashboard) -->
+        <div th:if="${topProjects != null}">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Projects</div>
+                    <div class="stat-value" th:text="${topProjects.size()}">5</div>
+                    <div class="stat-caption">In Database</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Top Frontend</div>
+                    <div class="stat-value" th:text="${topFrontendFrameworks != null && !topFrontendFrameworks.isEmpty() ? topFrontendFrameworks.entrySet().iterator().next().getKey() : 'N/A'}">React</div>
+                    <div class="stat-caption">Most Used Framework</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Top Backend</div>
+                    <div class="stat-value" th:text="${topBackendFrameworks != null && !topBackendFrameworks.isEmpty() ? topBackendFrameworks.entrySet().iterator().next().getKey() : 'N/A'}">Spring</div>
+                    <div class="stat-caption">Most Used Technology</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Top Database</div>
+                    <div class="stat-value" th:text="${topDatabases != null && !topDatabases.isEmpty() ? topDatabases.entrySet().iterator().next().getKey() : 'N/A'}">PostgreSQL</div>
+                    <div class="stat-caption">Most Popular Choice</div>
+                </div>
+            </div>
+
+            <!-- Top 3 Projects Podium -->
+            <section class="podium-section" th:if="${topProjects.size() >= 3}">
+                <h2 class="podium-title">Top 3 Projects</h2>
+
+                <div class="podium">
+                    <!-- Second Place -->
+                    <div class="position position-2" th:if="${topProjects.size() > 1}">
+                        <div class="pedestal pedestal-2">
+                            <div class="position-number">2</div>
+                            <div class="trophy">🥈</div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-name" th:text="${topProjects[1].project.name}">Project Two</div>
+                            <div class="project-tech">
+                                <span class="tech-badge" th:text="${#strings.toLowerCase(#strings.replace(topProjects[1].project.frontendType.name(), '_', ' '))}">react</span>
+                                <span class="tech-badge backend" th:text="${#strings.toLowerCase(#strings.replace(topProjects[1].project.backendType.name(), '_', ' '))}">spring boot</span>
+                                <span class="tech-badge database" th:text="${#strings.toLowerCase(#strings.replace(topProjects[1].project.databaseType.name(), '_', ' '))}">mongodb</span>
+                            </div>
+                            <div class="requests">
+                                <i>👁️</i> <span th:text="${topProjects[1].requestCount}">218</span> views
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- First Place -->
+                    <div class="position position-1" th:if="${!topProjects.isEmpty()}">
+                        <div class="pedestal pedestal-1">
+                            <div class="position-number">1</div>
+                            <div class="trophy">🏆</div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-name" th:text="${topProjects[0].project.name}">Project One</div>
+                            <div class="project-tech">
+                                <span class="tech-badge" th:text="${#strings.toLowerCase(#strings.replace(topProjects[0].project.frontendType.name(), '_', ' '))}">next js</span>
+                                <span class="tech-badge backend" th:text="${#strings.toLowerCase(#strings.replace(topProjects[0].project.backendType.name(), '_', ' '))}">spring boot</span>
+                                <span class="tech-badge database" th:text="${#strings.toLowerCase(#strings.replace(topProjects[0].project.databaseType.name(), '_', ' '))}">postgresql</span>
+                            </div>
+                            <div class="requests">
+                                <i>👁️</i> <span th:text="${topProjects[0].requestCount}">345</span> views
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Third Place -->
+                    <div class="position position-3" th:if="${topProjects.size() > 2}">
+                        <div class="pedestal pedestal-3">
+                            <div class="position-number">3</div>
+                            <div class="trophy">🥉</div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-name" th:text="${topProjects[2].project.name}">Project Three</div>
+                            <div class="project-tech">
+                                <span class="tech-badge" th:text="${#strings.toLowerCase(#strings.replace(topProjects[2].project.frontendType.name(), '_', ' '))}">vue</span>
+                                <span class="tech-badge backend" th:text="${#strings.toLowerCase(#strings.replace(topProjects[2].project.backendType.name(), '_', ' '))}">node js</span>
+                                <span class="tech-badge database" th:text="${#strings.toLowerCase(#strings.replace(topProjects[2].project.databaseType.name(), '_', ' '))}">mysql</span>
+                            </div>
+                            <div class="requests">
+                                <i>👁️</i> <span th:text="${topProjects[2].requestCount}">156</span> views
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Full Leaderboard Table -->
+            <section class="leaderboard-section">
+                <div class="leaderboard-header">
+                    <h2 class="leaderboard-title">Complete Leaderboard</h2>
+                </div>
+
+                <div class="leaderboard-card">
+                    <table class="leaderboard">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Project</th>
+                                <th>Technologies</th>
+                                <th>Created</th>
+                                <th>Views</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="project, iterStat : ${topProjects}">
+                                <td>
+                                    <div class="rank" th:classappend="${'rank-' + (iterStat.index + 1)}"
+                                         th:text="${iterStat.index + 1}" th:if="${iterStat.index < 3}">1</div>
+                                    <div class="rank" th:text="${iterStat.index + 1}" th:unless="${iterStat.index < 3}">4</div>
+                                </td>
+                                <td>
+                                    <div class="project-info">
+                                        <div class="project-icon">
+                                            <i>&#60;/&#62;</i>
+                                        </div>
+                                        <div class="project-detail">
+                                            <span class="project-detail-name" th:text="${project.project.name}">Project Name</span>
+                                            <span class="project-detail-desc" th:text="${project.project.description != null ? (project.project.description.length() > 30 ? project.project.description.substring(0, 30) + '...' : project.project.description) : 'No description'}">Project description...</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="project-tech">
+                                        <span class="tech-badge" th:text="${#strings.toLowerCase(#strings.replace(project.project.frontendType.name(), '_', ' '))}">react</span>
+                                        <span class="tech-badge backend" th:text="${#strings.toLowerCase(#strings.replace(project.project.backendType.name(), '_', ' '))}">spring boot</span>
+                                        <span class="tech-badge database" th:text="${#strings.toLowerCase(#strings.replace(project.project.databaseType.name(), '_', ' '))}">postgresql</span>
+                                    </div>
+                                </td>
+                                <td th:text="${#dates.format(project.project.createdAt, 'dd MMM yyyy')}">01 Jun 2025</td>
+                                <td>
+                                    <div class="requests">
+                                        <i>👁️</i> <span th:text="${project.requestCount}">245</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a th:href="@{/analytics/project/{id}(id=${project.project.id})}" class="view-btn">Details</a>
+                                </td>
+                            </tr>
+                            <tr th:if="${topProjects.isEmpty()}">
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon">📊</div>
+                                        <div class="empty-state-text">No projects found</div>
+                                        <div class="empty-state-subtext">Projects will appear here once they are created</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- Project Details (shown when a specific project is selected - for /analytics/project/{id}) -->
+        <section class="project-details" th:if="${analytics != null}">
+            <div class="project-details-header">
+                <h2 class="project-details-title" th:text="${analytics.project.name}">Project Name</h2>
+            </div>
+
+            <div class="project-details-content">
+                <div>
+                    <p class="project-details-description" th:text="${analytics.project.description}">This is a detailed project description that explains the purpose and goals of this particular project.</p>
+
+                    <div class="details-section">
+                        <h3 class="details-section-title">Technology Stack</h3>
+                        <div class="details-section-content project-tech">
+                            <span class="tech-badge" th:text="${#strings.toLowerCase(#strings.replace(analytics.project.frontendType.name(), '_', ' '))}">react</span>
+                            <span class="tech-badge backend" th:text="${#strings.toLowerCase(#strings.replace(analytics.project.backendType.name(), '_', ' '))}">spring boot</span>
+                            <span class="tech-badge database" th:text="${#strings.toLowerCase(#strings.replace(analytics.project.databaseType.name(), '_', ' '))}">postgresql</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="details-section">
+                        <h3 class="details-section-title">Analytics</h3>
+                        <div class="details-section-content">
+                            <p><strong>Views:</strong> <span th:text="${analytics.requestCount}">245</span></p>
+                            <p><strong>Created:</strong> <span th:text="${#dates.format(analytics.project.createdAt, 'dd MMM yyyy, HH:mm')}">01 Jun 2025, 14:30</span></p>
+                            <p><strong>Last Updated:</strong> <span th:text="${#dates.format(analytics.project.updatedAt, 'dd MMM yyyy, HH:mm')}">15 Jun 2025, 10:15</span></p>
+                            <p><strong>Last Viewed:</strong> <span th:text="${#dates.format(analytics.lastRequestedAt, 'dd MMM yyyy, HH:mm')}">22 Jun 2025, 09:45</span></p>
+                        </div>
+                    </div>
+                    <div class="details-section">
+                        <a href="/analytics/dashboard" class="view-btn" style="display: block; text-align: center; margin-top: 1rem;">Back to Leaderboard</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Empty State when neither topProjects nor analytics are available -->
+        <div th:if="${topProjects == null && analytics == null}" class="empty-state" style="margin: 5rem 0;">
+            <div class="empty-state-icon">🚀</div>
+            <div class="empty-state-text">Welcome to the Code Forge Leaderboard</div>
+            <div class="empty-state-subtext">Start creating projects to see them appear here</div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2025 Code Forge. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">↑</div>
+
+    <script>
+        // Create stars animation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create stars animation
+            const starsContainer = document.getElementById('stars-container');
+            const starCount = 100;
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+
+                // Random star properties
+                const size = Math.random() * 2;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.top = `${Math.random() * 100}vh`;
+                star.style.setProperty('--opacity', Math.random() * 0.8 + 0.2);
+                star.style.setProperty('--duration', `${Math.random() * 10 + 5}s`);
+                star.style.setProperty('--delay', `${Math.random() * 5}s`);
+
+                starsContainer.appendChild(star);
+            }
+
+            // Back to top button functionality
+            const backToTopButton = document.getElementById('backToTop');
+
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    backToTopButton.classList.add('visible');
+                } else {
+                    backToTopButton.classList.remove('visible');
+                }
+            });
+
+            backToTopButton.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
