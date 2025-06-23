@@ -3,6 +3,7 @@ package DrMuhamadMubarak.TheFuture.codeforge.model;
 import DrMuhamadMubarak.TheFuture.generator.enums.BackendType;
 import DrMuhamadMubarak.TheFuture.generator.enums.DatabaseType;
 import DrMuhamadMubarak.TheFuture.generator.enums.FrontendType;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -45,6 +46,7 @@ public class Project {
 
     @OneToOne(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     @Setter
+    @JsonBackReference
     private ProjectAnalytics analytics;
 
     private LocalDateTime createdAt;

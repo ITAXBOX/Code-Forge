@@ -1,5 +1,6 @@
 package DrMuhamadMubarak.TheFuture.codeforge.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,6 +21,7 @@ public class ProjectAnalytics {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", unique = true)
     @Setter
+    @JsonBackReference
     private Project project;
 
     @Column(nullable = false)
