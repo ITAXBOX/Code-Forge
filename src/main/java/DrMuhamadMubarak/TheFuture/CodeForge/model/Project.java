@@ -5,8 +5,7 @@ import DrMuhamadMubarak.TheFuture.generator.enums.DatabaseType;
 import DrMuhamadMubarak.TheFuture.generator.enums.FrontendType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -17,6 +16,9 @@ import java.time.LocalDateTime;
 )
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Project {
     @Id
     @GeneratedValue
@@ -55,9 +57,6 @@ public class Project {
         this.backendType = backendType;
         this.databaseType = databaseType;
     }
-
-    protected Project() {
-    } // Default constructor for JPA
 
     @PrePersist
     protected void onCreate() {

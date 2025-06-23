@@ -57,7 +57,7 @@ public class EntityJsonProcessorService {
             processEntities(AI, projectName, entitiesNode, model);
             model.addAttribute("message", successMessage);
             if (AI) {
-                ProjectCreateRequestDTO dto = ProjectCreateRequestBuilder.ProjectCreateRequestDTOBuilder(projectName,null, frontend, backend, database);
+                ProjectCreateRequestDTO dto = ProjectCreateRequestBuilder.projectCreateRequestDTOBuilder(projectName,null, frontend, backend, database);
                 projectService.createProject(dto);
                 copyProjectToProjectsDirectory(projectName);
             }

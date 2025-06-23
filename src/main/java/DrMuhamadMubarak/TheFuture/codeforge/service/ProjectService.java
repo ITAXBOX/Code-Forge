@@ -1,5 +1,6 @@
 package DrMuhamadMubarak.TheFuture.codeforge.service;
 
+import DrMuhamadMubarak.TheFuture.codeforge.builder.ProjectBuilder;
 import DrMuhamadMubarak.TheFuture.codeforge.dto.request.ProjectCreateRequestDTO;
 import DrMuhamadMubarak.TheFuture.codeforge.dto.request.ProjectUpdateRequestDTO;
 import DrMuhamadMubarak.TheFuture.codeforge.model.Project;
@@ -23,7 +24,7 @@ public class ProjectService {
         if (projectRepository.existsByName((request.getName()))) {
             throw new IllegalArgumentException("Project name already exists");
         }
-        Project project = new Project(
+        Project project = ProjectBuilder.projectBuilder(
                 request.getName(),
                 request.getDescription(),
                 request.getFrontendType(),
