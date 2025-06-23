@@ -1,5 +1,7 @@
 package DrMuhamadMubarak.TheFuture.codeforge.controller;
 
+import DrMuhamadMubarak.TheFuture.codeforge.builder.ProjectAnalyticsResponseDTOBuilder;
+import DrMuhamadMubarak.TheFuture.codeforge.dto.response.ProjectAnalyticsResponseDTO;
 import DrMuhamadMubarak.TheFuture.codeforge.model.ProjectAnalytics;
 import DrMuhamadMubarak.TheFuture.codeforge.service.ProjectAnalyticsService;
 import DrMuhamadMubarak.TheFuture.generator.enums.BackendType;
@@ -28,7 +30,10 @@ public class ProjectAnalyticsController {
 
         // Get top 5 projects
         List<ProjectAnalytics> topProjects = analyticsService.getTopProjects(5);
-        dashboardData.put("topProjects", topProjects);
+        List<ProjectAnalyticsResponseDTO> projectAnalyticsResponseDTOs = topProjects.stream()
+            .map(ProjectAnalyticsResponseDTOBuilder::projectAnalyticsResponseDTObuilder)
+            .toList();
+        dashboardData.put("topProjects", projectAnalyticsResponseDTOs);
 
         // Get top frontend framework
         Map<FrontendType, Long> topFrontendFrameworks = analyticsService.getTopFrontendFrameworks(1);
@@ -46,8 +51,9 @@ public class ProjectAnalyticsController {
     }
 
     @GetMapping("/project/{id}")
-    public ResponseEntity<ProjectAnalytics> getProjectAnalytics(@PathVariable Long id) {
+    public ResponseEntity<ProjectAnalyticsResponseDTO> getProjectAnalytics(@PathVariable Long id) {
         ProjectAnalytics analytics = analyticsService.getProjectAnalytics(id);
-        return ResponseEntity.ok(analytics);
+        ProjectAnalyticsResponseDTO responseDTO = ProjectAnalyticsResponseDTOBuilder.projectAnalyticsResponseDTObuilder(analytics);
+        return ResponseEntity.ok(responseDTO);
     }
 }
