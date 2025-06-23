@@ -1,920 +1,1619 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Code Forge: The Leaderboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    :root {
-      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-      --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-      --dark-bg: #0f0f23;
-      --card-bg: rgba(255, 255, 255, 0.1);
-      --text-primary: #ffffff;
-      --text-secondary: rgba(255, 255, 255, 0.8);
-      --text-muted: rgba(255, 255, 255, 0.6);
-      --border-color: rgba(255, 255, 255, 0.2);
-      --shadow-primary: 0 20px 40px rgba(0, 0, 0, 0.3);
-      --shadow-hover: 0 30px 60px rgba(0, 0, 0, 0.4);
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--dark-bg);
-      color: var(--text-primary);
-      overflow-x: hidden;
-      min-height: 100vh;
-      position: relative;
-    }
-
-    /* Animated Background */
-    .background-animation {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      background: linear-gradient(45deg, #0f0f23, #1a1a3e, #2d2d5f);
-      background-size: 400% 400%;
-      animation: gradientShift 15s ease infinite;
-    }
-
-    .background-animation::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
-      animation: float 20s ease-in-out infinite;
-    }
-
-    @keyframes gradientShift {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      33% { transform: translateY(-30px) rotate(1deg); }
-      66% { transform: translateY(30px) rotate(-1deg); }
-    }
-
-    /* Particles */
-    .particles {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-    }
-
-    .particle {
-      position: absolute;
-      width: 2px;
-      height: 2px;
-      background: rgba(255, 255, 255, 0.5);
-      border-radius: 50%;
-      animation: particleFloat 10s linear infinite;
-    }
-
-    @keyframes particleFloat {
-      0% {
-        transform: translateY(100vh) translateX(0);
-        opacity: 0;
-      }
-      10% {
-        opacity: 1;
-      }
-      90% {
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(-100px) translateX(100px);
-        opacity: 0;
-      }
-    }
-
-    /* Header */
-    .header {
-      text-align: center;
-      padding: 4rem 2rem 2rem;
-      position: relative;
-    }
-
-    .header h1 {
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      font-weight: 800;
-      background: var(--primary-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 1rem;
-      animation: titleGlow 3s ease-in-out infinite alternate;
-    }
-
-    @keyframes titleGlow {
-      from { filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.5)); }
-      to { filter: drop-shadow(0 0 30px rgba(118, 75, 162, 0.8)); }
-    }
-
-    .header p {
-      font-size: 1.2rem;
-      color: var(--text-secondary);
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    /* Stats Bar */
-    .stats-bar {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin: 2rem 0;
-      flex-wrap: wrap;
-    }
-
-    .stat-item {
-      background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 1.5rem 2rem;
-      text-align: center;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .stat-item::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-      transition: left 0.5s;
-    }
-
-    .stat-item:hover::before {
-      left: 100%;
-    }
-
-    .stat-item:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-hover);
-    }
-
-    .stat-number {
-      font-size: 2rem;
-      font-weight: 700;
-      background: var(--success-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .stat-label {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-top: 0.5rem;
-    }
-
-    /* Leaderboard Container */
-    .leaderboard-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 2rem 4rem;
-    }
-
-    .leaderboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .leaderboard-title {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .controls {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-    }
-
-    .search-box {
-      position: relative;
-    }
-
-    .search-box input {
-      background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--border-color);
-      border-radius: 25px;
-      padding: 0.75rem 1.5rem 0.75rem 3rem;
-      color: var(--text-primary);
-      font-size: 0.9rem;
-      width: 250px;
-      transition: all 0.3s ease;
-    }
-
-    .search-box input:focus {
-      outline: none;
-      border-color: rgba(102, 126, 234, 0.5);
-      box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
-    }
-
-    .search-box::before {
-      content: '🔍';
-      position: absolute;
-      left: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1rem;
-    }
-
-    .refresh-btn {
-      background: var(--primary-gradient);
-      border: none;
-      border-radius: 25px;
-      padding: 0.75rem 1.5rem;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .refresh-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-primary);
-    }
-
-    .refresh-btn:active {
-      transform: translateY(0);
-    }
-
-    /* Leaderboard Grid */
-    .leaderboard-grid {
-      display: grid;
-      gap: 1.5rem;
-    }
-
-    .leaderboard-item {
-      background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 2rem;
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-    }
-
-    .leaderboard-item::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: var(--primary-gradient);
-      transform: scaleX(0);
-      transition: transform 0.3s ease;
-    }
-
-    .leaderboard-item:hover::before {
-      transform: scaleX(1);
-    }
-
-    .leaderboard-item:hover {
-      transform: translateY(-10px) scale(1.02);
-      box-shadow: var(--shadow-hover);
-      border-color: rgba(102, 126, 234, 0.3);
-    }
-
-    .leaderboard-item.rank-1 {
-      background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, var(--card-bg) 100%);
-      border-color: rgba(255, 215, 0, 0.3);
-    }
-
-    .leaderboard-item.rank-2 {
-      background: linear-gradient(135deg, rgba(192, 192, 192, 0.1) 0%, var(--card-bg) 100%);
-      border-color: rgba(192, 192, 192, 0.3);
-    }
-
-    .leaderboard-item.rank-3 {
-      background: linear-gradient(135deg, rgba(205, 127, 50, 0.1) 0%, var(--card-bg) 100%);
-      border-color: rgba(205, 127, 50, 0.3);
-    }
-
-    .item-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 1.5rem;
-    }
-
-    .rank-badge {
-      background: var(--primary-gradient);
-      color: white;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1.2rem;
-      box-shadow: var(--shadow-primary);
-      position: relative;
-    }
-
-    .rank-badge.gold {
-      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-      color: #000;
-      animation: goldGlow 2s ease-in-out infinite alternate;
-    }
-
-    .rank-badge.silver {
-      background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
-      color: #000;
-    }
-
-    .rank-badge.bronze {
-      background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%);
-      color: #fff;
-    }
-
-    @keyframes goldGlow {
-      from { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
-      to { box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
-    }
-
-    .project-info {
-      flex: 1;
-      margin-left: 1.5rem;
-    }
-
-    .project-name {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 0.5rem;
-    }
-
-    .project-description {
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 1rem;
-    }
-
-    .tech-stack {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-bottom: 1.5rem;
-    }
-
-    .tech-badge {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid var(--border-color);
-      border-radius: 15px;
-      padding: 0.4rem 0.8rem;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--text-secondary);
-      transition: all 0.3s ease;
-    }
-
-    .tech-badge:hover {
-      background: var(--primary-gradient);
-      color: white;
-      transform: translateY(-2px);
-    }
-
-    .project-stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 1rem;
-    }
-
-    .stat-box {
-      text-align: center;
-      padding: 1rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-    }
-
-    .stat-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      background: var(--success-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .stat-name {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-top: 0.5rem;
-    }
-
-    /* Loading Animation */
-    .loading {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 200px;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 3px solid rgba(255, 255, 255, 0.1);
-      border-top: 3px solid var(--primary-gradient);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Error State */
-    .error {
-      text-align: center;
-      padding: 3rem;
-      color: #ff6b6b;
-    }
-
-    .error h3 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-    }
-
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 4rem 2rem;
-      color: var(--text-muted);
-    }
-
-    .empty-state h3 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      color: var(--text-secondary);
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .header {
-        padding: 2rem 1rem 1rem;
-      }
-
-      .stats-bar {
-        gap: 1rem;
-      }
-
-      .stat-item {
-        padding: 1rem 1.5rem;
-      }
-
-      .leaderboard-container {
-        padding: 0 1rem 2rem;
-      }
-
-      .leaderboard-header {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .controls {
-        justify-content: center;
-      }
-
-      .search-box input {
-        width: 200px;
-      }
-
-      .leaderboard-item {
-        padding: 1.5rem;
-      }
-
-      .item-header {
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .project-info {
-        margin-left: 0;
-      }
-
-      .project-stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    /* Scroll animations */
-    .fade-in {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: all 0.6s ease;
-    }
-
-    .fade-in.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--primary-gradient);
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--secondary-gradient);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Forge: The Leaderboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --dark-bg: #0f0f23;
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --shadow-primary: 0 20px 40px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 30px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Animated Background */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(45deg, #0f0f23, #1a1a3e, #2d2d5f);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        .background-animation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            33% {
+                transform: translateY(-30px) rotate(1deg);
+            }
+            66% {
+                transform: translateY(30px) rotate(-1deg);
+            }
+        }
+
+        /* Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: particleFloat 10s linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 4rem 2rem 2rem;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from {
+                filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.5));
+            }
+            to {
+                filter: drop-shadow(0 0 30px rgba(118, 75, 162, 0.8));
+            }
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .stat-item:hover::before {
+            left: 100%;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--success-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+        }
+
+        /* Leaderboard Container */
+        .leaderboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .leaderboard-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            padding: 0.75rem 1.5rem 0.75rem 3rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+        }
+
+        .refresh-btn {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 25px;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-primary);
+        }
+
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+
+        .add-project-btn {
+            background: var(--success-gradient);
+            border: none;
+            border-radius: 25px;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .add-project-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-primary);
+        }
+
+        .add-project-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Leaderboard Grid */
+        .leaderboard-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .leaderboard-item {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .leaderboard-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .leaderboard-item:hover::before {
+            transform: scaleX(1);
+        }
+
+        .leaderboard-item:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .leaderboard-item.rank-1 {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, var(--card-bg) 100%);
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+
+        .leaderboard-item.rank-2 {
+            background: linear-gradient(135deg, rgba(192, 192, 192, 0.1) 0%, var(--card-bg) 100%);
+            border-color: rgba(192, 192, 192, 0.3);
+        }
+
+        .leaderboard-item.rank-3 {
+            background: linear-gradient(135deg, rgba(205, 127, 50, 0.1) 0%, var(--card-bg) 100%);
+            border-color: rgba(205, 127, 50, 0.3);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .rank-badge {
+            background: var(--primary-gradient);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-primary);
+            position: relative;
+        }
+
+        .rank-badge.gold {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #000;
+            animation: goldGlow 2s ease-in-out infinite alternate;
+        }
+
+        .rank-badge.silver {
+            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+            color: #000;
+        }
+
+        .rank-badge.bronze {
+            background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%);
+            color: #fff;
+        }
+
+        @keyframes goldGlow {
+            from {
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            }
+            to {
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+            }
+        }
+
+        .project-info {
+            flex: 1;
+            margin-left: 1.5rem;
+        }
+
+        .project-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .project-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .tech-stack {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .tech-badge {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .tech-badge:hover {
+            background: var(--primary-gradient);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .project-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--success-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-name {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid var(--primary-gradient);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Error State */
+        .error {
+            text-align: center;
+            padding: 3rem;
+            color: #ff6b6b;
+        }
+
+        .error h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 35, 0.85);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            width: 90%;
+            max-width: 700px;
+            background: linear-gradient(135deg, rgba(20, 20, 50, 0.95) 0%, rgba(15, 15, 35, 0.95) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-hover);
+            transform: translateY(30px);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--secondary-gradient);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--text-primary);
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.8rem 1.2rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .form-select {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.8rem 1.2rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1rem;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        /* Fix for select options - make them dark with light text */
+        .form-select option {
+            background-color: #1a1a3e;
+            color: #ffffff;
+            padding: 0.5rem;
+        }
+
+        .form-select option:hover {
+            background-color: #2d2d5f;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        /* Button Styles */
+        .btn {
+            border: none;
+            border-radius: 25px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-primary);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success-gradient);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%);
+            color: white;
+        }
+
+        .btn-neutral {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Project Action Buttons */
+        .project-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .leaderboard-item:hover .project-actions {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-5px);
+        }
+
+        .edit-btn:hover {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+        }
+
+        .delete-btn:hover {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Tooltip Styles */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-5px);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 0.5rem 0.8rem;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(-10px);
+        }
+
+        /* Confirmation Dialog */
+        .confirm-dialog {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .confirm-dialog.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .confirm-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #ff6b6b;
+        }
+
+        .confirm-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .confirm-message {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .confirm-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                padding: 2rem 1rem 1rem;
+            }
+
+            .stats-bar {
+                gap: 1rem;
+            }
+
+            .stat-item {
+                padding: 1rem 1.5rem;
+            }
+
+            .leaderboard-container {
+                padding: 0 1rem 2rem;
+            }
+
+            .leaderboard-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .controls {
+                justify-content: center;
+            }
+
+            .search-box input {
+                width: 200px;
+            }
+
+            .leaderboard-item {
+                padding: 1.5rem;
+            }
+
+            .item-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .project-info {
+                margin-left: 0;
+            }
+
+            .project-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Scroll animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-gradient);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-gradient);
+        }
+    </style>
 </head>
 <body>
 <div class="background-animation"></div>
 <div class="particles" id="particles"></div>
 
 <header class="header">
-  <h1>Code Forge Leaderboard</h1>
-  <p>Discover the most innovative and active projects in our ecosystem</p>
+    <h1>Code Forge Leaderboard</h1>
+    <p>Discover the most innovative and active projects in our ecosystem</p>
 </header>
 
 <div class="stats-bar" id="statsBar">
-  <div class="stat-item">
-    <div class="stat-number" id="totalProjects">-</div>
-    <div class="stat-label">Total Projects</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-number" id="topFrontend">-</div>
-    <div class="stat-label">Top Frontend</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-number" id="topBackend">-</div>
-    <div class="stat-label">Top Backend</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-number" id="topDatabase">-</div>
-    <div class="stat-label">Top Database</div>
-  </div>
+    <div class="stat-item">
+        <div class="stat-number" id="totalProjects">-</div>
+        <div class="stat-label">Total Projects</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number" id="topFrontend">-</div>
+        <div class="stat-label">Top Frontend</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number" id="topBackend">-</div>
+        <div class="stat-label">Top Backend</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number" id="topDatabase">-</div>
+        <div class="stat-label">Top Database</div>
+    </div>
 </div>
 
 <div class="leaderboard-container">
-  <div class="leaderboard-header">
-    <h2 class="leaderboard-title">🏆 Project Rankings</h2>
-    <div class="controls">
-      <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Search projects...">
-      </div>
-      <button class="refresh-btn" id="refreshBtn">
-        <span id="refreshText">Refresh</span>
-      </button>
+    <div class="leaderboard-header">
+        <h2 class="leaderboard-title">🏆 Project Rankings</h2>
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search projects...">
+            </div>
+            <button class="add-project-btn" id="addProjectBtn">
+                <span>Add Project</span>
+            </button>
+            <button class="refresh-btn" id="refreshBtn">
+                <span id="refreshText">Refresh</span>
+            </button>
+        </div>
     </div>
-  </div>
 
-  <div class="leaderboard-grid" id="leaderboardGrid">
-    <div class="loading">
-      <div class="spinner"></div>
-      <p>Loading amazing projects...</p>
+    <div class="leaderboard-grid" id="leaderboardGrid">
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading amazing projects...</p>
+        </div>
     </div>
-  </div>
+</div>
+
+<!-- Add Project Modal -->
+<div class="modal-overlay" id="addProjectModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">✨ Create New Project</h3>
+            <button class="close-modal" id="closeAddModal">&times;</button>
+        </div>
+        <form id="addProjectForm">
+            <div class="form-group">
+                <label for="name" class="form-label">Project Name</label>
+                <input type="text" id="name" name="name" class="form-input" placeholder="Enter project name" required>
+            </div>
+            <div class="form-group">
+                <label for="description" class="form-label">Project Description</label>
+                <textarea id="description" name="description" class="form-input" rows="3"
+                          placeholder="Enter project description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="frontendType" class="form-label">Frontend Framework</label>
+                <select id="frontendType" name="frontendType" class="form-select" required>
+                    <option value="">Select Frontend Framework</option>
+                    <option value="REACT">React</option>
+                    <option value="ANGULAR">Angular</option>
+                    <option value="VUE">Vue</option>
+                    <option value="NEXT_JS">Next.js</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="backendType" class="form-label">Backend Framework</label>
+                <select id="backendType" name="backendType" class="form-select" required>
+                    <option value="">Select Backend Framework</option>
+                    <option value="SPRING_BOOT">Spring Boot</option>
+                    <option value="EXPRESS">Express</option>
+                    <option value="DJANGO">Django</option>
+                    <option value="FLASK">Flask</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="databaseType" class="form-label">Database</label>
+                <select id="databaseType" name="databaseType" class="form-select" required>
+                    <option value="">Select Database</option>
+                    <option value="MONGODB">MongoDB</option>
+                    <option value="MYSQL">MySQL</option>
+                    <option value="POSTGRESQL">PostgreSQL</option>
+                    <option value="SQLITE">SQLite</option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-neutral" id="cancelAddProject">Cancel</button>
+                <button type="submit" class="btn btn-success">Create Project</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Project Modal -->
+<div class="modal-overlay" id="editProjectModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">🔧 Edit Project</h3>
+            <button class="close-modal" id="closeEditModal">&times;</button>
+        </div>
+        <form id="editProjectForm">
+            <input type="hidden" id="editProjectId" name="id">
+            <div class="form-group">
+                <label for="editName" class="form-label">Project Name</label>
+                <input type="text" id="editName" name="name" class="form-input" placeholder="Enter project name"
+                       required>
+            </div>
+            <div class="form-group">
+                <label for="editDescription" class="form-label">Project Description</label>
+                <textarea id="editDescription" name="description" class="form-input" rows="3"
+                          placeholder="Enter project description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="editFrontendType" class="form-label">Frontend Framework</label>
+                <select id="editFrontendType" name="frontendType" class="form-select" required>
+                    <option value="">Select Frontend Framework</option>
+                    <option value="REACT">React</option>
+                    <option value="ANGULAR">Angular</option>
+                    <option value="VUE">Vue</option>
+                    <option value="NEXT_JS">Next.js</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="editBackendType" class="form-label">Backend Framework</label>
+                <select id="editBackendType" name="backendType" class="form-select" required>
+                    <option value="">Select Backend Framework</option>
+                    <option value="SPRING_BOOT">Spring Boot</option>
+                    <option value="EXPRESS">Express</option>
+                    <option value="DJANGO">Django</option>
+                    <option value="FLASK">Flask</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="editDatabaseType" class="form-label">Database</label>
+                <select id="editDatabaseType" name="databaseType" class="form-select" required>
+                    <option value="">Select Database</option>
+                    <option value="MONGODB">MongoDB</option>
+                    <option value="MYSQL">MySQL</option>
+                    <option value="POSTGRESQL">PostgreSQL</option>
+                    <option value="SQLITE">SQLite</option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-neutral" id="cancelEditProject">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update Project</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" id="deleteProjectModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">🗑️ Delete Project</h3>
+            <button class="close-modal" id="closeDeleteModal">&times;</button>
+        </div>
+        <div class="confirm-dialog" id="confirmDialog">
+            <div class="confirm-icon">⚠️</div>
+            <h3 class="confirm-title">Delete Project?</h3>
+            <p class="confirm-message">Are you sure you want to delete this project? This action cannot be undone.</p>
+            <div class="confirm-buttons">
+                <button class="btn btn-neutral" id="cancelDeleteProject">Cancel</button>
+                <button class="btn btn-danger" id="confirmDeleteProject">Delete</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-  // Configuration
-  const API_BASE_URL = 'http://localhost:8080/api'; // Update this to your actual API URL
+    // Configuration
+    const API_BASE_URL = 'http://localhost:8080/api'; // Update this to your actual API URL
 
-  // Global state
-  let allProjects = [];
-  let filteredProjects = [];
-  let isLoading = false;
+    // Global state
+    let allProjects = [];
+    let filteredProjects = [];
+    let isLoading = false;
+    let currentProjectToDelete = null;
 
-  // DOM Elements
-  const totalProjectsEl = document.getElementById('totalProjects');
-  const topFrontendEl = document.getElementById('topFrontend');
-  const topBackendEl = document.getElementById('topBackend');
-  const topDatabaseEl = document.getElementById('topDatabase');
-  const leaderboardGridEl = document.getElementById('leaderboardGrid');
-  const searchInputEl = document.getElementById('searchInput');
-  const refreshBtnEl = document.getElementById('refreshBtn');
-  const refreshTextEl = document.getElementById('refreshText');
+    // DOM Elements
+    const totalProjectsEl = document.getElementById('totalProjects');
+    const topFrontendEl = document.getElementById('topFrontend');
+    const topBackendEl = document.getElementById('topBackend');
+    const topDatabaseEl = document.getElementById('topDatabase');
+    const leaderboardGridEl = document.getElementById('leaderboardGrid');
+    const searchInputEl = document.getElementById('searchInput');
+    const refreshBtnEl = document.getElementById('refreshBtn');
+    const refreshTextEl = document.getElementById('refreshText');
+    const addProjectModalEl = document.getElementById('addProjectModal');
+    const closeAddModalEl = document.getElementById('closeAddModal');
+    const addProjectFormEl = document.getElementById('addProjectForm');
+    const editProjectModalEl = document.getElementById('editProjectModal');
+    const closeEditModalEl = document.getElementById('closeEditModal');
+    const editProjectFormEl = document.getElementById('editProjectForm');
+    const deleteProjectModalEl = document.getElementById('deleteProjectModal');
+    const closeDeleteModalEl = document.getElementById('closeDeleteModal');
+    const confirmDeleteProjectEl = document.getElementById('confirmDeleteProject');
+    const confirmDialogEl = document.getElementById('confirmDialog');
 
-  // Initialize
-  document.addEventListener('DOMContentLoaded', function() {
-    createParticles();
-    loadLeaderboardData();
-    setupEventListeners();
-    setupScrollAnimations();
-  });
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function () {
+        createParticles();
+        loadLeaderboardData();
+        setupEventListeners();
+        setupScrollAnimations();
+    });
 
-  // Create floating particles
-  function createParticles() {
-    const particlesContainer = document.getElementById('particles');
-    const particleCount = 50;
+    // Create floating particles
+    function createParticles() {
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 50;
 
-    for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement('div');
-      particle.className = 'particle';
-      particle.style.left = Math.random() * 100 + '%';
-      particle.style.animationDelay = Math.random() * 10 + 's';
-      particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
-      particlesContainer.appendChild(particle);
-    }
-  }
-
-  // Setup event listeners
-  function setupEventListeners() {
-    searchInputEl.addEventListener('input', handleSearch);
-    refreshBtnEl.addEventListener('click', handleRefresh);
-  }
-
-  // Setup scroll animations
-  function setupScrollAnimations() {
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 10 + 's';
+            particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            particlesContainer.appendChild(particle);
         }
-      });
-    }, observerOptions);
-
-    // Observe elements as they're added
-    const observeElements = () => {
-      document.querySelectorAll('.fade-in:not(.visible)').forEach(el => {
-        observer.observe(el);
-      });
-    };
-
-    // Initial observation
-    setTimeout(observeElements, 100);
-
-    // Re-observe after content updates
-    window.observeElements = observeElements;
-  }
-
-  // Load leaderboard data
-  async function loadLeaderboardData() {
-    if (isLoading) return;
-
-    isLoading = true;
-    showLoading();
-
-    try {
-      // Load dashboard analytics
-      const dashboardResponse = await fetch(`${API_BASE_URL}/analytics/dashboard`);
-      const dashboardData = await dashboardResponse.json();
-
-      // Load total projects count
-      const countResponse = await fetch(`${API_BASE_URL}/projects/count`);
-      const totalCount = await countResponse.json();
-
-      // Update stats
-      updateStats(dashboardData, totalCount);
-
-      // Update leaderboard
-      if (dashboardData.topProjects && dashboardData.topProjects.length > 0) {
-        allProjects = dashboardData.topProjects.sort((a, b) => b.requestCount - a.requestCount);
-        filteredProjects = [...allProjects];
-        updateLeaderboard();
-      } else {
-        showEmptyState();
-      }
-
-    } catch (error) {
-      console.error('Error loading leaderboard data:', error);
-      showError('Failed to load leaderboard data. Please check your connection and try again.');
-    } finally {
-      isLoading = false;
     }
-  }
 
-  // Update stats
-  function updateStats(data, totalCount) {
+    // Setup event listeners
+    function setupEventListeners() {
+        searchInputEl.addEventListener('input', handleSearch);
+        refreshBtnEl.addEventListener('click', handleRefresh);
+        document.getElementById('addProjectBtn').addEventListener('click', openAddModal);
+        document.getElementById('cancelAddProject').addEventListener('click', () => toggleModal(addProjectModalEl, false));
+        document.getElementById('cancelEditProject').addEventListener('click', () => toggleModal(editProjectModalEl, false));
+        document.getElementById('cancelDeleteProject').addEventListener('click', () => toggleModal(deleteProjectModalEl, false));
+        closeAddModalEl.addEventListener('click', () => toggleModal(addProjectModalEl, false));
+        closeEditModalEl.addEventListener('click', () => toggleModal(editProjectModalEl, false));
+        closeDeleteModalEl.addEventListener('click', () => toggleModal(deleteProjectModalEl, false));
+        addProjectFormEl.addEventListener('submit', handleAddProject);
+        editProjectFormEl.addEventListener('submit', handleEditProject);
+        confirmDeleteProjectEl.addEventListener('click', handleDeleteProject);
+
+        // Close modals when clicking outside
+        addProjectModalEl.addEventListener('click', (e) => {
+            if (e.target === addProjectModalEl) toggleModal(addProjectModalEl, false);
+        });
+        editProjectModalEl.addEventListener('click', (e) => {
+            if (e.target === editProjectModalEl) toggleModal(editProjectModalEl, false);
+        });
+        deleteProjectModalEl.addEventListener('click', (e) => {
+            if (e.target === deleteProjectModalEl) toggleModal(deleteProjectModalEl, false);
+        });
+    }
+
+    // Make functions accessible globally for HTML onclick attributes
+    window.openAddModal = openAddModal;
+    window.openEditModal = openEditModal;
+    window.openDeleteModal = openDeleteModal;
+
+    // Open Add Project Modal
+    function openAddModal() {
+        // Reset form
+        addProjectFormEl.reset();
+
+        // Show modal
+        toggleModal(addProjectModalEl, true);
+    }
+
+    // Open Edit Project Modal
+    function openEditModal(projectId) {
+        // Find project
+        const project = allProjects.find(p => p.id === projectId);
+        if (!project) {
+            console.error('Project not found:', projectId);
+            return;
+        }
+
+        // Populate form with correct field names
+        document.getElementById('editProjectId').value = project.id;
+        document.getElementById('editName').value = project.projectName || project.name || '';
+        document.getElementById('editDescription').value = project.projectDescription || project.description || '';
+        document.getElementById('editFrontendType').value = project.frontendType;
+        document.getElementById('editBackendType').value = project.backendType;
+        document.getElementById('editDatabaseType').value = project.databaseType;
+
+        // Show modal
+        toggleModal(editProjectModalEl, true);
+    }
+
+    // Open Delete Project Modal
+    function openDeleteModal(projectId) {
+        // Find project
+        const project = allProjects.find(p => p.id === projectId);
+        if (!project) {
+            console.error('Project not found:', projectId);
+            return;
+        }
+
+        // Store project to delete
+        currentProjectToDelete = project.id;
+
+        // Show confirmation dialog
+        confirmDialogEl.classList.add('active');
+
+        // Show modal
+        toggleModal(deleteProjectModalEl, true);
+    }
+
+    // Setup scroll animations
+    function setupScrollAnimations() {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements as they're added
+        const observeElements = () => {
+            document.querySelectorAll('.fade-in:not(.visible)').forEach(el => {
+                observer.observe(el);
+            });
+        };
+
+        // Initial observation
+        setTimeout(observeElements, 100);
+
+        // Re-observe after content updates
+        window.observeElements = observeElements;
+    }
+
+    // Load leaderboard data
+    async function loadLeaderboardData() {
+        if (isLoading) return;
+
+        isLoading = true;
+        showLoading();
+
+        try {
+            // Load dashboard analytics
+            const dashboardResponse = await fetch(`${API_BASE_URL}/analytics/dashboard`);
+            const dashboardData = await dashboardResponse.json();
+
+            // Load total projects count
+            const countResponse = await fetch(`${API_BASE_URL}/projects/count`);
+            const totalCount = await countResponse.json();
+
+            // Update stats
+            updateStats(dashboardData, totalCount);
+
+            // Update leaderboard
+            if (dashboardData.topProjects && dashboardData.topProjects.length > 0) {
+                allProjects = dashboardData.topProjects.sort((a, b) => b.requestCount - a.requestCount);
+                filteredProjects = [...allProjects];
+                updateLeaderboard();
+            } else {
+                showEmptyState();
+            }
+
+        } catch (error) {
+            console.error('Error loading leaderboard data:', error);
+            showError('Failed to load leaderboard data. Please check your connection and try again.');
+        } finally {
+            isLoading = false;
+        }
+    }
+
+    // Update stats
+    function updateStats(data, totalCount) {
+        // Animate number counting
+        animateNumber(totalProjectsEl, totalCount);
+
+        // Update top technologies
+        const topFrontend = Object.keys(data.topFrontendFrameworks)[0] || 'N/A';
+        const topBackend = Object.keys(data.topBackendFrameworks)[0] || 'N/A';
+        const topDatabase = Object.keys(data.topDatabases)[0] || 'N/A';
+
+        topFrontendEl.textContent = formatTechName(topFrontend);
+        topBackendEl.textContent = formatTechName(topBackend);
+        topDatabaseEl.textContent = formatTechName(topDatabase);
+    }
+
     // Animate number counting
-    animateNumber(totalProjectsEl, totalCount);
+    function animateNumber(element, target) {
+        const duration = 2000;
+        const start = parseInt(element.textContent) || 0;
+        const increment = (target - start) / (duration / 16);
+        let current = start;
 
-    // Update top technologies
-    const topFrontend = Object.keys(data.topFrontendFrameworks)[0] || 'N/A';
-    const topBackend = Object.keys(data.topBackendFrameworks)[0] || 'N/A';
-    const topDatabase = Object.keys(data.topDatabases)[0] || 'N/A';
-
-    topFrontendEl.textContent = formatTechName(topFrontend);
-    topBackendEl.textContent = formatTechName(topBackend);
-    topDatabaseEl.textContent = formatTechName(topDatabase);
-  }
-
-  // Animate number counting
-  function animateNumber(element, target) {
-    const duration = 2000;
-    const start = parseInt(element.textContent) || 0;
-    const increment = (target - start) / (duration / 16);
-    let current = start;
-
-    const timer = setInterval(() => {
-      current += increment;
-      if (current >= target) {
-        current = target;
-        clearInterval(timer);
-      }
-      element.textContent = Math.floor(current);
-    }, 16);
-  }
-
-  // Update leaderboard
-  function updateLeaderboard() {
-    if (filteredProjects.length === 0) {
-      showEmptyState();
-      return;
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            element.textContent = Math.floor(current);
+        }, 16);
     }
 
-    const leaderboardHTML = filteredProjects.map((project, index) => {
-      const rank = index + 1;
-      const rankClass = getRankClass(rank);
-      const badgeClass = getRankBadgeClass(rank);
+    // Update leaderboard
+    function updateLeaderboard() {
+        if (filteredProjects.length === 0) {
+            showEmptyState();
+            return;
+        }
 
-      return `
-                    <div class="leaderboard-item ${rankClass} fade-in" style="animation-delay: ${index * 0.1}s">
-                        <div class="item-header">
-                            <div class="rank-badge ${badgeClass}">
-                                ${rank <= 3 ? getRankEmoji(rank) : rank}
-                            </div>
-                            <div class="project-info">
-                                <h3 class="project-name">${project.projectName}</h3>
-                                <p class="project-description">${project.projectDescription || 'No description available'}</p>
-                                <div class="tech-stack">
-                                    <span class="tech-badge">${formatTechName(project.frontendType)}</span>
-                                    <span class="tech-badge">${formatTechName(project.backendType)}</span>
-                                    <span class="tech-badge">${formatTechName(project.databaseType)}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="project-stats">
-                            <div class="stat-box">
-                                <div class="stat-value">${project.requestCount}</div>
-                                <div class="stat-name">Requests</div>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-value">${formatDate(project.lastRequestedAt)}</div>
-                                <div class="stat-name">Last Active</div>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-value">${getActivityScore(project.requestCount)}</div>
-                                <div class="stat-name">Score</div>
-                            </div>
-                        </div>
+        const leaderboardHTML = filteredProjects.map((project, index) => {
+            const rank = index + 1;
+            const rankClass = getRankClass(rank);
+            const badgeClass = getRankBadgeClass(rank);
+
+            return `
+        <div class="leaderboard-item ${rankClass} fade-in" data-project-id="${project.id || ''}" style="animation-delay: ${index * 0.1}s">
+            <div class="item-header">
+                <div class="rank-badge ${badgeClass}">
+                    ${rank <= 3 ? getRankEmoji(rank) : rank}
+                </div>
+                <div class="project-info">
+                    <h3 class="project-name">${project.projectName || project.name || 'Unnamed Project'}</h3>
+                    <p class="project-description">${project.projectDescription || project.description || 'No description available'}</p>
+                    <div class="tech-stack">
+                        <span class="tech-badge">${formatTechName(project.frontendType)}</span>
+                        <span class="tech-badge">${formatTechName(project.backendType)}</span>
+                        <span class="tech-badge">${formatTechName(project.databaseType)}</span>
                     </div>
-                `;
-    }).join('');
+                </div>
+            </div>
+            <div class="project-stats">
+                <div class="stat-box">
+                    <div class="stat-value">${project.requestCount}</div>
+                    <div class="stat-name">Requests</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">${formatDate(project.lastRequestedAt)}</div>
+                    <div class="stat-name">Last Active</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">${getActivityScore(project.requestCount)}</div>
+                    <div class="stat-name">Score</div>
+                </div>
+            </div>
+            <div class="project-actions">
+                <button class="action-btn edit-btn tooltip" data-tooltip="Edit" onclick="openEditModal('${project.id || ''}')">✏️</button>
+                <button class="action-btn delete-btn tooltip" data-tooltip="Delete" onclick="openDeleteModal('${project.id || ''}')">🗑️</button>
+            </div>
+        </div>
+      `;
+        }).join('');
 
-    leaderboardGridEl.innerHTML = leaderboardHTML;
+        leaderboardGridEl.innerHTML = leaderboardHTML;
 
-    // Trigger scroll animations
-    setTimeout(() => {
-      if (window.observeElements) {
-        window.observeElements();
-      }
-    }, 100);
-  }
-
-  // Get rank class
-  function getRankClass(rank) {
-    switch(rank) {
-      case 1: return 'rank-1';
-      case 2: return 'rank-2';
-      case 3: return 'rank-3';
-      default: return '';
-    }
-  }
-
-  // Get rank badge class
-  function getRankBadgeClass(rank) {
-    switch(rank) {
-      case 1: return 'gold';
-      case 2: return 'silver';
-      case 3: return 'bronze';
-      default: return '';
-    }
-  }
-
-  // Get rank emoji
-  function getRankEmoji(rank) {
-    switch(rank) {
-      case 1: return '🥇';
-      case 2: return '🥈';
-      case 3: return '🥉';
-      default: return rank;
-    }
-  }
-
-  // Calculate activity score
-  function getActivityScore(requestCount) {
-    if (requestCount >= 1000) return 'S+';
-    if (requestCount >= 500) return 'S';
-    if (requestCount >= 100) return 'A';
-    if (requestCount >= 50) return 'B';
-    if (requestCount >= 10) return 'C';
-    return 'D';
-  }
-
-  // Handle search
-  function handleSearch(event) {
-    const searchTerm = event.target.value.toLowerCase().trim();
-
-    if (searchTerm === '') {
-      filteredProjects = [...allProjects];
-    } else {
-      filteredProjects = allProjects.filter(project =>
-              project.projectName.toLowerCase().includes(searchTerm) ||
-              (project.projectDescription && project.projectDescription.toLowerCase().includes(searchTerm)) ||
-              project.frontendType.toLowerCase().includes(searchTerm) ||
-              project.backendType.toLowerCase().includes(searchTerm) ||
-              project.databaseType.toLowerCase().includes(searchTerm)
-      );
+        // Trigger scroll animations
+        setTimeout(() => {
+            if (window.observeElements) {
+                window.observeElements();
+            }
+        }, 100);
     }
 
-    updateLeaderboard();
-  }
+    // Get rank class
+    function getRankClass(rank) {
+        switch (rank) {
+            case 1:
+                return 'rank-1';
+            case 2:
+                return 'rank-2';
+            case 3:
+                return 'rank-3';
+            default:
+                return '';
+        }
+    }
 
-  // Handle refresh
-  async function handleRefresh() {
-    if (isLoading) return;
+    // Get rank badge class
+    function getRankBadgeClass(rank) {
+        switch (rank) {
+            case 1:
+                return 'gold';
+            case 2:
+                return 'silver';
+            case 3:
+                return 'bronze';
+            default:
+                return '';
+        }
+    }
 
-    refreshTextEl.textContent = 'Refreshing...';
-    refreshBtnEl.style.transform = 'rotate(360deg)';
+    // Get rank emoji
+    function getRankEmoji(rank) {
+        switch (rank) {
+            case 1:
+                return '🥇';
+            case 2:
+                return '🥈';
+            case 3:
+                return '🥉';
+            default:
+                return rank;
+        }
+    }
 
-    await loadLeaderboardData();
+    // Calculate activity score
+    function getActivityScore(requestCount) {
+        if (requestCount >= 1000) return 'S+';
+        if (requestCount >= 500) return 'S';
+        if (requestCount >= 100) return 'A';
+        if (requestCount >= 50) return 'B';
+        if (requestCount >= 10) return 'C';
+        return 'D';
+    }
 
-    setTimeout(() => {
-      refreshTextEl.textContent = 'Refresh';
-      refreshBtnEl.style.transform = 'rotate(0deg)';
-    }, 500);
-  }
+    // Handle search
+    function handleSearch(event) {
+        const searchTerm = event.target.value.toLowerCase().trim();
 
-  // Show loading state
-  function showLoading() {
-    leaderboardGridEl.innerHTML = `
+        if (searchTerm === '') {
+            filteredProjects = [...allProjects];
+        } else {
+            filteredProjects = allProjects.filter(project =>
+                (project.projectName || project.name || '').toLowerCase().includes(searchTerm) ||
+                (project.projectDescription || project.description || '').toLowerCase().includes(searchTerm) ||
+                project.frontendType.toLowerCase().includes(searchTerm) ||
+                project.backendType.toLowerCase().includes(searchTerm) ||
+                project.databaseType.toLowerCase().includes(searchTerm)
+            );
+        }
+
+        updateLeaderboard();
+    }
+
+    // Handle refresh
+    async function handleRefresh() {
+        if (isLoading) return;
+
+        refreshTextEl.textContent = 'Refreshing...';
+        refreshBtnEl.style.transform = 'rotate(360deg)';
+
+        await loadLeaderboardData();
+
+        setTimeout(() => {
+            refreshTextEl.textContent = 'Refresh';
+            refreshBtnEl.style.transform = 'rotate(0deg)';
+        }, 500);
+    }
+
+    // Handle add project
+    async function handleAddProject(event) {
+        event.preventDefault();
+
+        const formData = new FormData(addProjectFormEl);
+        const newProject = {
+            name: formData.get('name'),
+            description: formData.get('description'),
+            frontendType: formData.get('frontendType'),
+            backendType: formData.get('backendType'),
+            databaseType: formData.get('databaseType')
+        };
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/projects`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newProject)
+            });
+
+            if (!response.ok) throw new Error('Network response was not ok');
+
+            const result = await response.json();
+            console.log('Project created:', result);
+
+            // Close modal and reload data
+            toggleModal(addProjectModalEl, false);
+            loadLeaderboardData();
+        } catch (error) {
+            console.error('Error creating project:', error);
+            showError('Failed to create project. Please try again later.');
+        }
+    }
+
+    // Handle edit project
+    async function handleEditProject(event) {
+        event.preventDefault();
+
+        const formData = new FormData(editProjectFormEl);
+        const updatedProject = {
+            id: formData.get('id'),
+            name: formData.get('name'),
+            description: formData.get('description'),
+            frontendType: formData.get('frontendType'),
+            backendType: formData.get('backendType'),
+            databaseType: formData.get('databaseType')
+        };
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/projects/${updatedProject.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedProject)
+            });
+
+            if (!response.ok) throw new Error('Network response was not ok');
+
+            const result = await response.json();
+            console.log('Project updated:', result);
+
+            // Close modal and reload data
+            toggleModal(editProjectModalEl, false);
+            loadLeaderboardData();
+        } catch (error) {
+            console.error('Error updating project:', error);
+            showError('Failed to update project. Please try again later.');
+        }
+    }
+
+    // Handle delete project
+    async function handleDeleteProject() {
+        if (!currentProjectToDelete) return;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/projects/${currentProjectToDelete}`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) throw new Error('Network response was not ok');
+
+            console.log('Project deleted:', currentProjectToDelete);
+
+            // Close modal and reload data
+            toggleModal(deleteProjectModalEl, false);
+            confirmDialogEl.classList.remove('active');
+            currentProjectToDelete = null;
+            loadLeaderboardData();
+        } catch (error) {
+            console.error('Error deleting project:', error);
+            showError('Failed to delete project. Please try again later.');
+        }
+    }
+
+    // Toggle modal visibility
+    function toggleModal(modalEl, isVisible) {
+        if (isVisible) {
+            modalEl.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        } else {
+            modalEl.classList.remove('active');
+            document.body.style.overflow = '';
+            // Reset confirmation dialog if it's the delete modal
+            if (modalEl === deleteProjectModalEl) {
+                confirmDialogEl.classList.remove('active');
+                currentProjectToDelete = null;
+            }
+        }
+    }
+
+    // Show loading state
+    function showLoading() {
+        leaderboardGridEl.innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
                     <p>Loading amazing projects...</p>
                 </div>
             `;
-  }
+    }
 
-  // Show error state
-  function showError(message) {
-    leaderboardGridEl.innerHTML = `
+    // Show error state
+    function showError(message) {
+        leaderboardGridEl.innerHTML = `
                 <div class="error">
                     <h3>⚠️ Oops!</h3>
                     <p>${message}</p>
@@ -923,45 +1622,45 @@
                     </button>
                 </div>
             `;
-  }
+    }
 
-  // Show empty state
-  function showEmptyState() {
-    leaderboardGridEl.innerHTML = `
+    // Show empty state
+    function showEmptyState() {
+        leaderboardGridEl.innerHTML = `
                 <div class="empty-state">
                     <h3>🚀 No Projects Yet</h3>
                     <p>Be the first to create an amazing project and claim the top spot!</p>
                 </div>
             `;
-  }
+    }
 
-  // Format technology names
-  function formatTechName(tech) {
-    if (!tech) return 'N/A';
-    return tech.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
-  }
+    // Format technology names
+    function formatTechName(tech) {
+        if (!tech) return 'N/A';
+        return tech.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+    }
 
-  // Format dates
-  function formatDate(dateString) {
-    if (!dateString) return 'Never';
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now - date);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    // Format dates
+    function formatDate(dateString) {
+        if (!dateString) return 'Never';
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffTime = Math.abs(now - date);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays}d ago`;
-    if (diffDays < 30) return `${Math.ceil(diffDays / 7)}w ago`;
-    return `${Math.ceil(diffDays / 30)}m ago`;
-  }
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return `${diffDays}d ago`;
+        if (diffDays < 30) return `${Math.ceil(diffDays / 7)}w ago`;
+        return `${Math.ceil(diffDays / 30)}m ago`;
+    }
 
-  // Add some interactive effects
-  document.addEventListener('mousemove', (e) => {
-    const cursor = document.querySelector('.cursor');
-    if (!cursor) {
-      const newCursor = document.createElement('div');
-      newCursor.className = 'cursor';
-      newCursor.style.cssText = `
+    // Add some interactive effects
+    document.addEventListener('mousemove', (e) => {
+        const cursor = document.querySelector('.cursor');
+        if (!cursor) {
+            const newCursor = document.createElement('div');
+            newCursor.className = 'cursor';
+            newCursor.style.cssText = `
                     position: fixed;
                     width: 20px;
                     height: 20px;
@@ -971,35 +1670,35 @@
                     z-index: 9999;
                     transition: transform 0.1s ease;
                 `;
-      document.body.appendChild(newCursor);
-    }
+            document.body.appendChild(newCursor);
+        }
 
-    const cursorEl = document.querySelector('.cursor');
-    cursorEl.style.left = e.clientX - 10 + 'px';
-    cursorEl.style.top = e.clientY - 10 + 'px';
-  });
+        const cursorEl = document.querySelector('.cursor');
+        cursorEl.style.left = e.clientX - 10 + 'px';
+        cursorEl.style.top = e.clientY - 10 + 'px';
+    });
 
-  // Add keyboard shortcuts
-  document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey || e.metaKey) {
-      switch(e.key) {
-        case 'r':
-          e.preventDefault();
-          handleRefresh();
-          break;
-        case 'f':
-          e.preventDefault();
-          searchInputEl.focus();
-          break;
-      }
-    }
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.metaKey) {
+            switch (e.key) {
+                case 'r':
+                    e.preventDefault();
+                    handleRefresh();
+                    break;
+                case 'f':
+                    e.preventDefault();
+                    searchInputEl.focus();
+                    break;
+            }
+        }
 
-    if (e.key === 'Escape') {
-      searchInputEl.value = '';
-      handleSearch({ target: { value: '' } });
-      searchInputEl.blur();
-    }
-  });
+        if (e.key === 'Escape') {
+            searchInputEl.value = '';
+            handleSearch({target: {value: ''}});
+            searchInputEl.blur();
+        }
+    });
 </script>
 </body>
 </html>
