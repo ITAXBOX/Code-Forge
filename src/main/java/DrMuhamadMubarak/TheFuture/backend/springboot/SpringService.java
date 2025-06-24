@@ -85,7 +85,8 @@ public class SpringService {
         String basePackage = "com.example." + projectName.toLowerCase();
         String cleanedBehaviorMethods = Arrays.stream(behaviorMethods.split("\\r?\\n"))
                 .filter(line -> !line.startsWith("Here are the method implementations for ") &&
-                        !line.startsWith("Here are the method implementations:"))
+                        !line.startsWith("Here are the method implementations:") &&
+                        !line.startsWith("Here are 5 business logic methods"))
                 .collect(Collectors.joining("\n"));
 
         String classCode = """
