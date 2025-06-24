@@ -26,6 +26,7 @@ public class ProjectAnalytics {
 
     @Column(nullable = false)
     private int requestCount;
+    @Getter
     private LocalDateTime lastRequestedAt;
 
     public void incrementRequestCount() {
