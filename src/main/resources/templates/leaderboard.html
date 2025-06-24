@@ -43,7 +43,7 @@
             position: relative;
         }
 
-        /* Elite Animated Background */
+        /* Simple Static Background */
         .elite-background {
             position: fixed;
             top: 0;
@@ -51,37 +51,7 @@
             width: 100%;
             height: 100%;
             z-index: -2;
-            background: linear-gradient(45deg, #0f172a, #1e293b, #334155, #475569);
-            background-size: 400% 400%;
-            animation: eliteGradientShift 20s ease infinite;
-        }
-
-        .elite-background::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.2) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(14, 165, 233, 0.2) 0%, transparent 50%),
-            radial-gradient(circle at 40% 40%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
-            radial-gradient(circle at 60% 80%, rgba(8, 145, 178, 0.15) 0%, transparent 50%);
-        }
-
-        @keyframes eliteGradientShift {
-            0%, 100% {
-                background-position: 0% 50%;
-            }
-            25% {
-                background-position: 100% 50%;
-            }
-            50% {
-                background-position: 100% 100%;
-            }
-            75% {
-                background-position: 0% 100%;
-            }
+            background: var(--dark-bg);
         }
 
         /* Elite Particles */
@@ -1006,8 +976,8 @@
 <div class="elite-particles" id="eliteParticles"></div>
 
 <header class="elite-header">
-    <h1>Elite Leaderboard</h1>
-    <p>Discover the most innovative and high-performing projects in our elite ecosystem</p>
+    <h1>The Ultimate Leaderboard</h1>
+    <p>Showcasing Top Elite Projects</p>
 </header>
 
 <!-- Elite Royalty Podium -->
@@ -1365,20 +1335,6 @@
         }
     };
 
-    // Helper function to get a valid project ID - FIXED VERSION FROM OLD FILE
-    function getProjectId(project, index) {
-        // Try multiple possible ID fields and fallback to index
-        return project.id || project.projectId || project._id || `temp_${index}`;
-    }
-
-    // Helper function to find project by ID with multiple fallbacks - FIXED VERSION FROM OLD FILE
-    function findProjectById(projectId) {
-        return allProjects.find(p => {
-            const pid = getProjectId(p, allProjects.indexOf(p));
-            return pid == projectId;
-        });
-    }
-
     // DOM Elements
     const elitePodiumEl = document.getElementById('elitePodium');
     const leaderboardGridEl = document.getElementById('leaderboardGrid');
@@ -1387,6 +1343,20 @@
     const refreshTextEl = document.getElementById('refreshText');
     const refreshIconEl = document.getElementById('refreshIcon');
     const paginationEl = document.getElementById('elitePagination');
+
+    // Helper function to get a valid project ID
+    function getProjectId(project, index) {
+        // Try multiple possible ID fields and fallback to index
+        return project.id || project.projectId || project._id || `temp_${index}`;
+    }
+
+    // Helper function to find project by ID with multiple fallbacks
+    function findProjectById(projectId) {
+        return allProjects.find(p => {
+            const pid = getProjectId(p, allProjects.indexOf(p));
+            return pid == projectId;
+        });
+    }
 
     // Initialize
     document.addEventListener('DOMContentLoaded', function () {
@@ -1432,78 +1402,6 @@
         document.getElementById('editProjectModal').addEventListener('click', (e) => {
             if (e.target.id === 'editProjectModal') toggleModal('editProjectModal', false);
         });
-    }
-
-    // FIXED EDIT MODAL FUNCTION FROM OLD VERSION
-    function openEditModal(projectId) {
-        console.log('Opening Edit Modal for ID:', projectId);
-
-        if (!projectId || projectId === 'undefined') {
-            console.error('Invalid project ID provided:', projectId);
-            alert('Error: Invalid project ID');
-            return;
-        }
-
-        // Find project using the helper function
-        const project = findProjectById(projectId);
-        if (!project) {
-            console.error('Project not found for ID:', projectId);
-            console.log('Available projects:', allProjects.map((p, i) => ({
-                originalId: p.id,
-                projectId: p.projectId,
-                _id: p._id,
-                calculatedId: getProjectId(p, i),
-                name: p.projectName || p.name
-            })));
-            alert(`Error: Project not found with ID: ${projectId}`);
-            return;
-        }
-
-        console.log('Found project for editing:', project);
-
-        try {
-            // Populate form with correct field names
-            document.getElementById('editProjectId').value = getProjectId(project, allProjects.indexOf(project));
-            document.getElementById('editName').value = project.projectName || project.name || '';
-            document.getElementById('editDescription').value = project.projectDescription || project.description || '';
-            document.getElementById('editFrontendType').value = project.frontendType || '';
-            document.getElementById('editBackendType').value = project.backendType || '';
-            document.getElementById('editDatabaseType').value = project.databaseType || '';
-
-            console.log('Form populated successfully');
-
-            // Show modal
-            toggleModal('editProjectModal', true);
-        } catch (error) {
-            console.error('Error populating edit form:', error);
-            alert('Error opening edit modal: ' + error.message);
-        }
-    }
-
-    // FIXED DELETE MODAL FUNCTION FROM OLD VERSION
-    function openDeleteModal(projectId) {
-        console.log('Opening Delete Modal for ID:', projectId);
-
-        if (!projectId || projectId === 'undefined') {
-            console.error('Invalid project ID provided for deletion:', projectId);
-            alert('Error: Invalid project ID');
-            return;
-        }
-
-        // Find project using the helper function
-        const project = findProjectById(projectId);
-        if (!project) {
-            console.error('Project not found for deletion, ID:', projectId);
-            alert(`Error: Project not found with ID: ${projectId}`);
-            return;
-        }
-
-        console.log('Found project for deletion:', project);
-
-        // Show confirmation and handle deletion
-        if (confirm('Are you sure you want to delete this elite project? This action cannot be undone.')) {
-            handleDeleteProject(getProjectId(project, allProjects.indexOf(project)));
-        }
     }
 
     // Load elite data
@@ -2067,11 +1965,11 @@
     }
 
     function getActivityScore(requestCount) {
-        if (requestCount >= 100) return 'S+';
-        if (requestCount >= 50) return 'S';
-        if (requestCount >= 10) return 'A';
-        if (requestCount >= 7) return 'B';
-        if (requestCount >= 2) return 'C';
+        if (requestCount >= 1000) return 'S+';
+        if (requestCount >= 300) return 'S';
+        if (requestCount >= 100) return 'A';
+        if (requestCount >= 50) return 'B';
+        if (requestCount >= 10) return 'C';
         return 'D';
     }
 
@@ -2145,6 +2043,57 @@
     function openAddModal() {
         document.getElementById('addProjectForm').reset();
         toggleModal('addProjectModal', true);
+    }
+
+    function openEditModal(projectId) {
+        console.log('Opening Edit Modal for ID:', projectId);
+
+        if (!projectId || projectId === 'undefined') {
+            console.error('Invalid project ID provided:', projectId);
+            alert('Error: Invalid project ID');
+            return;
+        }
+
+        // Find project using the helper function
+        const project = findProjectById(projectId);
+        if (!project) {
+            console.error('Project not found for ID:', projectId);
+            console.log('Available projects:', allProjects.map((p, i) => ({
+                originalId: p.id,
+                projectId: p.projectId,
+                _id: p._id,
+                calculatedId: getProjectId(p, i),
+                name: p.projectName || p.name
+            })));
+            alert(`Error: Project not found with ID: ${projectId}`);
+            return;
+        }
+
+        console.log('Found project for editing:', project);
+
+        try {
+            // Populate form with correct field names
+            document.getElementById('editProjectId').value = getProjectId(project, allProjects.indexOf(project));
+            document.getElementById('editName').value = project.projectName || project.name || '';
+            document.getElementById('editDescription').value = project.projectDescription || project.description || '';
+            document.getElementById('editFrontendType').value = project.frontendType || '';
+            document.getElementById('editBackendType').value = project.backendType || '';
+            document.getElementById('editDatabaseType').value = project.databaseType || '';
+
+            console.log('Form populated successfully');
+
+            // Show modal
+            toggleModal('editProjectModal', true);
+        } catch (error) {
+            console.error('Error populating edit form:', error);
+            alert('Error opening edit modal: ' + error.message);
+        }
+    }
+
+    function openDeleteModal(projectId) {
+        if (confirm('Are you sure you want to delete this elite project? This action cannot be undone.')) {
+            handleDeleteProject(projectId);
+        }
     }
 
     // CRUD operations
@@ -2261,7 +2210,7 @@
             `;
     }
 
-    // Make functions globally accessible - CRITICAL FIX FROM OLD VERSION
+    // Make functions globally accessible
     window.openEditModal = openEditModal;
     window.openDeleteModal = openDeleteModal;
     window.loadEliteData = loadEliteData;
@@ -2304,14 +2253,6 @@
             e.preventDefault();
             changePage(currentPage + 1);
         }
-    });
-
-    // Add elite scroll effects
-    window.addEventListener('scroll', () => {
-        const scrolled = window.pageYOffset;
-        const parallax = document.querySelector('.elite-background');
-        const speed = scrolled * 0.3;
-        parallax.style.transform = `translateY(${speed}px)`;
     });
 
     console.log('🚀 Elite Leaderboard initialized successfully!');
