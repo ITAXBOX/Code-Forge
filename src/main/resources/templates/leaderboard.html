@@ -790,6 +790,17 @@
             box-shadow: var(--glow-blue);
         }
 
+        .elite-form-select {
+            color: var(--text-primary);
+            background-color: rgba(15, 23, 42, 0.8);
+            border-color: var(--border-color);
+        }
+
+        .elite-form-select option {
+            color: var(--text-primary);
+            background-color: #1e293b;
+        }
+
         .elite-form-actions {
             display: flex;
             justify-content: flex-end;
@@ -968,6 +979,18 @@
 
         ::-webkit-scrollbar-thumb:hover {
             background: var(--secondary-gradient);
+        }
+
+        /* Fix for dropdown option text color */
+        .elite-form-select {
+            color: var(--text-primary);
+            background-color: rgba(15, 23, 42, 0.8);
+            border-color: var(--border-color);
+        }
+
+        .elite-form-select option {
+            color: var(--text-primary);
+            background-color: #1e293b;
         }
     </style>
 </head>
@@ -2259,3 +2282,4 @@
 </script>
 </body>
 </html>
+
