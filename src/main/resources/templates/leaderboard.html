@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code Forge: The Leaderboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Elite Code Forge Leaderboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -13,18 +16,22 @@
         }
 
         :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            --dark-bg: #0f0f23;
-            --card-bg: rgba(255, 255, 255, 0.1);
+            --primary-gradient: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            --secondary-gradient: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+            --success-gradient: linear-gradient(135deg, #0284c7 0%, #0891b2 100%);
+            --warning-gradient: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+            --elite-gradient: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #0ea5e9 100%);
+            --dark-bg: #0f172a;
+            --card-bg: rgba(59, 130, 246, 0.08);
+            --glass-bg: rgba(59, 130, 246, 0.12);
             --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.8);
-            --text-muted: rgba(255, 255, 255, 0.6);
-            --border-color: rgba(255, 255, 255, 0.2);
-            --shadow-primary: 0 20px 40px rgba(0, 0, 0, 0.3);
-            --shadow-hover: 0 30px 60px rgba(0, 0, 0, 0.4);
+            --text-secondary: rgba(255, 255, 255, 0.85);
+            --text-muted: rgba(255, 255, 255, 0.65);
+            --border-color: rgba(59, 130, 246, 0.15);
+            --shadow-primary: 0 25px 50px rgba(30, 58, 138, 0.4);
+            --shadow-hover: 0 35px 70px rgba(30, 58, 138, 0.5);
+            --glow-blue: 0 0 30px rgba(59, 130, 246, 0.3);
+            --glow-cyan: 0 0 30px rgba(6, 182, 212, 0.3);
         }
 
         body {
@@ -36,65 +43,71 @@
             position: relative;
         }
 
-        /* Animated Background */
-        .background-animation {
+        /* Elite Animated Background */
+        .elite-background {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
-            background: linear-gradient(45deg, #0f0f23, #1a1a3e, #2d2d5f);
+            z-index: -2;
+            background: linear-gradient(45deg, #0f172a, #1e293b, #334155, #475569);
             background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+            animation: eliteGradientShift 20s ease infinite;
         }
 
-        .background-animation::before {
+        .elite-background::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-            radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
-            animation: float 20s ease-in-out infinite;
+            background: radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.2) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(14, 165, 233, 0.2) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 60% 80%, rgba(8, 145, 178, 0.15) 0%, transparent 50%);
         }
 
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+        @keyframes eliteGradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            25% {
+                background-position: 100% 50%;
+            }
+            50% {
+                background-position: 100% 100%;
+            }
+            75% {
+                background-position: 0% 100%;
+            }
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            33% { transform: translateY(-30px) rotate(1deg); }
-            66% { transform: translateY(30px) rotate(-1deg); }
-        }
-
-        /* Particles */
-        .particles {
+        /* Elite Particles */
+        .elite-particles {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -1;
+            pointer-events: none;
         }
 
-        .particle {
+        .elite-particle {
             position: absolute;
-            width: 2px;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.5);
+            width: 3px;
+            height: 3px;
+            background: linear-gradient(45deg, #3b82f6, #0ea5e9);
             border-radius: 50%;
-            animation: particleFloat 10s linear infinite;
+            animation: eliteParticleFloat 15s linear infinite;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
         }
 
-        @keyframes particleFloat {
+        @keyframes eliteParticleFloat {
             0% {
-                transform: translateY(100vh) translateX(0);
+                transform: translateY(100vh) translateX(0) rotate(0deg);
                 opacity: 0;
             }
             10% {
@@ -104,879 +117,883 @@
                 opacity: 1;
             }
             100% {
-                transform: translateY(-100px) translateX(100px);
+                transform: translateY(-100px) translateX(200px) rotate(360deg);
                 opacity: 0;
             }
         }
 
-        /* Header */
-        .header {
+        /* Elite Header */
+        .elite-header {
             text-align: center;
-            padding: 4rem 2rem 2rem;
+            padding: 3rem 2rem 2rem;
             position: relative;
+            background: linear-gradient(180deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
         }
 
-        .header h1 {
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            font-weight: 800;
-            background: var(--primary-gradient);
+        .elite-header h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            background: var(--elite-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 1rem;
-            animation: titleGlow 3s ease-in-out infinite alternate;
+            animation: eliteTitleGlow 4s ease-in-out infinite alternate;
+            text-shadow: 0 0 50px rgba(59, 130, 246, 0.3);
         }
 
-        @keyframes titleGlow {
-            from { filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.5)); }
-            to { filter: drop-shadow(0 0 30px rgba(118, 75, 162, 0.8)); }
+        @keyframes eliteTitleGlow {
+            from {
+                filter: drop-shadow(0 0 30px rgba(59, 130, 246, 0.6));
+                transform: scale(1);
+            }
+            to {
+                filter: drop-shadow(0 0 50px rgba(14, 165, 233, 0.8));
+                transform: scale(1.02);
+            }
         }
 
-        .header p {
+        .elite-header p {
             font-size: 1.2rem;
             color: var(--text-secondary);
             max-width: 600px;
             margin: 0 auto;
+            font-weight: 500;
         }
 
-        /* Notification Message */
-        .notification {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            border-radius: 15px;
-            padding: 1.2rem 2rem;
+        /* Elite Royalty Podium */
+        .elite-royalty {
+            max-width: 1400px;
             margin: 2rem auto;
-            max-width: 800px;
+            padding: 0 2rem;
+        }
+
+        .elite-royalty-title {
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            animation: notificationFadeIn 0.5s ease-out forwards;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .elite-podium {
+            display: flex;
+            justify-content: center;
+            align-items: end;
+            gap: 2rem;
+            margin-bottom: 4rem;
+            flex-wrap: wrap;
+        }
+
+        .elite-podium-place {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--border-color);
+            border-radius: 25px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
+            min-width: 280px;
+            cursor: pointer;
         }
 
-        .notification::before {
+        .elite-podium-place::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            animation: notificationShimmer 2s infinite;
+            height: 6px;
+            background: var(--elite-gradient);
         }
 
-        .notification-message {
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        @keyframes notificationFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes notificationShimmer {
-            from { transform: translateX(-100%); }
-            to { transform: translateX(100%); }
-        }
-
-        /* Stats Bar */
-        .stats-bar {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin: 2rem 0;
-            flex-wrap: wrap;
-        }
-
-        .stat-item {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 1.5rem 2rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.5s;
-        }
-
-        .stat-item:hover::before {
-            left: 100%;
-        }
-
-        .stat-item:hover {
-            transform: translateY(-5px);
+        .elite-podium-place:hover {
+            transform: translateY(-15px) scale(1.05);
             box-shadow: var(--shadow-hover);
         }
 
-        .stat-number {
+        .elite-podium-first {
+            order: 2;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, var(--glass-bg) 100%);
+            border-color: rgba(255, 215, 0, 0.4);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.2);
+            transform: scale(1.1);
+        }
+
+        .elite-podium-second {
+            order: 1;
+            background: linear-gradient(135deg, rgba(192, 192, 192, 0.15) 0%, var(--glass-bg) 100%);
+            border-color: rgba(192, 192, 192, 0.4);
+            box-shadow: 0 0 40px rgba(192, 192, 192, 0.2);
+        }
+
+        .elite-podium-third {
+            order: 3;
+            background: linear-gradient(135deg, rgba(205, 127, 50, 0.15) 0%, var(--glass-bg) 100%);
+            border-color: rgba(205, 127, 50, 0.4);
+            box-shadow: 0 0 40px rgba(205, 127, 50, 0.2);
+        }
+
+        .elite-podium-rank {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .elite-podium-name {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .elite-podium-requests {
             font-size: 2rem;
             font-weight: 700;
             background: var(--success-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            margin-bottom: 1rem;
         }
 
-        .stat-label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 0.5rem;
-        }
-
-        /* Leaderboard Container */
-        .leaderboard-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem 4rem;
-        }
-
-        .leaderboard-header {
+        .elite-podium-tech {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .leaderboard-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .controls {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .search-box {
-            position: relative;
-        }
-
-        .search-box input {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-color);
-            border-radius: 25px;
-            padding: 0.75rem 1.5rem 0.75rem 3rem;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            width: 250px;
-            transition: all 0.3s ease;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: rgba(102, 126, 234, 0.5);
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .search-box::before {
-            content: '🔍';
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1rem;
-        }
-
-        .refresh-btn {
-            background: var(--primary-gradient);
-            border: none;
-            border-radius: 25px;
-            padding: 0.75rem 1.5rem;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .refresh-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-primary);
-        }
-
-        .refresh-btn:active {
-            transform: translateY(0);
-        }
-
-        .add-project-btn {
-            background: var(--success-gradient);
-            border: none;
-            border-radius: 25px;
-            padding: 0.75rem 1.5rem;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .add-project-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-primary);
-        }
-
-        .add-project-btn:active {
-            transform: translateY(0);
-        }
-
-        /* Home Button */
-        .home-btn {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            border: none;
-            border-radius: 25px;
-            padding: 0.75rem 1.5rem;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            display: inline-flex;
-            align-items: center;
+            justify-content: center;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
 
-        .home-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(67, 233, 123, 0.4);
-        }
-
-        .home-btn:active {
-            transform: translateY(0);
-        }
-
-        .home-btn-container {
-            margin: 2rem auto;
-            text-align: center;
-        }
-        /* Leaderboard Grid */
-        .leaderboard-grid {
-            display: grid;
-            gap: 1.5rem;
-        }
-
-        .leaderboard-item {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
+        .elite-podium-tech-badge {
+            background: rgba(59, 130, 246, 0.2);
             border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 2rem;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 15px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* Elite Charts Grid */
+        .elite-charts-grid {
+            max-width: 1400px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 3rem;
+        }
+
+        .elite-chart-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--border-color);
+            border-radius: 25px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-primary);
             position: relative;
             overflow: hidden;
-            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .leaderboard-item::before {
+        .elite-chart-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .elite-chart-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 4px;
-            background: var(--primary-gradient);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
+            background: var(--elite-gradient);
         }
 
-        .leaderboard-item:hover::before {
-            transform: scaleX(1);
-        }
-
-        .leaderboard-item:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: var(--shadow-hover);
-            border-color: rgba(102, 126, 234, 0.3);
-        }
-
-        .leaderboard-item.rank-1 {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, var(--card-bg) 100%);
-            border-color: rgba(255, 215, 0, 0.3);
-        }
-
-        .leaderboard-item.rank-2 {
-            background: linear-gradient(135deg, rgba(192, 192, 192, 0.1) 0%, var(--card-bg) 100%);
-            border-color: rgba(192, 192, 192, 0.3);
-        }
-
-        .leaderboard-item.rank-3 {
-            background: linear-gradient(135deg, rgba(205, 127, 50, 0.1) 0%, var(--card-bg) 100%);
-            border-color: rgba(205, 127, 50, 0.3);
-        }
-
-        .item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1.5rem;
-        }
-
-        .rank-badge {
-            background: var(--primary-gradient);
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1.2rem;
-            box-shadow: var(--shadow-primary);
-            position: relative;
-        }
-
-        .rank-badge.gold {
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            color: #000;
-            animation: goldGlow 2s ease-in-out infinite alternate;
-        }
-
-        .rank-badge.silver {
-            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
-            color: #000;
-        }
-
-        .rank-badge.bronze {
-            background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%);
-            color: #fff;
-        }
-
-        @keyframes goldGlow {
-            from { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
-            to { box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
-        }
-
-        .project-info {
-            flex: 1;
-            margin-left: 1.5rem;
-        }
-
-        .project-name {
+        .elite-chart-title {
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 0.5rem;
-        }
-
-        .project-description {
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-
-        .tech-stack {
             display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-bottom: 1.5rem;
-        }
-
-        .tech-badge {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--border-color);
-            border-radius: 15px;
-            padding: 0.4rem 0.8rem;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            transition: all 0.3s ease;
-        }
-
-        .tech-badge:hover {
-            background: var(--primary-gradient);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .project-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            align-items: center;
             gap: 1rem;
         }
 
-        .stat-box {
-            text-align: center;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
+        .elite-chart-subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 2rem;
         }
 
-        .stat-value {
-            font-size: 1.5rem;
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 1rem 0;
+        }
+
+        /* Elite Controls */
+        .elite-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 4rem auto 2rem;
+            max-width: 1400px;
+            padding: 0 2rem;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .elite-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .elite-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .elite-search {
+            position: relative;
+        }
+
+        .elite-search input {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--border-color);
+            border-radius: 30px;
+            padding: 1rem 1.5rem 1rem 3.5rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            width: 300px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .elite-search input:focus {
+            outline: none;
+            border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: var(--glow-blue);
+            transform: scale(1.02);
+        }
+
+        .elite-search::before {
+            content: '🔍';
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+
+        .elite-btn {
+            background: var(--elite-gradient);
+            border: none;
+            border-radius: 30px;
+            padding: 1rem 2rem;
+            color: white;
             font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .elite-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-primary);
+        }
+
+        .elite-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .elite-btn-success {
+            background: var(--success-gradient);
+        }
+
+        .elite-btn-warning {
+            background: var(--warning-gradient);
+        }
+
+        /* Elite Leaderboard */
+        .elite-leaderboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        .elite-project-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--border-color);
+            border-radius: 25px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .elite-project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: var(--elite-gradient);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .elite-project-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .elite-project-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .elite-project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .elite-rank-badge {
+            background: var(--elite-gradient);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            box-shadow: var(--shadow-primary);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .elite-project-info {
+            flex: 1;
+            margin-left: 2rem;
+        }
+
+        .elite-project-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .elite-project-description {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
+        .elite-tech-stack {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .elite-tech-badge {
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .elite-tech-badge:hover {
+            background: var(--elite-gradient);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .elite-project-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .elite-stat-box {
+            text-align: center;
+            padding: 1.2rem;
+            background: rgba(59, 130, 246, 0.08);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .elite-stat-box:hover {
+            transform: translateY(-5px);
+            background: rgba(59, 130, 246, 0.12);
+        }
+
+        .elite-stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
             background: var(--success-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            margin-bottom: 0.5rem;
         }
 
-        .stat-name {
+        .elite-stat-name {
             font-size: 0.8rem;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-top: 0.5rem;
+            font-weight: 600;
         }
 
-        /* Loading Animation */
-        .loading {
+        .elite-project-actions {
+            display: flex;
+            gap: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+        }
+
+        .elite-project-card:hover .elite-project-actions {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .elite-action-btn {
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .elite-action-btn:hover {
+            transform: translateY(-5px);
+        }
+
+        .elite-edit-btn:hover {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+        }
+
+        .elite-delete-btn:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Pagination */
+        .elite-pagination {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 200px;
-            flex-direction: column;
             gap: 1rem;
+            margin: 3rem 0;
+            flex-wrap: wrap;
         }
 
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top: 3px solid var(--primary-gradient);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Error State */
-        .error {
-            text-align: center;
-            padding: 3rem;
-            color: #ff6b6b;
-        }
-
-        .error h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--text-muted);
-        }
-
-        .empty-state h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
+        .elite-pagination-btn {
+            background: var(--glass-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 0.8rem 1.5rem;
             color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
         }
 
-        /* Modal Styles */
-        .modal-overlay {
+        .elite-pagination-btn:hover {
+            background: var(--elite-gradient);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .elite-pagination-btn.active {
+            background: var(--elite-gradient);
+            color: white;
+            border-color: transparent;
+        }
+
+        .elite-pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .elite-pagination-info {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0 1rem;
+        }
+
+        /* Elite Modal */
+        .elite-modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(15, 15, 35, 0.85);
-            backdrop-filter: blur(10px);
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(15px);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .modal-overlay.active {
+        .elite-modal-overlay.active {
             opacity: 1;
             visibility: visible;
         }
 
-        .modal {
+        .elite-modal {
             width: 90%;
             max-width: 700px;
-            background: linear-gradient(135deg, rgba(20, 20, 50, 0.95) 0%, rgba(15, 15, 35, 0.95) 100%);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--border-color);
+            border-radius: 25px;
             padding: 2.5rem;
             box-shadow: var(--shadow-hover);
-            transform: translateY(30px);
-            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: translateY(50px) scale(0.9);
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
             overflow: hidden;
         }
 
-        .modal-overlay.active .modal {
-            transform: translateY(0);
+        .elite-modal-overlay.active .elite-modal {
+            transform: translateY(0) scale(1);
         }
 
-        .modal::before {
+        .elite-modal::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 4px;
-            background: var(--secondary-gradient);
+            height: 6px;
+            background: var(--elite-gradient);
         }
 
-        .modal-header {
+        .elite-modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
         }
 
-        .modal-title {
+        .elite-modal-title {
             font-size: 1.8rem;
-            font-weight: 700;
+            font-weight: 800;
             color: var(--text-primary);
         }
 
-        .close-modal {
+        .elite-close-modal {
             background: none;
             border: none;
             color: var(--text-muted);
-            font-size: 1.5rem;
+            font-size: 2rem;
             cursor: pointer;
             transition: all 0.3s ease;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .close-modal:hover {
+        .elite-close-modal:hover {
             color: var(--text-primary);
             transform: rotate(90deg);
+            background: rgba(59, 130, 246, 0.1);
         }
 
-        .form-group {
+        .elite-form-group {
             margin-bottom: 1.5rem;
         }
 
-        .form-label {
+        .elite-form-label {
             display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
+            margin-bottom: 0.6rem;
+            font-weight: 700;
             color: var(--text-secondary);
+            font-size: 1rem;
         }
 
-        .form-input {
+        .elite-form-input {
             width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 0.8rem 1.2rem;
+            background: rgba(59, 130, 246, 0.08);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 1rem 1.2rem;
             color: var(--text-primary);
             font-size: 1rem;
             transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-weight: 500;
         }
 
-        .form-input:focus {
+        .elite-form-input:focus {
             outline: none;
-            border-color: rgba(102, 126, 234, 0.5);
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+            border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: var(--glow-blue);
+            transform: scale(1.02);
         }
 
-        .form-select {
+        .elite-form-select {
             width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 0.8rem 1.2rem;
+            background: rgba(59, 130, 246, 0.08);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 1rem 1.2rem;
             color: var(--text-primary);
             font-size: 1rem;
             transition: all 0.3s ease;
             appearance: none;
+            backdrop-filter: blur(10px);
+            font-weight: 500;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 1rem center;
+            background-position: right 1.2rem center;
             background-size: 1rem;
         }
 
-        .form-select:focus {
+        .elite-form-select:focus {
             outline: none;
-            border-color: rgba(102, 126, 234, 0.5);
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+            border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: var(--glow-blue);
         }
 
-        /* Fix for select options - make them dark with light text */
-        .form-select option {
-            background-color: #1a1a3e;
-            color: #ffffff;
-            padding: 0.5rem;
-        }
-
-        .form-select option:hover {
-            background-color: #2d2d5f;
-        }
-
-        .form-actions {
+        .elite-form-actions {
             display: flex;
             justify-content: flex-end;
             gap: 1rem;
             margin-top: 2rem;
         }
 
-        /* Button Styles */
-        .btn {
-            border: none;
-            border-radius: 25px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
+        /* Loading States */
+        .elite-loading {
+            display: flex;
             justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-primary);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-primary {
-            background: var(--primary-gradient);
-            color: white;
-        }
-
-        .btn-success {
-            background: var(--success-gradient);
-            color: white;
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%);
-            color: white;
-        }
-
-        .btn-neutral {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-
-        /* Project Action Buttons */
-        .project-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-            margin-top: 1.5rem;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.3s ease;
-        }
-
-        .leaderboard-item:hover .project-actions {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .action-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1.2rem;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-5px);
-        }
-
-        .edit-btn:hover {
-            background: var(--primary-gradient);
-            color: white;
-            border-color: transparent;
-        }
-
-        .delete-btn:hover {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%);
-            color: white;
-            border-color: transparent;
-        }
-
-        /* Tooltip Styles */
-        .tooltip {
-            position: relative;
-        }
-
-        .tooltip::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%) translateY(-5px);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 0.5rem 0.8rem;
-            border-radius: 5px;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .tooltip:hover::after {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(-10px);
-        }
-
-        /* Confirmation Dialog */
-        .confirm-dialog {
-            display: flex;
+            height: 300px;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+            gap: 2rem;
         }
 
-        .confirm-dialog.active {
-            opacity: 1;
-            visibility: visible;
+        .elite-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(59, 130, 246, 0.1);
+            border-top: 4px solid var(--elite-gradient);
+            border-radius: 50%;
+            animation: eliteSpin 1.5s linear infinite;
         }
 
-        .confirm-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: #ff6b6b;
+        @keyframes eliteSpin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
-        .confirm-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
+        /* Empty State */
+        .elite-empty-state {
             text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
         }
 
-        .confirm-message {
-            text-align: center;
-            margin-bottom: 2rem;
+        .elite-empty-state h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
             color: var(--text-secondary);
         }
 
-        .confirm-buttons {
-            display: flex;
-            gap: 1rem;
+        /* Activity Score Badges */
+        .elite-score-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 15px;
+            font-weight: 800;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .elite-score-s-plus {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .elite-score-s {
+            background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+            color: white;
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
+        }
+
+        .elite-score-a {
+            background: linear-gradient(135deg, #0284c7 0%, #0891b2 100%);
+            color: white;
+            box-shadow: 0 0 15px rgba(2, 132, 199, 0.4);
+        }
+
+        .elite-score-b {
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .elite-score-c {
+            background: linear-gradient(135deg, #64748b 0%, #94a3b8 100%);
+            color: white;
+        }
+
+        .elite-score-d {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--text-muted);
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .header {
-                padding: 2rem 1rem 1rem;
+            .elite-header {
+                padding: 2rem 1rem 1.5rem;
             }
 
-            .stats-bar {
-                gap: 1rem;
+            .elite-charts-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 0 1rem;
             }
 
-            .stat-item {
-                padding: 1rem 1.5rem;
-            }
-
-            .leaderboard-container {
-                padding: 0 1rem 2rem;
-            }
-
-            .leaderboard-header {
+            .elite-controls {
                 flex-direction: column;
                 align-items: stretch;
+                padding: 0 1rem;
             }
 
-            .controls {
+            .elite-actions {
                 justify-content: center;
             }
 
-            .search-box input {
-                width: 200px;
+            .elite-search input {
+                width: 100%;
             }
 
-            .leaderboard-item {
-                padding: 1.5rem;
+            .elite-leaderboard {
+                padding: 0 1rem 2rem;
             }
 
-            .item-header {
+            .elite-project-card {
+                padding: 2rem;
+            }
+
+            .elite-project-header {
                 flex-direction: column;
                 gap: 1rem;
             }
 
-            .project-info {
+            .elite-project-info {
                 margin-left: 0;
             }
 
-            .project-stats {
+            .elite-project-stats {
                 grid-template-columns: repeat(2, 1fr);
+            }
+
+            .elite-podium {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .elite-podium-place {
+                min-width: 250px;
+            }
+
+            .elite-podium-first {
+                order: 1;
+                transform: none;
+            }
+
+            .elite-podium-second {
+                order: 2;
+            }
+
+            .elite-podium-third {
+                order: 3;
             }
         }
 
-        /* Scroll animations */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.6s ease;
-        }
-
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Custom scrollbar */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 10px;
         }
 
         ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 5px;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--primary-gradient);
-            border-radius: 4px;
+            background: var(--elite-gradient);
+            border-radius: 5px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
@@ -985,91 +1002,140 @@
     </style>
 </head>
 <body>
-<div class="background-animation"></div>
-<div class="particles" id="particles"></div>
+<div class="elite-background"></div>
+<div class="elite-particles" id="eliteParticles"></div>
 
-<header class="header">
-    <h1>Code Forge Leaderboard</h1>
-    <p>Discover the most innovative and active projects in our ecosystem</p>
+<header class="elite-header">
+    <h1>Elite Leaderboard</h1>
+    <p>Discover the most innovative and high-performing projects in our elite ecosystem</p>
 </header>
 
-<!-- Notification Message Display -->
-<div th:if="${message}" class="notification">
-    <div class="notification-message">
-        <strong>✨ Your project is already build! ✨</strong>
-        <p th:text="${message}"></p>
+<!-- Elite Royalty Podium -->
+<div class="elite-royalty">
+    <h2 class="elite-royalty-title">
+        <span>👑</span>
+        Elite Royalty
+    </h2>
+    <div class="elite-podium" id="elitePodium">
+        <div class="elite-loading">
+            <div class="elite-spinner"></div>
+            <p>Loading elite royalty...</p>
+        </div>
     </div>
 </div>
 
-<div class="stats-bar" id="statsBar">
-    <div class="stat-item">
-        <div class="stat-number" id="totalProjects">-</div>
-        <div class="stat-label">Total Projects</div>
+<!-- Elite Charts Grid -->
+<div class="elite-charts-grid">
+    <!-- Technology Distribution Chart -->
+    <div class="elite-chart-card">
+        <h3 class="elite-chart-title">
+            <span>📊</span>
+            Technology Distribution
+        </h3>
+        <p class="elite-chart-subtitle">Distribution of technologies across all projects</p>
+        <div class="chart-container">
+            <canvas id="technologyChart"></canvas>
+        </div>
     </div>
-    <div class="stat-item">
-        <div class="stat-number" id="topFrontend">-</div>
-        <div class="stat-label">Top Frontend</div>
+
+    <!-- Project Timeline Chart -->
+    <div class="elite-chart-card">
+        <h3 class="elite-chart-title">
+            <span>📈</span>
+            Project Timeline
+        </h3>
+        <p class="elite-chart-subtitle">Project creation over time</p>
+        <div class="chart-container">
+            <canvas id="timelineChart"></canvas>
+        </div>
     </div>
-    <div class="stat-item">
-        <div class="stat-number" id="topBackend">-</div>
-        <div class="stat-label">Top Backend</div>
+
+    <!-- Activity Scores Chart -->
+    <div class="elite-chart-card">
+        <h3 class="elite-chart-title">
+            <span>⚡</span>
+            Activity Scores
+        </h3>
+        <p class="elite-chart-subtitle">Distribution of project activity levels</p>
+        <div class="chart-container">
+            <canvas id="activityChart"></canvas>
+        </div>
     </div>
-    <div class="stat-item">
-        <div class="stat-number" id="topDatabase">-</div>
-        <div class="stat-label">Top Database</div>
+
+    <!-- Tech Pairings Chart -->
+    <div class="elite-chart-card">
+        <h3 class="elite-chart-title">
+            <span>🔗</span>
+            Popular Tech Stacks
+        </h3>
+        <p class="elite-chart-subtitle">Most popular technology combinations</p>
+        <div class="chart-container">
+            <canvas id="techPairingsChart"></canvas>
+        </div>
     </div>
 </div>
 
-<div class="leaderboard-container">
-    <div class="leaderboard-header">
-        <h2 class="leaderboard-title">🏆 Project Rankings</h2>
-        <div class="controls">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search projects...">
-            </div>
-            <button class="add-project-btn" id="addProjectBtn">
-                <span>Add Project</span>
-            </button>
-            <button class="refresh-btn" id="refreshBtn">
-                <span id="refreshText">Refresh</span>
-            </button>
+<!-- Elite Controls -->
+<div class="elite-controls">
+    <h2 class="elite-title">
+        <span>🏆</span>
+        All Projects
+    </h2>
+    <div class="elite-actions">
+        <div class="elite-search">
+            <input type="text" id="searchInput" placeholder="Search elite projects...">
         </div>
-    </div>
-
-    <div class="leaderboard-grid" id="leaderboardGrid">
-        <div class="loading">
-            <div class="spinner"></div>
-            <p>Loading amazing projects...</p>
-        </div>
-    </div>
-
-    <!-- Home Button -->
-    <div class="home-btn-container">
-        <button class="home-btn" id="homeBtn">
-            <span>🏠 Go Back to Home Page</span>
+        <button class="elite-btn elite-btn-success" id="addProjectBtn">
+            <span>➕</span>
+            Add Project
+        </button>
+        <button class="elite-btn" id="refreshBtn">
+            <span id="refreshIcon">🔄</span>
+            <span id="refreshText">Refresh</span>
+        </button>
+        <button class="elite-btn elite-btn-warning" id="homeBtn">
+            <span>🏠</span>
+            Home
         </button>
     </div>
 </div>
 
+<!-- Elite Leaderboard -->
+<div class="elite-leaderboard">
+    <div id="leaderboardGrid">
+        <div class="elite-loading">
+            <div class="elite-spinner"></div>
+            <p>Loading elite projects...</p>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="elite-pagination" id="elitePagination">
+        <!-- Pagination will be generated by JavaScript -->
+    </div>
+</div>
+
 <!-- Add Project Modal -->
-<div class="modal-overlay" id="addProjectModal">
-    <div class="modal">
-        <div class="modal-header">
-            <h3 class="modal-title">✨ Create New Project</h3>
-            <button class="close-modal" id="closeAddModal">&times;</button>
+<div class="elite-modal-overlay" id="addProjectModal">
+    <div class="elite-modal">
+        <div class="elite-modal-header">
+            <h3 class="elite-modal-title">✨ Create Elite Project</h3>
+            <button class="elite-close-modal" id="closeAddModal">&times;</button>
         </div>
         <form id="addProjectForm">
-            <div class="form-group">
-                <label for="name" class="form-label">Project Name</label>
-                <input type="text" id="name" name="name" class="form-input" placeholder="Enter project name" required>
+            <div class="elite-form-group">
+                <label for="name" class="elite-form-label">Project Name</label>
+                <input type="text" id="name" name="name" class="elite-form-input" placeholder="Enter elite project name"
+                       required>
             </div>
-            <div class="form-group">
-                <label for="description" class="form-label">Project Description</label>
-                <textarea id="description" name="description" class="form-input" rows="3" placeholder="Enter project description"></textarea>
+            <div class="elite-form-group">
+                <label for="description" class="elite-form-label">Project Description</label>
+                <textarea id="description" name="description" class="elite-form-input" rows="3"
+                          placeholder="Describe your elite project"></textarea>
             </div>
-            <div class="form-group">
-                <label for="frontendType" class="form-label">Frontend Framework</label>
-                <select id="frontendType" name="frontendType" class="form-select" required>
+            <div class="elite-form-group">
+                <label for="frontendType" class="elite-form-label">Frontend Framework</label>
+                <select id="frontendType" name="frontendType" class="elite-form-select" required>
                     <option value="">Select Frontend Framework</option>
                     <option value="REACT">React</option>
                     <option value="ANGULAR">Angular</option>
@@ -1077,9 +1143,9 @@
                     <option value="NEXT_JS">Next.js</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label for="backendType" class="form-label">Backend Framework</label>
-                <select id="backendType" name="backendType" class="form-select" required>
+            <div class="elite-form-group">
+                <label for="backendType" class="elite-form-label">Backend Framework</label>
+                <select id="backendType" name="backendType" class="elite-form-select" required>
                     <option value="">Select Backend Framework</option>
                     <option value="SPRING_BOOT">Spring Boot</option>
                     <option value="EXPRESS">Express</option>
@@ -1087,9 +1153,9 @@
                     <option value="FLASK">Flask</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label for="databaseType" class="form-label">Database</label>
-                <select id="databaseType" name="databaseType" class="form-select" required>
+            <div class="elite-form-group">
+                <label for="databaseType" class="elite-form-label">Database</label>
+                <select id="databaseType" name="databaseType" class="elite-form-select" required>
                     <option value="">Select Database</option>
                     <option value="MONGODB">MongoDB</option>
                     <option value="MYSQL">MySQL</option>
@@ -1097,34 +1163,36 @@
                     <option value="SQLITE">SQLite</option>
                 </select>
             </div>
-            <div class="form-actions">
-                <button type="button" class="btn btn-neutral" id="cancelAddProject">Cancel</button>
-                <button type="submit" class="btn btn-success">Create Project</button>
+            <div class="elite-form-actions">
+                <button type="button" class="elite-btn" id="cancelAddProject" style="background: rgba(59,130,246,0.1);">
+                    Cancel
+                </button>
+                <button type="submit" class="elite-btn elite-btn-success">Create Elite Project</button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Edit Project Modal -->
-<div class="modal-overlay" id="editProjectModal">
-    <div class="modal">
-        <div class="modal-header">
-            <h3 class="modal-title">🔧 Edit Project</h3>
-            <button class="close-modal" id="closeEditModal">&times;</button>
+<div class="elite-modal-overlay" id="editProjectModal">
+    <div class="elite-modal">
+        <div class="elite-modal-header">
+            <h3 class="elite-modal-title">🔧 Edit Elite Project</h3>
+            <button class="elite-close-modal" id="closeEditModal">&times;</button>
         </div>
         <form id="editProjectForm">
             <input type="hidden" id="editProjectId" name="id">
-            <div class="form-group">
-                <label for="editName" class="form-label">Project Name</label>
-                <input type="text" id="editName" name="name" class="form-input" placeholder="Enter project name" required>
+            <div class="elite-form-group">
+                <label for="editName" class="elite-form-label">Project Name</label>
+                <input type="text" id="editName" name="name" class="elite-form-input" required>
             </div>
-            <div class="form-group">
-                <label for="editDescription" class="form-label">Project Description</label>
-                <textarea id="editDescription" name="description" class="form-input" rows="3" placeholder="Enter project description"></textarea>
+            <div class="elite-form-group">
+                <label for="editDescription" class="elite-form-label">Project Description</label>
+                <textarea id="editDescription" name="description" class="elite-form-input" rows="3"></textarea>
             </div>
-            <div class="form-group">
-                <label for="editFrontendType" class="form-label">Frontend Framework</label>
-                <select id="editFrontendType" name="frontendType" class="form-select" required>
+            <div class="elite-form-group">
+                <label for="editFrontendType" class="elite-form-label">Frontend Framework</label>
+                <select id="editFrontendType" name="frontendType" class="elite-form-select" required>
                     <option value="">Select Frontend Framework</option>
                     <option value="REACT">React</option>
                     <option value="ANGULAR">Angular</option>
@@ -1132,9 +1200,9 @@
                     <option value="NEXT_JS">Next.js</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label for="editBackendType" class="form-label">Backend Framework</label>
-                <select id="editBackendType" name="backendType" class="form-select" required>
+            <div class="elite-form-group">
+                <label for="editBackendType" class="elite-form-label">Backend Framework</label>
+                <select id="editBackendType" name="backendType" class="elite-form-select" required>
                     <option value="">Select Backend Framework</option>
                     <option value="SPRING_BOOT">Spring Boot</option>
                     <option value="EXPRESS">Express</option>
@@ -1142,9 +1210,9 @@
                     <option value="FLASK">Flask</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label for="editDatabaseType" class="form-label">Database</label>
-                <select id="editDatabaseType" name="databaseType" class="form-select" required>
+            <div class="elite-form-group">
+                <label for="editDatabaseType" class="elite-form-label">Database</label>
+                <select id="editDatabaseType" name="databaseType" class="elite-form-select" required>
                     <option value="">Select Database</option>
                     <option value="MONGODB">MongoDB</option>
                     <option value="MYSQL">MySQL</option>
@@ -1152,70 +1220,158 @@
                     <option value="SQLITE">SQLite</option>
                 </select>
             </div>
-            <div class="form-actions">
-                <button type="button" class="btn btn-neutral" id="cancelEditProject">Cancel</button>
-                <button type="submit" class="btn btn-primary">Update Project</button>
+            <div class="elite-form-actions">
+                <button type="button" class="elite-btn" id="cancelEditProject"
+                        style="background: rgba(59,130,246,0.1);">Cancel
+                </button>
+                <button type="submit" class="elite-btn">Update Elite Project</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal-overlay" id="deleteProjectModal">
-    <div class="modal">
-        <div class="modal-header">
-            <h3 class="modal-title">🗑️ Delete Project</h3>
-            <button class="close-modal" id="closeDeleteModal">&times;</button>
-        </div>
-        <div class="confirm-dialog" id="confirmDialog">
-            <div class="confirm-icon">⚠️</div>
-            <h3 class="confirm-title">Delete Project?</h3>
-            <p class="confirm-message">Are you sure you want to delete this project? This action cannot be undone.</p>
-            <div class="confirm-buttons">
-                <button class="btn btn-neutral" id="cancelDeleteProject">Cancel</button>
-                <button class="btn btn-danger" id="confirmDeleteProject">Delete</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
     // Configuration
-    const API_BASE_URL = 'http://localhost:8080/api'; // Update this to your actual API URL
+    const API_BASE_URL = 'http://localhost:8080/api';
+    const PROJECTS_PER_PAGE = 5;
 
     // Global state
     let allProjects = [];
     let filteredProjects = [];
+    let currentPage = 1;
+    let totalPages = 1;
     let isLoading = false;
-    let currentProjectToDelete = null;
+    let charts = {};
 
-    // DOM Elements
-    const totalProjectsEl = document.getElementById('totalProjects');
-    const topFrontendEl = document.getElementById('topFrontend');
-    const topBackendEl = document.getElementById('topBackend');
-    const topDatabaseEl = document.getElementById('topDatabase');
-    const leaderboardGridEl = document.getElementById('leaderboardGrid');
-    const searchInputEl = document.getElementById('searchInput');
-    const refreshBtnEl = document.getElementById('refreshBtn');
-    const refreshTextEl = document.getElementById('refreshText');
-    const addProjectModalEl = document.getElementById('addProjectModal');
-    const closeAddModalEl = document.getElementById('closeAddModal');
-    const addProjectFormEl = document.getElementById('addProjectForm');
-    const editProjectModalEl = document.getElementById('editProjectModal');
-    const closeEditModalEl = document.getElementById('closeEditModal');
-    const editProjectFormEl = document.getElementById('editProjectForm');
-    const deleteProjectModalEl = document.getElementById('deleteProjectModal');
-    const closeDeleteModalEl = document.getElementById('closeDeleteModal');
-    const confirmDeleteProjectEl = document.getElementById('confirmDeleteProject');
-    const confirmDialogEl = document.getElementById('confirmDialog');
+    // Mock data for development/testing
+    const mockProjects = [
+        {
+            id: 1,
+            projectName: "Elite React Dashboard",
+            projectDescription: "A comprehensive dashboard built with React and modern UI components",
+            frontendType: "REACT",
+            backendType: "SPRING_BOOT",
+            databaseType: "POSTGRESQL",
+            requestCount: 1250,
+            lastRequestedAt: "2024-01-15T10:30:00Z",
+            createdAt: "2024-01-01T08:00:00Z"
+        },
+        {
+            id: 2,
+            projectName: "Vue E-commerce Platform",
+            projectDescription: "Full-featured e-commerce solution with Vue.js frontend",
+            frontendType: "VUE",
+            backendType: "EXPRESS",
+            databaseType: "MONGODB",
+            requestCount: 890,
+            lastRequestedAt: "2024-01-14T15:45:00Z",
+            createdAt: "2024-01-02T09:15:00Z"
+        },
+        {
+            id: 3,
+            projectName: "Angular CRM System",
+            projectDescription: "Customer relationship management system built with Angular",
+            frontendType: "ANGULAR",
+            backendType: "DJANGO",
+            databaseType: "MYSQL",
+            requestCount: 675,
+            lastRequestedAt: "2024-01-13T12:20:00Z",
+            createdAt: "2024-01-03T11:30:00Z"
+        },
+        {
+            id: 4,
+            projectName: "Next.js Blog Platform",
+            projectDescription: "Modern blog platform with SSR capabilities",
+            frontendType: "NEXT_JS",
+            backendType: "EXPRESS",
+            databaseType: "POSTGRESQL",
+            requestCount: 445,
+            lastRequestedAt: "2024-01-12T09:10:00Z",
+            createdAt: "2024-01-04T14:45:00Z"
+        },
+        {
+            id: 5,
+            projectName: "React Native Mobile App",
+            projectDescription: "Cross-platform mobile application",
+            frontendType: "REACT",
+            backendType: "FLASK",
+            databaseType: "SQLITE",
+            requestCount: 320,
+            lastRequestedAt: "2024-01-11T16:30:00Z",
+            createdAt: "2024-01-05T10:20:00Z"
+        },
+        {
+            id: 6,
+            projectName: "Vue Analytics Dashboard",
+            projectDescription: "Real-time analytics dashboard with beautiful charts",
+            frontendType: "VUE",
+            backendType: "SPRING_BOOT",
+            databaseType: "MONGODB",
+            requestCount: 180,
+            lastRequestedAt: "2024-01-10T13:15:00Z",
+            createdAt: "2024-01-06T12:00:00Z"
+        },
+        {
+            id: 7,
+            projectName: "Angular Task Manager",
+            projectDescription: "Project management and task tracking application",
+            frontendType: "ANGULAR",
+            backendType: "EXPRESS",
+            databaseType: "MYSQL",
+            requestCount: 95,
+            lastRequestedAt: "2024-01-09T11:45:00Z",
+            createdAt: "2024-01-07T15:30:00Z"
+        },
+        {
+            id: 8,
+            projectName: "React Portfolio Site",
+            projectDescription: "Personal portfolio website with modern design",
+            frontendType: "REACT",
+            backendType: "DJANGO",
+            databaseType: "SQLITE",
+            requestCount: 45,
+            lastRequestedAt: "2024-01-08T08:20:00Z",
+            createdAt: "2024-01-08T16:10:00Z"
+        }
+    ];
 
-    // Helper function to get a valid project ID
+    // Mock dashboard data
+    const mockDashboardData = {
+        topFrontendFrameworks: {
+            "REACT": 3,
+            "VUE": 2,
+            "ANGULAR": 2,
+            "NEXT_JS": 1
+        },
+        topBackendFrameworks: {
+            "SPRING_BOOT": 2,
+            "EXPRESS": 3,
+            "DJANGO": 2,
+            "FLASK": 1
+        },
+        topDatabases: {
+            "POSTGRESQL": 2,
+            "MONGODB": 2,
+            "MYSQL": 2,
+            "SQLITE": 2
+        }
+    };
+
+    // Mock leaderboard data
+    const mockLeaderboardData = {
+        leaderboardProjects: mockProjects,
+        projectCreationTimeline: {
+            "2024-01": 8
+        }
+    };
+
+    // Helper function to get a valid project ID - FIXED VERSION FROM OLD FILE
     function getProjectId(project, index) {
         // Try multiple possible ID fields and fallback to index
         return project.id || project.projectId || project._id || `temp_${index}`;
     }
 
-    // Helper function to find project by ID with multiple fallbacks
+    // Helper function to find project by ID with multiple fallbacks - FIXED VERSION FROM OLD FILE
     function findProjectById(projectId) {
         return allProjects.find(p => {
             const pid = getProjectId(p, allProjects.indexOf(p));
@@ -1223,30 +1379,33 @@
         });
     }
 
-    // Make functions accessible globally
-    window.openAddModal = openAddModal;
-    window.openEditModal = openEditModal;
-    window.openDeleteModal = openDeleteModal;
+    // DOM Elements
+    const elitePodiumEl = document.getElementById('elitePodium');
+    const leaderboardGridEl = document.getElementById('leaderboardGrid');
+    const searchInputEl = document.getElementById('searchInput');
+    const refreshBtnEl = document.getElementById('refreshBtn');
+    const refreshTextEl = document.getElementById('refreshText');
+    const refreshIconEl = document.getElementById('refreshIcon');
+    const paginationEl = document.getElementById('elitePagination');
 
     // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-        createParticles();
-        loadLeaderboardData();
+    document.addEventListener('DOMContentLoaded', function () {
+        createEliteParticles();
+        loadEliteData();
         setupEventListeners();
-        setupScrollAnimations();
     });
 
-    // Create floating particles
-    function createParticles() {
-        const particlesContainer = document.getElementById('particles');
-        const particleCount = 50;
+    // Create elite floating particles
+    function createEliteParticles() {
+        const particlesContainer = document.getElementById('eliteParticles');
+        const particleCount = 60;
 
         for (let i = 0; i < particleCount; i++) {
             const particle = document.createElement('div');
-            particle.className = 'particle';
+            particle.className = 'elite-particle';
             particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 10 + 's';
-            particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            particle.style.animationDelay = Math.random() * 15 + 's';
+            particle.style.animationDuration = (Math.random() * 15 + 15) + 's';
             particlesContainer.appendChild(particle);
         }
     }
@@ -1256,39 +1415,26 @@
         searchInputEl.addEventListener('input', handleSearch);
         refreshBtnEl.addEventListener('click', handleRefresh);
         document.getElementById('addProjectBtn').addEventListener('click', openAddModal);
-        document.getElementById('cancelAddProject').addEventListener('click', () => toggleModal(addProjectModalEl, false));
-        document.getElementById('cancelEditProject').addEventListener('click', () => toggleModal(editProjectModalEl, false));
-        document.getElementById('cancelDeleteProject').addEventListener('click', () => toggleModal(deleteProjectModalEl, false));
-        closeAddModalEl.addEventListener('click', () => toggleModal(addProjectModalEl, false));
-        closeEditModalEl.addEventListener('click', () => toggleModal(editProjectModalEl, false));
-        closeDeleteModalEl.addEventListener('click', () => toggleModal(deleteProjectModalEl, false));
-        addProjectFormEl.addEventListener('submit', handleAddProject);
-        editProjectFormEl.addEventListener('submit', handleEditProject);
-        confirmDeleteProjectEl.addEventListener('click', handleDeleteProject);
         document.getElementById('homeBtn').addEventListener('click', () => window.location.href = '/');
 
+        // Modal event listeners
+        document.getElementById('closeAddModal').addEventListener('click', () => toggleModal('addProjectModal', false));
+        document.getElementById('closeEditModal').addEventListener('click', () => toggleModal('editProjectModal', false));
+        document.getElementById('cancelAddProject').addEventListener('click', () => toggleModal('addProjectModal', false));
+        document.getElementById('cancelEditProject').addEventListener('click', () => toggleModal('editProjectModal', false));
+        document.getElementById('addProjectForm').addEventListener('submit', handleAddProject);
+        document.getElementById('editProjectForm').addEventListener('submit', handleEditProject);
+
         // Close modals when clicking outside
-        addProjectModalEl.addEventListener('click', (e) => {
-            if (e.target === addProjectModalEl) toggleModal(addProjectModalEl, false);
+        document.getElementById('addProjectModal').addEventListener('click', (e) => {
+            if (e.target.id === 'addProjectModal') toggleModal('addProjectModal', false);
         });
-        editProjectModalEl.addEventListener('click', (e) => {
-            if (e.target === editProjectModalEl) toggleModal(editProjectModalEl, false);
-        });
-        deleteProjectModalEl.addEventListener('click', (e) => {
-            if (e.target === deleteProjectModalEl) toggleModal(deleteProjectModalEl, false);
+        document.getElementById('editProjectModal').addEventListener('click', (e) => {
+            if (e.target.id === 'editProjectModal') toggleModal('editProjectModal', false);
         });
     }
 
-    // Open Add Project Modal
-    function openAddModal() {
-        console.log('Opening Add Modal');
-        // Reset form
-        addProjectFormEl.reset();
-        // Show modal
-        toggleModal(addProjectModalEl, true);
-    }
-
-    // Open Edit Project Modal
+    // FIXED EDIT MODAL FUNCTION FROM OLD VERSION
     function openEditModal(projectId) {
         console.log('Opening Edit Modal for ID:', projectId);
 
@@ -1327,14 +1473,14 @@
             console.log('Form populated successfully');
 
             // Show modal
-            toggleModal(editProjectModalEl, true);
+            toggleModal('editProjectModal', true);
         } catch (error) {
             console.error('Error populating edit form:', error);
             alert('Error opening edit modal: ' + error.message);
         }
     }
 
-    // Open Delete Project Modal
+    // FIXED DELETE MODAL FUNCTION FROM OLD VERSION
     function openDeleteModal(projectId) {
         console.log('Opening Delete Modal for ID:', projectId);
 
@@ -1354,244 +1500,600 @@
 
         console.log('Found project for deletion:', project);
 
-        // Store project to delete
-        currentProjectToDelete = getProjectId(project, allProjects.indexOf(project));
-
-        // Show confirmation dialog
-        confirmDialogEl.classList.add('active');
-
-        // Show modal
-        toggleModal(deleteProjectModalEl, true);
+        // Show confirmation and handle deletion
+        if (confirm('Are you sure you want to delete this elite project? This action cannot be undone.')) {
+            handleDeleteProject(getProjectId(project, allProjects.indexOf(project)));
+        }
     }
 
-    // Setup scroll animations
-    function setupScrollAnimations() {
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, observerOptions);
-
-        // Observe elements as they're added
-        const observeElements = () => {
-            document.querySelectorAll('.fade-in:not(.visible)').forEach(el => {
-                observer.observe(el);
-            });
-        };
-
-        // Initial observation
-        setTimeout(observeElements, 100);
-
-        // Re-observe after content updates
-        window.observeElements = observeElements;
-    }
-
-    // Load leaderboard data
-    async function loadLeaderboardData() {
+    // Load elite data
+    async function loadEliteData() {
         if (isLoading) return;
 
         isLoading = true;
         showLoading();
 
         try {
-            // Load dashboard analytics
-            const dashboardResponse = await fetch(`${API_BASE_URL}/analytics/dashboard`);
-            if (!dashboardResponse.ok) {
-                throw new Error(`Dashboard API error: ${dashboardResponse.status}`);
+            let dashboardData, leaderboardData;
+
+            // Try to load from API first, fallback to mock data
+            try {
+                const [dashboardResponse, leaderboardResponse] = await Promise.all([
+                    fetch(`${API_BASE_URL}/analytics/dashboard`),
+                    fetch(`${API_BASE_URL}/analytics/leaderboard`)
+                ]);
+
+                if (dashboardResponse.ok && leaderboardResponse.ok) {
+                    dashboardData = await dashboardResponse.json();
+                    leaderboardData = await leaderboardResponse.json();
+                    console.log('Elite data loaded from API successfully');
+                } else {
+                    throw new Error('API not available');
+                }
+            } catch (apiError) {
+                console.log('API not available, using mock data for demonstration');
+                dashboardData = mockDashboardData;
+                leaderboardData = mockLeaderboardData;
             }
-            const dashboardData = await dashboardResponse.json();
 
-            // Load total projects count
-            const countResponse = await fetch(`${API_BASE_URL}/projects/count`);
-            if (!countResponse.ok) {
-                throw new Error(`Count API error: ${countResponse.status}`);
-            }
-            const totalCount = await countResponse.json();
-
-            console.log('Data loaded successfully:', {
-                dashboardData: dashboardData,
-                totalCount: totalCount,
-                topProjectsCount: dashboardData.topProjects ? dashboardData.topProjects.length : 0
-            });
-
-            // Update stats
-            updateStats(dashboardData, totalCount);
+            // Update charts
+            updateAllCharts(dashboardData, leaderboardData);
 
             // Update leaderboard
-            if (dashboardData.topProjects && dashboardData.topProjects.length > 0) {
-                allProjects = dashboardData.topProjects.sort((a, b) => b.requestCount - a.requestCount);
+            if (leaderboardData.leaderboardProjects && leaderboardData.leaderboardProjects.length > 0) {
+                allProjects = leaderboardData.leaderboardProjects.sort((a, b) => b.requestCount - a.requestCount);
                 filteredProjects = [...allProjects];
 
-                console.log('Projects loaded:', allProjects.length);
-                console.log('Sample project structure:', allProjects[0]);
+                // Update podium
+                updateElitePodium();
 
-                updateLeaderboard();
+                // Update paginated leaderboard
+                updatePagination();
+                updateEliteLeaderboard();
             } else {
-                console.log('No projects found');
                 showEmptyState();
             }
 
         } catch (error) {
-            console.error('Error loading leaderboard data:', error);
-            showError('Failed to load leaderboard data. Please check your connection and try again.');
+            console.error('Error loading elite data:', error);
+            showError('Failed to load elite data. Using demo data for now.');
+
+            // Use mock data as fallback
+            const dashboardData = mockDashboardData;
+            const leaderboardData = mockLeaderboardData;
+
+            updateAllCharts(dashboardData, leaderboardData);
+            allProjects = leaderboardData.leaderboardProjects.sort((a, b) => b.requestCount - a.requestCount);
+            filteredProjects = [...allProjects];
+            updateElitePodium();
+            updatePagination();
+            updateEliteLeaderboard();
         } finally {
             isLoading = false;
         }
     }
 
-    // Update stats
-    function updateStats(data, totalCount) {
-        // Animate number counting
-        animateNumber(totalProjectsEl, totalCount);
+    // Update elite podium
+    function updateElitePodium() {
+        const topThree = allProjects.slice(0, 3);
 
-        // Update top technologies
-        const topFrontend = Object.keys(data.topFrontendFrameworks)[0] || 'N/A';
-        const topBackend = Object.keys(data.topBackendFrameworks)[0] || 'N/A';
-        const topDatabase = Object.keys(data.topDatabases)[0] || 'N/A';
+        if (topThree.length === 0) {
+            elitePodiumEl.innerHTML = `
+                    <div class="elite-empty-state">
+                        <h3>🚀 No Elite Projects Yet</h3>
+                        <p>Be the first to create an elite project!</p>
+                    </div>
+                `;
+            return;
+        }
 
-        topFrontendEl.textContent = formatTechName(topFrontend);
-        topBackendEl.textContent = formatTechName(topBackend);
-        topDatabaseEl.textContent = formatTechName(topDatabase);
+        const podiumHTML = topThree.map((project, index) => {
+            const rank = index + 1;
+            const rankEmoji = getRankEmoji(rank);
+            const placeClass = `elite-podium-${getRankName(rank)}`;
+
+            return `
+                    <div class="elite-podium-place ${placeClass}">
+                        <span class="elite-podium-rank">${rankEmoji}</span>
+                        <h3 class="elite-podium-name">${project.projectName || project.name || 'Unnamed Project'}</h3>
+                        <div class="elite-podium-requests">${project.requestCount} requests</div>
+                        <div class="elite-podium-tech">
+                            <span class="elite-podium-tech-badge">${formatTechName(project.frontendType)}</span>
+                            <span class="elite-podium-tech-badge">${formatTechName(project.backendType)}</span>
+                            <span class="elite-podium-tech-badge">${formatTechName(project.databaseType)}</span>
+                        </div>
+                    </div>
+                `;
+        }).join('');
+
+        elitePodiumEl.innerHTML = podiumHTML;
     }
 
-    // Animate number counting
-    function animateNumber(element, target) {
-        const duration = 2000;
-        const start = parseInt(element.textContent) || 0;
-        const increment = (target - start) / (duration / 16);
-        let current = start;
+    // Update all charts
+    function updateAllCharts(dashboardData, leaderboardData) {
+        updateTechnologyChart(dashboardData);
+        updateTimelineChart(leaderboardData);
+        updateActivityChart();
+        updateTechPairingsChart(dashboardData);
+    }
 
-        const timer = setInterval(() => {
-            current += increment;
-            if (current >= target) {
-                current = target;
-                clearInterval(timer);
+    // Update technology distribution chart
+    function updateTechnologyChart(dashboardData) {
+        const ctx = document.getElementById('technologyChart').getContext('2d');
+
+        if (charts.technology) {
+            charts.technology.destroy();
+        }
+
+        const chartData = [];
+        const colors = ['#3b82f6', '#0ea5e9', '#06b6d4', '#0891b2', '#0284c7', '#1d4ed8', '#2563eb'];
+        let colorIndex = 0;
+
+        // Add all technology data
+        Object.entries(dashboardData.topFrontendFrameworks).forEach(([tech, count]) => {
+            chartData.push({
+                label: formatTechName(tech),
+                data: count,
+                backgroundColor: colors[colorIndex % colors.length],
+            });
+            colorIndex++;
+        });
+
+        Object.entries(dashboardData.topBackendFrameworks).forEach(([tech, count]) => {
+            chartData.push({
+                label: formatTechName(tech),
+                data: count,
+                backgroundColor: colors[colorIndex % colors.length],
+            });
+            colorIndex++;
+        });
+
+        Object.entries(dashboardData.topDatabases).forEach(([tech, count]) => {
+            chartData.push({
+                label: formatTechName(tech),
+                data: count,
+                backgroundColor: colors[colorIndex % colors.length],
+            });
+            colorIndex++;
+        });
+
+        charts.technology = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: chartData.map(item => item.label),
+                datasets: [{
+                    data: chartData.map(item => item.data),
+                    backgroundColor: chartData.map(item => item.backgroundColor),
+                    borderWidth: 2,
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            font: {size: 12, weight: '600'},
+                            padding: 15,
+                            usePointStyle: true,
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: 'white',
+                        bodyColor: 'white',
+                        borderColor: 'rgba(59, 130, 246, 0.2)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                    }
+                },
+                animation: {duration: 1500}
             }
-            element.textContent = Math.floor(current);
-        }, 16);
+        });
     }
 
-    // Update leaderboard
-    function updateLeaderboard() {
-        if (filteredProjects.length === 0) {
+    // Update timeline chart
+    function updateTimelineChart(leaderboardData) {
+        const ctx = document.getElementById('timelineChart').getContext('2d');
+
+        if (charts.timeline) {
+            charts.timeline.destroy();
+        }
+
+        const timelineData = leaderboardData.projectCreationTimeline || {};
+        const chartData = Object.entries(timelineData).map(([month, count]) => ({
+            x: month,
+            y: count
+        }));
+
+        charts.timeline = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: 'Projects Created',
+                    data: chartData,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#3b82f6',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            font: {size: 12, weight: '600'}
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: 'white',
+                        bodyColor: 'white',
+                        borderColor: 'rgba(59, 130, 246, 0.2)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {color: 'rgba(255, 255, 255, 0.7)'},
+                        grid: {color: 'rgba(59, 130, 246, 0.1)'}
+                    },
+                    y: {
+                        ticks: {color: 'rgba(255, 255, 255, 0.7)'},
+                        grid: {color: 'rgba(59, 130, 246, 0.1)'}
+                    }
+                },
+                animation: {duration: 1500}
+            }
+        });
+    }
+
+    // Update activity scores chart
+    function updateActivityChart() {
+        // Wait for projects to be loaded
+        if (!allProjects || allProjects.length === 0) {
+            setTimeout(() => updateActivityChart(), 100);
+            return;
+        }
+
+        const ctx = document.getElementById('activityChart').getContext('2d');
+
+        if (charts.activity) {
+            charts.activity.destroy();
+        }
+
+        const activityScores = {'S+': 0, 'S': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0};
+        allProjects.forEach(project => {
+            const score = getActivityScore(project.requestCount);
+            activityScores[score]++;
+        });
+
+        charts.activity = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(activityScores),
+                datasets: [{
+                    label: 'Number of Projects',
+                    data: Object.values(activityScores),
+                    backgroundColor: [
+                        '#1e40af', '#3b82f6', '#0ea5e9', '#06b6d4', '#0891b2', '#64748b'
+                    ],
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            font: {size: 12, weight: '600'}
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: 'white',
+                        bodyColor: 'white',
+                        borderColor: 'rgba(59, 130, 246, 0.2)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {color: 'rgba(255, 255, 255, 0.7)'},
+                        grid: {color: 'rgba(59, 130, 246, 0.1)'}
+                    },
+                    y: {
+                        ticks: {color: 'rgba(255, 255, 255, 0.7)'},
+                        grid: {color: 'rgba(59, 130, 246, 0.1)'}
+                    }
+                },
+                animation: {duration: 1500}
+            }
+        });
+    }
+
+    // Update tech pairings chart (Fixed: using 'bar' instead of 'horizontalBar')
+    function updateTechPairingsChart(dashboardData) {
+        // Wait for projects to be loaded
+        if (!allProjects || allProjects.length === 0) {
+            setTimeout(() => updateTechPairingsChart(dashboardData), 100);
+            return;
+        }
+
+        const ctx = document.getElementById('techPairingsChart').getContext('2d');
+
+        if (charts.techPairings) {
+            charts.techPairings.destroy();
+        }
+
+        // Create tech stack combinations
+        const techStacks = {};
+        allProjects.forEach(project => {
+            const stack = `${formatTechName(project.frontendType)} + ${formatTechName(project.backendType)}`;
+            techStacks[stack] = (techStacks[stack] || 0) + 1;
+        });
+
+        const sortedStacks = Object.entries(techStacks)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 8);
+
+        charts.techPairings = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: sortedStacks.map(([stack]) => stack),
+                datasets: [{
+                    label: 'Projects Using Stack',
+                    data: sortedStacks.map(([, count]) => count),
+                    backgroundColor: '#3b82f6',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y', // This makes it horizontal
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            font: {size: 12, weight: '600'}
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: 'white',
+                        bodyColor: 'white',
+                        borderColor: 'rgba(59, 130, 246, 0.2)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {color: 'rgba(255, 255, 255, 0.7)'},
+                        grid: {color: 'rgba(59, 130, 246, 0.1)'}
+                    },
+                    y: {
+                        ticks: {color: 'rgba(255, 255, 255, 0.7)'},
+                        grid: {color: 'rgba(59, 130, 246, 0.1)'}
+                    }
+                },
+                animation: {duration: 1500}
+            }
+        });
+    }
+
+    // Update pagination
+    function updatePagination() {
+        totalPages = Math.ceil(filteredProjects.length / PROJECTS_PER_PAGE);
+
+        if (totalPages <= 1) {
+            paginationEl.innerHTML = '';
+            return;
+        }
+
+        let paginationHTML = '';
+
+        // Previous button
+        paginationHTML += `
+                <button class="elite-pagination-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">
+                    ← Previous
+                </button>
+            `;
+
+        // Page numbers
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(totalPages, currentPage + 2);
+
+        if (startPage > 1) {
+            paginationHTML += `<button class="elite-pagination-btn" onclick="changePage(1)">1</button>`;
+            if (startPage > 2) {
+                paginationHTML += `<span class="elite-pagination-info">...</span>`;
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHTML += `
+                    <button class="elite-pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
+                        ${i}
+                    </button>
+                `;
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                paginationHTML += `<span class="elite-pagination-info">...</span>`;
+            }
+            paginationHTML += `<button class="elite-pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+        }
+
+        // Next button
+        paginationHTML += `
+                <button class="elite-pagination-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">
+                    Next →
+                </button>
+            `;
+
+        // Page info
+        const startItem = (currentPage - 1) * PROJECTS_PER_PAGE + 1;
+        const endItem = Math.min(currentPage * PROJECTS_PER_PAGE, filteredProjects.length);
+        paginationHTML += `
+                <span class="elite-pagination-info">
+                    Showing ${startItem}-${endItem} of ${filteredProjects.length} projects
+                </span>
+            `;
+
+        paginationEl.innerHTML = paginationHTML;
+    }
+
+    // Change page
+    function changePage(page) {
+        if (page < 1 || page > totalPages) return;
+        currentPage = page;
+        updatePagination();
+        updateEliteLeaderboard();
+    }
+
+    // Update elite leaderboard
+    function updateEliteLeaderboard() {
+        const startIndex = (currentPage - 1) * PROJECTS_PER_PAGE;
+        const endIndex = startIndex + PROJECTS_PER_PAGE;
+        const pageProjects = filteredProjects.slice(startIndex, endIndex);
+
+        if (pageProjects.length === 0) {
             showEmptyState();
             return;
         }
 
-        console.log('Updating leaderboard with', filteredProjects.length, 'projects');
+        console.log('Updating elite leaderboard with', pageProjects.length, 'projects for page', currentPage);
 
-        const leaderboardHTML = filteredProjects.map((project, index) => {
-            const rank = index + 1;
-            const rankClass = getRankClass(rank);
-            const badgeClass = getRankBadgeClass(rank);
-            const projectId = getProjectId(project, index);
-            const projectName = project.projectName || project.name || 'Unnamed Project';
-
-            console.log(`Rendering project ${index}:`, {
-                originalId: project.id,
-                calculatedId: projectId,
-                name: projectName,
-                rank: rank
-            });
+        const leaderboardHTML = pageProjects.map((project, index) => {
+            const globalRank = startIndex + index + 1;
+            const projectId = getProjectId(project, allProjects.indexOf(project));
+            const projectName = project.projectName || project.name || 'Unnamed Elite Project';
+            const activityScore = getActivityScore(project.requestCount);
 
             return `
-      <div class="leaderboard-item ${rankClass} fade-in" data-project-id="${projectId}" style="animation-delay: ${index * 0.1}s">
-          <div class="item-header">
-              <div class="rank-badge ${badgeClass}">
-                  ${rank <= 3 ? getRankEmoji(rank) : rank}
-              </div>
-              <div class="project-info">
-                  <h3 class="project-name">${projectName}</h3>
-                  <p class="project-description">${project.projectDescription || project.description || 'No description available'}</p>
-                  <div class="tech-stack">
-                      <span class="tech-badge">${formatTechName(project.frontendType)}</span>
-                      <span class="tech-badge">${formatTechName(project.backendType)}</span>
-                      <span class="tech-badge">${formatTechName(project.databaseType)}</span>
-                  </div>
-              </div>
-          </div>
-          <div class="project-stats">
-              <div class="stat-box">
-                  <div class="stat-value">${project.requestCount}</div>
-                  <div class="stat-name">Requests</div>
-              </div>
-              <div class="stat-box">
-                  <div class="stat-value">${formatDate(project.lastRequestedAt)}</div>
-                  <div class="stat-name">Last Active</div>
-              </div>
-              <div class="stat-box">
-                  <div class="stat-value">${getActivityScore(project.requestCount)}</div>
-                  <div class="stat-name">Score</div>
-              </div>
-          </div>
-          <div class="project-actions">
-              <button class="action-btn edit-btn tooltip" data-tooltip="Edit" onclick="openEditModal('${projectId}')">✏️</button>
-              <button class="action-btn delete-btn tooltip" data-tooltip="Delete" onclick="openDeleteModal('${projectId}')">🗑️</button>
-          </div>
-      </div>
-    `;
+                    <div class="elite-project-card" data-project-id="${projectId}">
+                        <div class="elite-project-header">
+                            <div class="elite-rank-badge">
+                                #${globalRank}
+                            </div>
+                            <div class="elite-project-info">
+                                <div class="elite-project-name">
+                                    ${projectName}
+                                    <span class="elite-score-badge elite-score-${activityScore.toLowerCase().replace('+', '-plus')}">${activityScore}</span>
+                                </div>
+                                <p class="elite-project-description">${project.projectDescription || project.description || 'No description available for this elite project'}</p>
+                                <div class="elite-tech-stack">
+                                    <span class="elite-tech-badge">${formatTechName(project.frontendType)}</span>
+                                    <span class="elite-tech-badge">${formatTechName(project.backendType)}</span>
+                                    <span class="elite-tech-badge">${formatTechName(project.databaseType)}</span>
+                                </div>
+                            </div>
+                            <div class="elite-project-actions">
+                                <button class="elite-action-btn elite-edit-btn" onclick="openEditModal('${projectId}')">✏️</button>
+                                <button class="elite-action-btn elite-delete-btn" onclick="openDeleteModal('${projectId}')">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="elite-project-stats">
+                            <div class="elite-stat-box">
+                                <div class="elite-stat-value">${project.requestCount}</div>
+                                <div class="elite-stat-name">Requests</div>
+                            </div>
+                            <div class="elite-stat-box">
+                                <div class="elite-stat-value">${formatDate(project.lastRequestedAt)}</div>
+                                <div class="elite-stat-name">Last Active</div>
+                            </div>
+                            <div class="elite-stat-box">
+                                <div class="elite-stat-value">${formatDate(project.createdAt)}</div>
+                                <div class="elite-stat-name">Created</div>
+                            </div>
+                            <div class="elite-stat-box">
+                                <div class="elite-stat-value">${activityScore}</div>
+                                <div class="elite-stat-name">Elite Score</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
         }).join('');
 
         leaderboardGridEl.innerHTML = leaderboardHTML;
-
-        // Trigger scroll animations
-        setTimeout(() => {
-            if (window.observeElements) {
-                window.observeElements();
-            }
-        }, 100);
-
-        console.log('Leaderboard updated successfully');
+        console.log('Elite leaderboard updated successfully');
     }
 
-    // Get rank class
-    function getRankClass(rank) {
-        switch(rank) {
-            case 1: return 'rank-1';
-            case 2: return 'rank-2';
-            case 3: return 'rank-3';
-            default: return '';
-        }
-    }
-
-    // Get rank badge class
-    function getRankBadgeClass(rank) {
-        switch(rank) {
-            case 1: return 'gold';
-            case 2: return 'silver';
-            case 3: return 'bronze';
-            default: return '';
-        }
-    }
-
-    // Get rank emoji
+    // Helper functions
     function getRankEmoji(rank) {
-        switch(rank) {
-            case 1: return '🥇';
-            case 2: return '🥈';
-            case 3: return '🥉';
-            default: return rank;
+        switch (rank) {
+            case 1:
+                return '🥇';
+            case 2:
+                return '🥈';
+            case 3:
+                return '🥉';
+            default:
+                return rank;
         }
     }
 
-    // Calculate activity score
+    function getRankName(rank) {
+        switch (rank) {
+            case 1:
+                return 'first';
+            case 2:
+                return 'second';
+            case 3:
+                return 'third';
+            default:
+                return '';
+        }
+    }
+
     function getActivityScore(requestCount) {
-        if (requestCount >= 1000) return 'S+';
-        if (requestCount >= 500) return 'S';
-        if (requestCount >= 100) return 'A';
-        if (requestCount >= 50) return 'B';
-        if (requestCount >= 10) return 'C';
+        if (requestCount >= 100) return 'S+';
+        if (requestCount >= 50) return 'S';
+        if (requestCount >= 10) return 'A';
+        if (requestCount >= 7) return 'B';
+        if (requestCount >= 2) return 'C';
         return 'D';
     }
 
-    // Handle search
+    function formatTechName(tech) {
+        if (!tech) return 'N/A';
+        return tech.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return 'Never';
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffTime = Math.abs(now - date);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return `${diffDays}d ago`;
+        if (diffDays < 30) return `${Math.ceil(diffDays / 7)}w ago`;
+        return `${Math.ceil(diffDays / 30)}m ago`;
+    }
+
+    // Search functionality
     function handleSearch(event) {
         const searchTerm = event.target.value.toLowerCase().trim();
 
@@ -1607,31 +2109,48 @@
             );
         }
 
-        updateLeaderboard();
+        currentPage = 1; // Reset to first page
+        updatePagination();
+        updateEliteLeaderboard();
     }
 
-    // Handle refresh
+    // Refresh functionality
     async function handleRefresh() {
         if (isLoading) return;
 
-        console.log('Refreshing data');
+        console.log('Refreshing elite data');
         refreshTextEl.textContent = 'Refreshing...';
-        refreshBtnEl.style.transform = 'rotate(360deg)';
+        refreshIconEl.style.transform = 'rotate(360deg)';
 
-        await loadLeaderboardData();
+        await loadEliteData();
 
         setTimeout(() => {
             refreshTextEl.textContent = 'Refresh';
-            refreshBtnEl.style.transform = 'rotate(0deg)';
+            refreshIconEl.style.transform = 'rotate(0deg)';
         }, 500);
     }
 
-    // Handle add project
+    // Modal functions
+    function toggleModal(modalId, isVisible) {
+        const modal = document.getElementById(modalId);
+        if (isVisible) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        } else {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+
+    function openAddModal() {
+        document.getElementById('addProjectForm').reset();
+        toggleModal('addProjectModal', true);
+    }
+
+    // CRUD operations
     async function handleAddProject(event) {
         event.preventDefault();
-        console.log('Adding new project');
-
-        const formData = new FormData(addProjectFormEl);
+        const formData = new FormData(event.target);
         const newProject = {
             name: formData.get('name'),
             description: formData.get('description'),
@@ -1640,39 +2159,28 @@
             databaseType: formData.get('databaseType')
         };
 
-        console.log('New project data:', newProject);
-
         try {
             const response = await fetch(`${API_BASE_URL}/projects`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(newProject)
             });
 
-            if (!response.ok) throw new Error('Network response was not ok');
+            if (!response.ok) throw new Error('Failed to create project');
 
-            const result = await response.json();
-            console.log('Project created successfully:', result);
-
-            // Close modal and reload data
-            toggleModal(addProjectModalEl, false);
-            loadLeaderboardData();
+            toggleModal('addProjectModal', false);
+            loadEliteData();
         } catch (error) {
             console.error('Error creating project:', error);
-            showError('Failed to create project. Please try again later.');
+            alert('Failed to create project. Please try again.');
         }
     }
 
-    // Handle edit project
     async function handleEditProject(event) {
         event.preventDefault();
-        console.log('Updating project');
-
-        const formData = new FormData(editProjectFormEl);
+        const formData = new FormData(event.target);
+        const projectId = formData.get('id');
         const updatedProject = {
-            id: formData.get('id'),
             name: formData.get('name'),
             description: formData.get('description'),
             frontendType: formData.get('frontendType'),
@@ -1680,156 +2188,90 @@
             databaseType: formData.get('databaseType')
         };
 
-        console.log('Updated project data:', updatedProject);
-
         try {
-            const response = await fetch(`${API_BASE_URL}/projects/${updatedProject.id}`, {
+            const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(updatedProject)
             });
 
-            if (!response.ok) throw new Error('Network response was not ok');
+            if (!response.ok) throw new Error('Failed to update project');
 
-            const result = await response.json();
-            console.log('Project updated successfully:', result);
-
-            // Close modal and reload data
-            toggleModal(editProjectModalEl, false);
-            loadLeaderboardData();
+            toggleModal('editProjectModal', false);
+            loadEliteData();
         } catch (error) {
             console.error('Error updating project:', error);
-            showError('Failed to update project. Please try again later.');
+            alert('Failed to update project. Please try again.');
         }
     }
 
-    // Handle delete project
-    async function handleDeleteProject() {
-        if (!currentProjectToDelete) return;
-
-        console.log('Deleting project:', currentProjectToDelete);
-
+    async function handleDeleteProject(projectId) {
         try {
-            const response = await fetch(`${API_BASE_URL}/projects/${currentProjectToDelete}`, {
+            const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
                 method: 'DELETE'
             });
 
-            if (!response.ok) throw new Error('Network response was not ok');
+            if (!response.ok) throw new Error('Failed to delete project');
 
-            console.log('Project deleted successfully:', currentProjectToDelete);
-
-            // Close modal and reload data
-            toggleModal(deleteProjectModalEl, false);
-            confirmDialogEl.classList.remove('active');
-            currentProjectToDelete = null;
-            loadLeaderboardData();
+            loadEliteData();
         } catch (error) {
             console.error('Error deleting project:', error);
-            showError('Failed to delete project. Please try again later.');
+            alert('Failed to delete project. Please try again.');
         }
     }
 
-    // Toggle modal visibility
-    function toggleModal(modalEl, isVisible) {
-        console.log(`Toggling modal ${modalEl.id}:`, isVisible);
-
-        if (isVisible) {
-            modalEl.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        } else {
-            modalEl.classList.remove('active');
-            document.body.style.overflow = '';
-            // Reset confirmation dialog if it's the delete modal
-            if (modalEl === deleteProjectModalEl) {
-                confirmDialogEl.classList.remove('active');
-                currentProjectToDelete = null;
-            }
-        }
-    }
-
-    // Show loading state
+    // Loading and error states
     function showLoading() {
         leaderboardGridEl.innerHTML = `
-              <div class="loading">
-                  <div class="spinner"></div>
-                  <p>Loading amazing projects...</p>
-              </div>
-          `;
+                <div class="elite-loading">
+                    <div class="elite-spinner"></div>
+                    <p>Loading elite projects...</p>
+                </div>
+            `;
+        elitePodiumEl.innerHTML = `
+                <div class="elite-loading">
+                    <div class="elite-spinner"></div>
+                    <p>Loading elite royalty...</p>
+                </div>
+            `;
     }
 
-    // Show error state
     function showError(message) {
         leaderboardGridEl.innerHTML = `
-              <div class="error">
-                  <h3>⚠️ Oops!</h3>
-                  <p>${message}</p>
-                  <button class="refresh-btn" onclick="loadLeaderboardData()" style="margin-top: 1rem;">
-                      Try Again
-                  </button>
-              </div>
-          `;
+                <div class="elite-empty-state">
+                    <h3>⚠️ Elite Error</h3>
+                    <p>${message}</p>
+                    <button class="elite-btn" onclick="loadEliteData()" style="margin-top: 2rem;">
+                        Try Again
+                    </button>
+                </div>
+            `;
     }
 
-    // Show empty state
     function showEmptyState() {
         leaderboardGridEl.innerHTML = `
-              <div class="empty-state">
-                  <h3>🚀 No Projects Yet</h3>
-                  <p>Be the first to create an amazing project and claim the top spot!</p>
-              </div>
-          `;
+                <div class="elite-empty-state">
+                    <h3>🚀 No Elite Projects Found</h3>
+                    <p>No projects match your search criteria. Try adjusting your search or create a new elite project!</p>
+                    <button class="elite-btn elite-btn-success" onclick="openAddModal()" style="margin-top: 2rem;">
+                        <span>➕</span>
+                        Create Elite Project
+                    </button>
+                </div>
+            `;
     }
 
-    // Format technology names
-    function formatTechName(tech) {
-        if (!tech) return 'N/A';
-        return tech.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
-    }
+    // Make functions globally accessible - CRITICAL FIX FROM OLD VERSION
+    window.openEditModal = openEditModal;
+    window.openDeleteModal = openDeleteModal;
+    window.loadEliteData = loadEliteData;
+    window.openAddModal = openAddModal;
+    window.changePage = changePage;
 
-    // Format dates
-    function formatDate(dateString) {
-        if (!dateString) return 'Never';
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffTime = Math.abs(now - date);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-        if (diffDays === 1) return 'Yesterday';
-        if (diffDays < 7) return `${diffDays}d ago`;
-        if (diffDays < 30) return `${Math.ceil(diffDays / 7)}w ago`;
-        return `${Math.ceil(diffDays / 30)}m ago`;
-    }
-
-    // Add some interactive effects
-    document.addEventListener('mousemove', (e) => {
-        const cursor = document.querySelector('.cursor');
-        if (!cursor) {
-            const newCursor = document.createElement('div');
-            newCursor.className = 'cursor';
-            newCursor.style.cssText = `
-                  position: fixed;
-                  width: 20px;
-                  height: 20px;
-                  background: radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, transparent 70%);
-                  border-radius: 50%;
-                  pointer-events: none;
-                  z-index: 9999;
-                  transition: transform 0.1s ease;
-              `;
-            document.body.appendChild(newCursor);
-        }
-
-        const cursorEl = document.querySelector('.cursor');
-        cursorEl.style.left = e.clientX - 10 + 'px';
-        cursorEl.style.top = e.clientY - 10 + 'px';
-    });
-
-    // Add keyboard shortcuts
+    // Add elite keyboard shortcuts
     document.addEventListener('keydown', (e) => {
         if (e.ctrlKey || e.metaKey) {
-            switch(e.key) {
+            switch (e.key) {
                 case 'r':
                     e.preventDefault();
                     handleRefresh();
@@ -1838,15 +2280,41 @@
                     e.preventDefault();
                     searchInputEl.focus();
                     break;
+                case 'n':
+                    e.preventDefault();
+                    openAddModal();
+                    break;
             }
         }
 
         if (e.key === 'Escape') {
             searchInputEl.value = '';
-            handleSearch({ target: { value: '' } });
+            handleSearch({target: {value: ''}});
             searchInputEl.blur();
+            toggleModal('addProjectModal', false);
+            toggleModal('editProjectModal', false);
+        }
+
+        // Pagination shortcuts
+        if (e.key === 'ArrowLeft' && e.altKey) {
+            e.preventDefault();
+            changePage(currentPage - 1);
+        }
+        if (e.key === 'ArrowRight' && e.altKey) {
+            e.preventDefault();
+            changePage(currentPage + 1);
         }
     });
+
+    // Add elite scroll effects
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const parallax = document.querySelector('.elite-background');
+        const speed = scrolled * 0.3;
+        parallax.style.transform = `translateY(${speed}px)`;
+    });
+
+    console.log('🚀 Elite Leaderboard initialized successfully!');
 </script>
 </body>
 </html>
