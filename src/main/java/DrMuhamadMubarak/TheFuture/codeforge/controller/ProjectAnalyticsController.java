@@ -56,4 +56,83 @@ public class ProjectAnalyticsController {
         ProjectAnalyticsResponseDTO responseDTO = ProjectAnalyticsResponseDTOBuilder.projectAnalyticsResponseDTObuilder(analytics);
         return ResponseEntity.ok(responseDTO);
     }
+
+    @GetMapping("/leaderboard")
+    public ResponseEntity<Map<String, Object>> getLeaderboard() {
+        Map<String, Object> leaderboardData = new HashMap<>();
+
+        // 1. Top 3 projects for special highlighting
+        List<ProjectAnalytics> podiumProjects = analyticsService.getTopProjects(3);
+        List<ProjectAnalyticsResponseDTO> podiumProjectDTOs = podiumProjects.stream()
+            .map(ProjectAnalyticsResponseDTOBuilder::projectAnalyticsResponseDTObuilder)
+            .toList();
+        leaderboardData.put("podiumProjects", podiumProjectDTOs);
+
+        // 2. Top 10 projects for complete leaderboard
+        List<ProjectAnalytics> leaderboardProjects = analyticsService.getTopProjects(10);
+        List<ProjectAnalyticsResponseDTO> leaderboardProjectDTOs = leaderboardProjects.stream()
+            .map(ProjectAnalyticsResponseDTOBuilder::projectAnalyticsResponseDTObuilder)
+            .toList();
+        leaderboardData.put("leaderboardProjects", leaderboardProjectDTOs);
+
+        // 3. Top 5 frontend frameworks with counts
+        Map<FrontendType, Long> topFrontendFrameworks = analyticsService.getTopFrontendFrameworks(5);
+        leaderboardData.put("topFrontendFrameworks", topFrontendFrameworks);
+
+        // 4. Top 5 backend frameworks with counts
+        Map<BackendType, Long> topBackendFrameworks = analyticsService.getTopBackendFrameworks(5);
+        leaderboardData.put("topBackendFrameworks", topBackendFrameworks);
+
+        // 5. Top 5 database types with counts
+        Map<DatabaseType, Long> topDatabases = analyticsService.getTopDatabaseTypes(5);
+        leaderboardData.put("topDatabases", topDatabases);
+
+        // 6. Projects creation timeline (last 6 months)
+        Map<String, Long> projectCreationTimeline = analyticsService.getProjectCreationTimeline(6);
+        leaderboardData.put("projectCreationTimeline", projectCreationTimeline);
+
+        // 7. Recent activity - recently updated projects
+        List<Map<String, Object>> recentActivity = analyticsService.getRecentActivity(5);
+        leaderboardData.put("recentActivity", recentActivity);
+
+        // 8. Technology distribution
+        Map<String, Long> technologyDistribution = analyticsService.getTechnologyDistribution();
+        leaderboardData.put("technologyDistribution", technologyDistribution);
+
+        // 9. Top requested projects by time period (day, week, month)
+        Map<String, List<ProjectAnalyticsResponseDTO>> topByTimePeriod = analyticsService.getTopProjectsByTimePeriod();
+        leaderboardData.put("topByTimePeriod", topByTimePeriod);
+
+        // 10. Popular technology pairings (which frontend works with which backend)
+        List<Map<String, Object>> technologyPairings = analyticsService.getPopularTechnologyPairings(5);
+        leaderboardData.put("technologyPairings", technologyPairings);
+
+        return ResponseEntity.ok(leaderboardData);
+    }
+
+    @GetMapping("/charts/tech-distribution")
+    public ResponseEntity<Map<String, Object>> getTechnologyDistribution() {
+        Map<String, Object> chartData = new HashMap<>();
+
+        chartData.put("frontend", analyticsService.getTopFrontendFrameworks(10));
+        chartData.put("backend", analyticsService.getTopBackendFrameworks(10));
+        chartData.put("database", analyticsService.getTopDatabaseTypes(10));
+
+        return ResponseEntity.ok(chartData);
+    }
+
+    @GetMapping("/charts/tech-pairings")
+    public ResponseEntity<List<Map<String, Object>>> getTechnologyPairings() {
+        return ResponseEntity.ok(analyticsService.getPopularTechnologyPairings(10));
+    }
+
+    @GetMapping("/charts/project-timeline")
+    public ResponseEntity<Map<String, Long>> getProjectTimeline(@RequestParam(defaultValue = "12") int months) {
+        return ResponseEntity.ok(analyticsService.getProjectCreationTimeline(months));
+    }
+
+    @GetMapping("/charts/recent-activity")
+    public ResponseEntity<List<Map<String, Object>>> getRecentActivity(@RequestParam(defaultValue = "10") int limit) {
+        return ResponseEntity.ok(analyticsService.getRecentActivity(limit));
+    }
 }
