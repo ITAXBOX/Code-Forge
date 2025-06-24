@@ -17,6 +17,7 @@ public class ProjectAnalyticsResponseDTO {
     private FrontendType frontendType;
     private BackendType backendType;
     private DatabaseType databaseType;
+    private LocalDateTime createdAt;
     private int requestCount;
     private LocalDateTime lastRequestedAt;
 }

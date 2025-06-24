@@ -49,6 +49,7 @@ public class Project {
     @JsonBackReference
     private ProjectAnalytics analytics;
 
+    @Getter
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

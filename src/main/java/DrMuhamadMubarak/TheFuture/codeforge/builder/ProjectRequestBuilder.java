@@ -16,7 +16,8 @@ public class ProjectRequestBuilder {
                 .description(project.getDescription())
                 .frontendType(project.getFrontendType())
                 .backendType(project.getBackendType())
-                .databaseType(project.getDatabaseType());
+                .databaseType(project.getDatabaseType())
+                .createdAt(project.getCreatedAt());
 
         // Add analytics if available
         if (project.getAnalytics() != null) {

@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 @AllArgsConstructor
@@ -18,5 +20,6 @@ public class ProjectResponseDTO {
     private FrontendType frontendType;
     private BackendType backendType;
     private DatabaseType databaseType;
+    private LocalDateTime createdAt;
     private ProjectAnalyticsResponseDTO projectAnalyticsDTO; // Optional, can be null if no analytics available
 }

@@ -21,6 +21,7 @@ public class ProjectAnalyticsResponseDTOBuilder {
                 .backendType(projectAnalytics.getProject().getBackendType())
                 .databaseType(projectAnalytics.getProject().getDatabaseType())
                 .requestCount(projectAnalytics.getRequestCount())
+                .createdAt(projectAnalytics.getProject().getCreatedAt())
                 .lastRequestedAt(projectAnalytics.getLastRequestedAt())
                 .build();
     }
