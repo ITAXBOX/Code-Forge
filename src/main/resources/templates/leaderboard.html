@@ -1076,7 +1076,7 @@
     </h2>
     <div class="elite-actions">
         <div class="elite-search">
-            <input type="text" id="searchInput" placeholder="Search elite projects...">
+            <input type="text" id="searchInput" placeholder="Search">
         </div>
         <button class="elite-btn elite-btn-success" id="addProjectBtn">
             <span>➕</span>
@@ -2007,13 +2007,16 @@
         if (isNaN(date.getTime())) return 'Invalid Date';
 
         const now = new Date();
-        const diffTime = Math.abs(now - date);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const diffTime = now - date;
+        const diffHours = diffTime / (1000 * 60 * 60);
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
+        if (diffHours < 24) return 'Today';
+        if (diffDays === 0) return 'Today';
         if (diffDays === 1) return 'Yesterday';
         if (diffDays < 7) return `${diffDays}d ago`;
-        if (diffDays < 30) return `${Math.ceil(diffDays / 7)}w ago`;
-        return `${Math.ceil(diffDays / 30)}m ago`;
+        if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+        return `${Math.floor(diffDays / 30)}m ago`;
     }
 
     // Search functionality
