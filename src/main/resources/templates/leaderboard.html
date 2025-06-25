@@ -892,6 +892,62 @@
             color: var(--text-muted);
         }
 
+        /* Project Notification Message */
+        .project-notification {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            border: 2px solid rgba(59, 130, 246, 0.4);
+            border-radius: 15px;
+            padding: 1.5rem 2rem;
+            z-index: 1000;
+            box-shadow: var(--shadow-primary);
+            animation: notificationSlideIn 0.5s forwards, notificationFadeOut 0.5s 5s forwards;
+            max-width: 400px;
+        }
+
+        .project-notification-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .project-notification-title::before {
+            content: '⚠️';
+        }
+
+        .project-notification-message {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        @keyframes notificationSlideIn {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes notificationFadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .elite-header {
@@ -995,927 +1051,934 @@
     </style>
 </head>
 <body>
-<div class="elite-background"></div>
-<div class="elite-particles" id="eliteParticles"></div>
-
-<header class="elite-header">
-    <h1>The Ultimate Leaderboard</h1>
-    <p>Showcasing Top Elite Projects</p>
-</header>
-
-<!-- Elite Royalty Podium -->
-<div class="elite-royalty">
-    <h2 class="elite-royalty-title">
-        <span>👑</span>
-        Elite Royalty
-    </h2>
-    <div class="elite-podium" id="elitePodium">
-        <div class="elite-loading">
-            <div class="elite-spinner"></div>
-            <p>Loading elite royalty...</p>
-        </div>
+    <!-- Project Notification Message - Only shown when message exists -->
+    <div class="project-notification" th:if="${message != null}">
+        <div class="project-notification-title">Project Alert</div>
+        <div class="project-notification-message" th:text="${message}"></div>
     </div>
-</div>
 
-<!-- Elite Charts Grid -->
-<div class="elite-charts-grid">
-    <!-- Technology Distribution Chart -->
-    <div class="elite-chart-card">
-        <h3 class="elite-chart-title">
-            <span>📊</span>
-            Technology Distribution
-        </h3>
-        <p class="elite-chart-subtitle">Distribution of technologies across all projects</p>
-        <div class="chart-container">
-            <canvas id="technologyChart"></canvas>
+    <!-- Elite Background Elements -->
+    <div class="elite-background"></div>
+    <div class="elite-particles" id="eliteParticles"></div>
+
+    <header class="elite-header">
+        <h1>The Ultimate Leaderboard</h1>
+        <p>Showcasing Top Elite Projects</p>
+    </header>
+
+    <!-- Elite Royalty Podium -->
+    <div class="elite-royalty">
+        <h2 class="elite-royalty-title">
+            <span>👑</span>
+            Elite Royalty
+        </h2>
+        <div class="elite-podium" id="elitePodium">
+            <div class="elite-loading">
+                <div class="elite-spinner"></div>
+                <p>Loading elite royalty...</p>
+            </div>
         </div>
     </div>
 
-    <!-- Project Timeline Chart -->
-    <div class="elite-chart-card">
-        <h3 class="elite-chart-title">
-            <span>📈</span>
-            Project Timeline
-        </h3>
-        <p class="elite-chart-subtitle">Project creation over time</p>
-        <div class="chart-container">
-            <canvas id="timelineChart"></canvas>
+    <!-- Elite Charts Grid -->
+    <div class="elite-charts-grid">
+        <!-- Technology Distribution Chart -->
+        <div class="elite-chart-card">
+            <h3 class="elite-chart-title">
+                <span>📊</span>
+                Technology Distribution
+            </h3>
+            <p class="elite-chart-subtitle">Distribution of technologies across all projects</p>
+            <div class="chart-container">
+                <canvas id="technologyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Project Timeline Chart -->
+        <div class="elite-chart-card">
+            <h3 class="elite-chart-title">
+                <span>📈</span>
+                Project Timeline
+            </h3>
+            <p class="elite-chart-subtitle">Project creation over time</p>
+            <div class="chart-container">
+                <canvas id="timelineChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Activity Scores Chart -->
+        <div class="elite-chart-card">
+            <h3 class="elite-chart-title">
+                <span>⚡</span>
+                Activity Scores
+            </h3>
+            <p class="elite-chart-subtitle">Distribution of project activity levels</p>
+            <div class="chart-container">
+                <canvas id="activityChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Tech Pairings Chart -->
+        <div class="elite-chart-card">
+            <h3 class="elite-chart-title">
+                <span>🔗</span>
+                Popular Tech Stacks
+            </h3>
+            <p class="elite-chart-subtitle">Most popular technology combinations</p>
+            <div class="chart-container">
+                <canvas id="techPairingsChart"></canvas>
+            </div>
         </div>
     </div>
 
-    <!-- Activity Scores Chart -->
-    <div class="elite-chart-card">
-        <h3 class="elite-chart-title">
-            <span>⚡</span>
-            Activity Scores
-        </h3>
-        <p class="elite-chart-subtitle">Distribution of project activity levels</p>
-        <div class="chart-container">
-            <canvas id="activityChart"></canvas>
+    <!-- Elite Controls -->
+    <div class="elite-controls">
+        <h2 class="elite-title">
+            <span>🏆</span>
+            All Projects
+        </h2>
+        <div class="elite-actions">
+            <div class="elite-search">
+                <input type="text" id="searchInput" placeholder="Search">
+            </div>
+            <button class="elite-btn elite-btn-success" id="addProjectBtn">
+                <span>➕</span>
+                Add Project
+            </button>
+            <button class="elite-btn" id="refreshBtn">
+                <span id="refreshIcon">🔄</span>
+                <span id="refreshText">Refresh</span>
+            </button>
+            <button class="elite-btn elite-btn-warning" id="homeBtn">
+                <span>🏠</span>
+                Home
+            </button>
         </div>
     </div>
 
-    <!-- Tech Pairings Chart -->
-    <div class="elite-chart-card">
-        <h3 class="elite-chart-title">
-            <span>🔗</span>
-            Popular Tech Stacks
-        </h3>
-        <p class="elite-chart-subtitle">Most popular technology combinations</p>
-        <div class="chart-container">
-            <canvas id="techPairingsChart"></canvas>
+    <!-- Elite Leaderboard -->
+    <div class="elite-leaderboard">
+        <div id="leaderboardGrid">
+            <div class="elite-loading">
+                <div class="elite-spinner"></div>
+                <p>Loading elite projects...</p>
+            </div>
         </div>
-    </div>
-</div>
 
-<!-- Elite Controls -->
-<div class="elite-controls">
-    <h2 class="elite-title">
-        <span>🏆</span>
-        All Projects
-    </h2>
-    <div class="elite-actions">
-        <div class="elite-search">
-            <input type="text" id="searchInput" placeholder="Search">
-        </div>
-        <button class="elite-btn elite-btn-success" id="addProjectBtn">
-            <span>➕</span>
-            Add Project
-        </button>
-        <button class="elite-btn" id="refreshBtn">
-            <span id="refreshIcon">🔄</span>
-            <span id="refreshText">Refresh</span>
-        </button>
-        <button class="elite-btn elite-btn-warning" id="homeBtn">
-            <span>🏠</span>
-            Home
-        </button>
-    </div>
-</div>
-
-<!-- Elite Leaderboard -->
-<div class="elite-leaderboard">
-    <div id="leaderboardGrid">
-        <div class="elite-loading">
-            <div class="elite-spinner"></div>
-            <p>Loading elite projects...</p>
+        <!-- Pagination -->
+        <div class="elite-pagination" id="elitePagination">
+            <!-- Pagination will be generated by JavaScript -->
         </div>
     </div>
 
-    <!-- Pagination -->
-    <div class="elite-pagination" id="elitePagination">
-        <!-- Pagination will be generated by JavaScript -->
-    </div>
-</div>
-
-<!-- Add Project Modal -->
-<div class="elite-modal-overlay" id="addProjectModal">
-    <div class="elite-modal">
-        <div class="elite-modal-header">
-            <h3 class="elite-modal-title">✨ Create Elite Project</h3>
-            <button class="elite-close-modal" id="closeAddModal">&times;</button>
+    <!-- Add Project Modal -->
+    <div class="elite-modal-overlay" id="addProjectModal">
+        <div class="elite-modal">
+            <div class="elite-modal-header">
+                <h3 class="elite-modal-title">✨ Create Elite Project</h3>
+                <button class="elite-close-modal" id="closeAddModal">&times;</button>
+            </div>
+            <form id="addProjectForm">
+                <div class="elite-form-group">
+                    <label for="name" class="elite-form-label">Project Name</label>
+                    <input type="text" id="name" name="name" class="elite-form-input" placeholder="Enter elite project name"
+                           required>
+                </div>
+                <div class="elite-form-group">
+                    <label for="description" class="elite-form-label">Project Description</label>
+                    <textarea id="description" name="description" class="elite-form-input" rows="3"
+                              placeholder="Describe your elite project"></textarea>
+                </div>
+                <div class="elite-form-group">
+                    <label for="frontendType" class="elite-form-label">Frontend Framework</label>
+                    <select id="frontendType" name="frontendType" class="elite-form-select" required>
+                        <option value="">Select Frontend Framework</option>
+                        <option value="REACT">React</option>
+                        <option value="ANGULAR">Angular</option>
+                        <option value="VUE">Vue</option>
+                        <option value="NEXT_JS">Next.js</option>
+                    </select>
+                </div>
+                <div class="elite-form-group">
+                    <label for="backendType" class="elite-form-label">Backend Framework</label>
+                    <select id="backendType" name="backendType" class="elite-form-select" required>
+                        <option value="">Select Backend Framework</option>
+                        <option value="SPRING_BOOT">Spring Boot</option>
+                        <option value="EXPRESS">Express</option>
+                        <option value="DJANGO">Django</option>
+                        <option value="FLASK">Flask</option>
+                    </select>
+                </div>
+                <div class="elite-form-group">
+                    <label for="databaseType" class="elite-form-label">Database</label>
+                    <select id="databaseType" name="databaseType" class="elite-form-select" required>
+                        <option value="">Select Database</option>
+                        <option value="MONGODB">MongoDB</option>
+                        <option value="MYSQL">MySQL</option>
+                        <option value="POSTGRESQL">PostgreSQL</option>
+                        <option value="SQLITE">SQLite</option>
+                    </select>
+                </div>
+                <div class="elite-form-actions">
+                    <button type="button" class="elite-btn" id="cancelAddProject" style="background: rgba(59,130,246,0.1);">
+                        Cancel
+                    </button>
+                    <button type="submit" class="elite-btn elite-btn-success">Create Elite Project</button>
+                </div>
+            </form>
         </div>
-        <form id="addProjectForm">
-            <div class="elite-form-group">
-                <label for="name" class="elite-form-label">Project Name</label>
-                <input type="text" id="name" name="name" class="elite-form-input" placeholder="Enter elite project name"
-                       required>
-            </div>
-            <div class="elite-form-group">
-                <label for="description" class="elite-form-label">Project Description</label>
-                <textarea id="description" name="description" class="elite-form-input" rows="3"
-                          placeholder="Describe your elite project"></textarea>
-            </div>
-            <div class="elite-form-group">
-                <label for="frontendType" class="elite-form-label">Frontend Framework</label>
-                <select id="frontendType" name="frontendType" class="elite-form-select" required>
-                    <option value="">Select Frontend Framework</option>
-                    <option value="REACT">React</option>
-                    <option value="ANGULAR">Angular</option>
-                    <option value="VUE">Vue</option>
-                    <option value="NEXT_JS">Next.js</option>
-                </select>
-            </div>
-            <div class="elite-form-group">
-                <label for="backendType" class="elite-form-label">Backend Framework</label>
-                <select id="backendType" name="backendType" class="elite-form-select" required>
-                    <option value="">Select Backend Framework</option>
-                    <option value="SPRING_BOOT">Spring Boot</option>
-                    <option value="EXPRESS">Express</option>
-                    <option value="DJANGO">Django</option>
-                    <option value="FLASK">Flask</option>
-                </select>
-            </div>
-            <div class="elite-form-group">
-                <label for="databaseType" class="elite-form-label">Database</label>
-                <select id="databaseType" name="databaseType" class="elite-form-select" required>
-                    <option value="">Select Database</option>
-                    <option value="MONGODB">MongoDB</option>
-                    <option value="MYSQL">MySQL</option>
-                    <option value="POSTGRESQL">PostgreSQL</option>
-                    <option value="SQLITE">SQLite</option>
-                </select>
-            </div>
-            <div class="elite-form-actions">
-                <button type="button" class="elite-btn" id="cancelAddProject" style="background: rgba(59,130,246,0.1);">
-                    Cancel
-                </button>
-                <button type="submit" class="elite-btn elite-btn-success">Create Elite Project</button>
-            </div>
-        </form>
     </div>
-</div>
 
-<!-- Edit Project Modal -->
-<div class="elite-modal-overlay" id="editProjectModal">
-    <div class="elite-modal">
-        <div class="elite-modal-header">
-            <h3 class="elite-modal-title">🔧 Edit Elite Project</h3>
-            <button class="elite-close-modal" id="closeEditModal">&times;</button>
+    <!-- Edit Project Modal -->
+    <div class="elite-modal-overlay" id="editProjectModal">
+        <div class="elite-modal">
+            <div class="elite-modal-header">
+                <h3 class="elite-modal-title">🔧 Edit Elite Project</h3>
+                <button class="elite-close-modal" id="closeEditModal">&times;</button>
+            </div>
+            <form id="editProjectForm">
+                <input type="hidden" id="editProjectId" name="id">
+                <div class="elite-form-group">
+                    <label for="editName" class="elite-form-label">Project Name</label>
+                    <input type="text" id="editName" name="name" class="elite-form-input" required>
+                </div>
+                <div class="elite-form-group">
+                    <label for="editDescription" class="elite-form-label">Project Description</label>
+                    <textarea id="editDescription" name="description" class="elite-form-input" rows="3"></textarea>
+                </div>
+                <div class="elite-form-group">
+                    <label for="editFrontendType" class="elite-form-label">Frontend Framework</label>
+                    <select id="editFrontendType" name="frontendType" class="elite-form-select" required>
+                        <option value="">Select Frontend Framework</option>
+                        <option value="REACT">React</option>
+                        <option value="ANGULAR">Angular</option>
+                        <option value="VUE">Vue</option>
+                        <option value="NEXT_JS">Next.js</option>
+                    </select>
+                </div>
+                <div class="elite-form-group">
+                    <label for="editBackendType" class="elite-form-label">Backend Framework</label>
+                    <select id="editBackendType" name="backendType" class="elite-form-select" required>
+                        <option value="">Select Backend Framework</option>
+                        <option value="SPRING_BOOT">Spring Boot</option>
+                        <option value="EXPRESS">Express</option>
+                        <option value="DJANGO">Django</option>
+                        <option value="FLASK">Flask</option>
+                    </select>
+                </div>
+                <div class="elite-form-group">
+                    <label for="editDatabaseType" class="elite-form-label">Database</label>
+                    <select id="editDatabaseType" name="databaseType" class="elite-form-select" required>
+                        <option value="">Select Database</option>
+                        <option value="MONGODB">MongoDB</option>
+                        <option value="MYSQL">MySQL</option>
+                        <option value="POSTGRESQL">PostgreSQL</option>
+                        <option value="SQLITE">SQLite</option>
+                    </select>
+                </div>
+                <div class="elite-form-actions">
+                    <button type="button" class="elite-btn" id="cancelEditProject"
+                            style="background: rgba(59,130,246,0.1);">Cancel
+                    </button>
+                    <button type="submit" class="elite-btn">Update Elite Project</button>
+                </div>
+            </form>
         </div>
-        <form id="editProjectForm">
-            <input type="hidden" id="editProjectId" name="id">
-            <div class="elite-form-group">
-                <label for="editName" class="elite-form-label">Project Name</label>
-                <input type="text" id="editName" name="name" class="elite-form-input" required>
-            </div>
-            <div class="elite-form-group">
-                <label for="editDescription" class="elite-form-label">Project Description</label>
-                <textarea id="editDescription" name="description" class="elite-form-input" rows="3"></textarea>
-            </div>
-            <div class="elite-form-group">
-                <label for="editFrontendType" class="elite-form-label">Frontend Framework</label>
-                <select id="editFrontendType" name="frontendType" class="elite-form-select" required>
-                    <option value="">Select Frontend Framework</option>
-                    <option value="REACT">React</option>
-                    <option value="ANGULAR">Angular</option>
-                    <option value="VUE">Vue</option>
-                    <option value="NEXT_JS">Next.js</option>
-                </select>
-            </div>
-            <div class="elite-form-group">
-                <label for="editBackendType" class="elite-form-label">Backend Framework</label>
-                <select id="editBackendType" name="backendType" class="elite-form-select" required>
-                    <option value="">Select Backend Framework</option>
-                    <option value="SPRING_BOOT">Spring Boot</option>
-                    <option value="EXPRESS">Express</option>
-                    <option value="DJANGO">Django</option>
-                    <option value="FLASK">Flask</option>
-                </select>
-            </div>
-            <div class="elite-form-group">
-                <label for="editDatabaseType" class="elite-form-label">Database</label>
-                <select id="editDatabaseType" name="databaseType" class="elite-form-select" required>
-                    <option value="">Select Database</option>
-                    <option value="MONGODB">MongoDB</option>
-                    <option value="MYSQL">MySQL</option>
-                    <option value="POSTGRESQL">PostgreSQL</option>
-                    <option value="SQLITE">SQLite</option>
-                </select>
-            </div>
-            <div class="elite-form-actions">
-                <button type="button" class="elite-btn" id="cancelEditProject"
-                        style="background: rgba(59,130,246,0.1);">Cancel
-                </button>
-                <button type="submit" class="elite-btn">Update Elite Project</button>
-            </div>
-        </form>
     </div>
-</div>
 
-<script>
-    // Configuration
-    const API_BASE_URL = 'http://localhost:8080/api';
-    const PROJECTS_PER_PAGE = 5;
+    <script>
+        // Configuration
+        const API_BASE_URL = 'http://localhost:8080/api';
+        const PROJECTS_PER_PAGE = 5;
 
-    // Global state
-    let allProjects = [];
-    let filteredProjects = [];
-    let currentPage = 1;
-    let totalPages = 1;
-    let isLoading = false;
-    let charts = {};
+        // Global state
+        let allProjects = [];
+        let filteredProjects = [];
+        let currentPage = 1;
+        let totalPages = 1;
+        let isLoading = false;
+        let charts = {};
 
-    // Mock data for development/testing
-    const mockProjects = [
-        {
-            id: 1,
-            projectName: "Elite React Dashboard",
-            projectDescription: "A comprehensive dashboard built with React and modern UI components",
-            frontendType: "REACT",
-            backendType: "SPRING_BOOT",
-            databaseType: "POSTGRESQL",
-            requestCount: 1250,
-            lastRequestedAt: "2024-01-15T10:30:00Z",
-            createdAt: "2024-01-01T08:00:00Z"
-        },
-        {
-            id: 2,
-            projectName: "Vue E-commerce Platform",
-            projectDescription: "Full-featured e-commerce solution with Vue.js frontend",
-            frontendType: "VUE",
-            backendType: "EXPRESS",
-            databaseType: "MONGODB",
-            requestCount: 890,
-            lastRequestedAt: "2024-01-14T15:45:00Z",
-            createdAt: "2024-01-02T09:15:00Z"
-        },
-        {
-            id: 3,
-            projectName: "Angular CRM System",
-            projectDescription: "Customer relationship management system built with Angular",
-            frontendType: "ANGULAR",
-            backendType: "DJANGO",
-            databaseType: "MYSQL",
-            requestCount: 675,
-            lastRequestedAt: "2024-01-13T12:20:00Z",
-            createdAt: "2024-01-03T11:30:00Z"
-        },
-        {
-            id: 4,
-            projectName: "Next.js Blog Platform",
-            projectDescription: "Modern blog platform with SSR capabilities",
-            frontendType: "NEXT_JS",
-            backendType: "EXPRESS",
-            databaseType: "POSTGRESQL",
-            requestCount: 445,
-            lastRequestedAt: "2024-01-12T09:10:00Z",
-            createdAt: "2024-01-04T14:45:00Z"
-        },
-        {
-            id: 5,
-            projectName: "React Native Mobile App",
-            projectDescription: "Cross-platform mobile application",
-            frontendType: "REACT",
-            backendType: "FLASK",
-            databaseType: "SQLITE",
-            requestCount: 320,
-            lastRequestedAt: "2024-01-11T16:30:00Z",
-            createdAt: "2024-01-05T10:20:00Z"
-        },
-        {
-            id: 6,
-            projectName: "Vue Analytics Dashboard",
-            projectDescription: "Real-time analytics dashboard with beautiful charts",
-            frontendType: "VUE",
-            backendType: "SPRING_BOOT",
-            databaseType: "MONGODB",
-            requestCount: 180,
-            lastRequestedAt: "2024-01-10T13:15:00Z",
-            createdAt: "2024-01-06T12:00:00Z"
-        },
-        {
-            id: 7,
-            projectName: "Angular Task Manager",
-            projectDescription: "Project management and task tracking application",
-            frontendType: "ANGULAR",
-            backendType: "EXPRESS",
-            databaseType: "MYSQL",
-            requestCount: 95,
-            lastRequestedAt: "2024-01-09T11:45:00Z",
-            createdAt: "2024-01-07T15:30:00Z"
-        },
-        {
-            id: 8,
-            projectName: "React Portfolio Site",
-            projectDescription: "Personal portfolio website with modern design",
-            frontendType: "REACT",
-            backendType: "DJANGO",
-            databaseType: "SQLITE",
-            requestCount: 45,
-            lastRequestedAt: "2024-01-08T08:20:00Z",
-            createdAt: "2024-01-08T16:10:00Z"
-        }
-    ];
-
-    // Mock dashboard data
-    const mockDashboardData = {
-        topFrontendFrameworks: {
-            "REACT": 3,
-            "VUE": 2,
-            "ANGULAR": 2,
-            "NEXT_JS": 1
-        },
-        topBackendFrameworks: {
-            "SPRING_BOOT": 2,
-            "EXPRESS": 3,
-            "DJANGO": 2,
-            "FLASK": 1
-        },
-        topDatabases: {
-            "POSTGRESQL": 2,
-            "MONGODB": 2,
-            "MYSQL": 2,
-            "SQLITE": 2
-        }
-    };
-
-    // Mock leaderboard data
-    const mockLeaderboardData = {
-        leaderboardProjects: mockProjects,
-        projectCreationTimeline: {
-            "2024-01": 8
-        }
-    };
-
-    // DOM Elements
-    const elitePodiumEl = document.getElementById('elitePodium');
-    const leaderboardGridEl = document.getElementById('leaderboardGrid');
-    const searchInputEl = document.getElementById('searchInput');
-    const refreshBtnEl = document.getElementById('refreshBtn');
-    const refreshTextEl = document.getElementById('refreshText');
-    const refreshIconEl = document.getElementById('refreshIcon');
-    const paginationEl = document.getElementById('elitePagination');
-
-    // Helper function to get a valid project ID
-    function getProjectId(project, index) {
-        // Try multiple possible ID fields and fallback to index
-        return project.id || project.projectId || project._id || `temp_${index}`;
-    }
-
-    // Helper function to find project by ID with multiple fallbacks
-    function findProjectById(projectId) {
-        return allProjects.find(p => {
-            const pid = getProjectId(p, allProjects.indexOf(p));
-            return pid == projectId;
-        });
-    }
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function () {
-        createEliteParticles();
-        loadEliteData();
-        setupEventListeners();
-    });
-
-    // Create elite floating particles
-    function createEliteParticles() {
-        const particlesContainer = document.getElementById('eliteParticles');
-        const particleCount = 60;
-
-        for (let i = 0; i < particleCount; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'elite-particle';
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 15 + 's';
-            particle.style.animationDuration = (Math.random() * 15 + 15) + 's';
-            particlesContainer.appendChild(particle);
-        }
-    }
-
-    // Setup event listeners
-    function setupEventListeners() {
-        searchInputEl.addEventListener('input', handleSearch);
-        refreshBtnEl.addEventListener('click', handleRefresh);
-        document.getElementById('addProjectBtn').addEventListener('click', openAddModal);
-        document.getElementById('homeBtn').addEventListener('click', () => window.location.href = '/');
-
-        // Modal event listeners
-        document.getElementById('closeAddModal').addEventListener('click', () => toggleModal('addProjectModal', false));
-        document.getElementById('closeEditModal').addEventListener('click', () => toggleModal('editProjectModal', false));
-        document.getElementById('cancelAddProject').addEventListener('click', () => toggleModal('addProjectModal', false));
-        document.getElementById('cancelEditProject').addEventListener('click', () => toggleModal('editProjectModal', false));
-        document.getElementById('addProjectForm').addEventListener('submit', handleAddProject);
-        document.getElementById('editProjectForm').addEventListener('submit', handleEditProject);
-
-        // Close modals when clicking outside
-        document.getElementById('addProjectModal').addEventListener('click', (e) => {
-            if (e.target.id === 'addProjectModal') toggleModal('addProjectModal', false);
-        });
-        document.getElementById('editProjectModal').addEventListener('click', (e) => {
-            if (e.target.id === 'editProjectModal') toggleModal('editProjectModal', false);
-        });
-    }
-
-    // Load elite data
-    async function loadEliteData() {
-        if (isLoading) return;
-
-        isLoading = true;
-        showLoading();
-
-        try {
-            let dashboardData, leaderboardData;
-
-            // Try to load from API first, fallback to mock data
-            try {
-                const [dashboardResponse, leaderboardResponse] = await Promise.all([
-                    fetch(`${API_BASE_URL}/analytics/dashboard`),
-                    fetch(`${API_BASE_URL}/analytics/leaderboard`)
-                ]);
-
-                if (dashboardResponse.ok && leaderboardResponse.ok) {
-                    dashboardData = await dashboardResponse.json();
-                    leaderboardData = await leaderboardResponse.json();
-                    console.log('Elite data loaded from API successfully');
-                } else {
-                    throw new Error('API not available');
-                }
-            } catch (apiError) {
-                console.log('API not available, using mock data for demonstration');
-                dashboardData = mockDashboardData;
-                leaderboardData = mockLeaderboardData;
+        // Mock data for development/testing
+        const mockProjects = [
+            {
+                id: 1,
+                projectName: "Elite React Dashboard",
+                projectDescription: "A comprehensive dashboard built with React and modern UI components",
+                frontendType: "REACT",
+                backendType: "SPRING_BOOT",
+                databaseType: "POSTGRESQL",
+                requestCount: 1250,
+                lastRequestedAt: "2024-01-15T10:30:00Z",
+                createdAt: "2024-01-01T08:00:00Z"
+            },
+            {
+                id: 2,
+                projectName: "Vue E-commerce Platform",
+                projectDescription: "Full-featured e-commerce solution with Vue.js frontend",
+                frontendType: "VUE",
+                backendType: "EXPRESS",
+                databaseType: "MONGODB",
+                requestCount: 890,
+                lastRequestedAt: "2024-01-14T15:45:00Z",
+                createdAt: "2024-01-02T09:15:00Z"
+            },
+            {
+                id: 3,
+                projectName: "Angular CRM System",
+                projectDescription: "Customer relationship management system built with Angular",
+                frontendType: "ANGULAR",
+                backendType: "DJANGO",
+                databaseType: "MYSQL",
+                requestCount: 675,
+                lastRequestedAt: "2024-01-13T12:20:00Z",
+                createdAt: "2024-01-03T11:30:00Z"
+            },
+            {
+                id: 4,
+                projectName: "Next.js Blog Platform",
+                projectDescription: "Modern blog platform with SSR capabilities",
+                frontendType: "NEXT_JS",
+                backendType: "EXPRESS",
+                databaseType: "POSTGRESQL",
+                requestCount: 445,
+                lastRequestedAt: "2024-01-12T09:10:00Z",
+                createdAt: "2024-01-04T14:45:00Z"
+            },
+            {
+                id: 5,
+                projectName: "React Native Mobile App",
+                projectDescription: "Cross-platform mobile application",
+                frontendType: "REACT",
+                backendType: "FLASK",
+                databaseType: "SQLITE",
+                requestCount: 320,
+                lastRequestedAt: "2024-01-11T16:30:00Z",
+                createdAt: "2024-01-05T10:20:00Z"
+            },
+            {
+                id: 6,
+                projectName: "Vue Analytics Dashboard",
+                projectDescription: "Real-time analytics dashboard with beautiful charts",
+                frontendType: "VUE",
+                backendType: "SPRING_BOOT",
+                databaseType: "MONGODB",
+                requestCount: 180,
+                lastRequestedAt: "2024-01-10T13:15:00Z",
+                createdAt: "2024-01-06T12:00:00Z"
+            },
+            {
+                id: 7,
+                projectName: "Angular Task Manager",
+                projectDescription: "Project management and task tracking application",
+                frontendType: "ANGULAR",
+                backendType: "EXPRESS",
+                databaseType: "MYSQL",
+                requestCount: 95,
+                lastRequestedAt: "2024-01-09T11:45:00Z",
+                createdAt: "2024-01-07T15:30:00Z"
+            },
+            {
+                id: 8,
+                projectName: "React Portfolio Site",
+                projectDescription: "Personal portfolio website with modern design",
+                frontendType: "REACT",
+                backendType: "DJANGO",
+                databaseType: "SQLITE",
+                requestCount: 45,
+                lastRequestedAt: "2024-01-08T08:20:00Z",
+                createdAt: "2024-01-08T16:10:00Z"
             }
+        ];
 
-            // Update charts
-            updateAllCharts(dashboardData, leaderboardData);
+        // Mock dashboard data
+        const mockDashboardData = {
+            topFrontendFrameworks: {
+                "REACT": 3,
+                "VUE": 2,
+                "ANGULAR": 2,
+                "NEXT_JS": 1
+            },
+            topBackendFrameworks: {
+                "SPRING_BOOT": 2,
+                "EXPRESS": 3,
+                "DJANGO": 2,
+                "FLASK": 1
+            },
+            topDatabases: {
+                "POSTGRESQL": 2,
+                "MONGODB": 2,
+                "MYSQL": 2,
+                "SQLITE": 2
+            }
+        };
 
-            // Update leaderboard
-            if (leaderboardData.leaderboardProjects && leaderboardData.leaderboardProjects.length > 0) {
+        // Mock leaderboard data
+        const mockLeaderboardData = {
+            leaderboardProjects: mockProjects,
+            projectCreationTimeline: {
+                "2024-01": 8
+            }
+        };
+
+        // DOM Elements
+        const elitePodiumEl = document.getElementById('elitePodium');
+        const leaderboardGridEl = document.getElementById('leaderboardGrid');
+        const searchInputEl = document.getElementById('searchInput');
+        const refreshBtnEl = document.getElementById('refreshBtn');
+        const refreshTextEl = document.getElementById('refreshText');
+        const refreshIconEl = document.getElementById('refreshIcon');
+        const paginationEl = document.getElementById('elitePagination');
+
+        // Helper function to get a valid project ID
+        function getProjectId(project, index) {
+            // Try multiple possible ID fields and fallback to index
+            return project.id || project.projectId || project._id || `temp_${index}`;
+        }
+
+        // Helper function to find project by ID with multiple fallbacks
+        function findProjectById(projectId) {
+            return allProjects.find(p => {
+                const pid = getProjectId(p, allProjects.indexOf(p));
+                return pid == projectId;
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            createEliteParticles();
+            loadEliteData();
+            setupEventListeners();
+        });
+
+        // Create elite floating particles
+        function createEliteParticles() {
+            const particlesContainer = document.getElementById('eliteParticles');
+            const particleCount = 60;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'elite-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 15 + 15) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            searchInputEl.addEventListener('input', handleSearch);
+            refreshBtnEl.addEventListener('click', handleRefresh);
+            document.getElementById('addProjectBtn').addEventListener('click', openAddModal);
+            document.getElementById('homeBtn').addEventListener('click', () => window.location.href = '/');
+
+            // Modal event listeners
+            document.getElementById('closeAddModal').addEventListener('click', () => toggleModal('addProjectModal', false));
+            document.getElementById('closeEditModal').addEventListener('click', () => toggleModal('editProjectModal', false));
+            document.getElementById('cancelAddProject').addEventListener('click', () => toggleModal('addProjectModal', false));
+            document.getElementById('cancelEditProject').addEventListener('click', () => toggleModal('editProjectModal', false));
+            document.getElementById('addProjectForm').addEventListener('submit', handleAddProject);
+            document.getElementById('editProjectForm').addEventListener('submit', handleEditProject);
+
+            // Close modals when clicking outside
+            document.getElementById('addProjectModal').addEventListener('click', (e) => {
+                if (e.target.id === 'addProjectModal') toggleModal('addProjectModal', false);
+            });
+            document.getElementById('editProjectModal').addEventListener('click', (e) => {
+                if (e.target.id === 'editProjectModal') toggleModal('editProjectModal', false);
+            });
+        }
+
+        // Load elite data
+        async function loadEliteData() {
+            if (isLoading) return;
+
+            isLoading = true;
+            showLoading();
+
+            try {
+                let dashboardData, leaderboardData;
+
+                // Try to load from API first, fallback to mock data
+                try {
+                    const [dashboardResponse, leaderboardResponse] = await Promise.all([
+                        fetch(`${API_BASE_URL}/analytics/dashboard`),
+                        fetch(`${API_BASE_URL}/analytics/leaderboard`)
+                    ]);
+
+                    if (dashboardResponse.ok && leaderboardResponse.ok) {
+                        dashboardData = await dashboardResponse.json();
+                        leaderboardData = await leaderboardResponse.json();
+                        console.log('Elite data loaded from API successfully');
+                    } else {
+                        throw new Error('API not available');
+                    }
+                } catch (apiError) {
+                    console.log('API not available, using mock data for demonstration');
+                    dashboardData = mockDashboardData;
+                    leaderboardData = mockLeaderboardData;
+                }
+
+                // Update charts
+                updateAllCharts(dashboardData, leaderboardData);
+
+                // Update leaderboard
+                if (leaderboardData.leaderboardProjects && leaderboardData.leaderboardProjects.length > 0) {
+                    allProjects = leaderboardData.leaderboardProjects.sort((a, b) => b.requestCount - a.requestCount);
+                    filteredProjects = [...allProjects];
+
+                    // Update podium
+                    updateElitePodium();
+
+                    // Update paginated leaderboard
+                    updatePagination();
+                    updateEliteLeaderboard();
+                } else {
+                    showEmptyState();
+                }
+
+            } catch (error) {
+                console.error('Error loading elite data:', error);
+                showError('Failed to load elite data. Using demo data for now.');
+
+                // Use mock data as fallback
+                const dashboardData = mockDashboardData;
+                const leaderboardData = mockLeaderboardData;
+
+                updateAllCharts(dashboardData, leaderboardData);
                 allProjects = leaderboardData.leaderboardProjects.sort((a, b) => b.requestCount - a.requestCount);
                 filteredProjects = [...allProjects];
-
-                // Update podium
                 updateElitePodium();
-
-                // Update paginated leaderboard
                 updatePagination();
                 updateEliteLeaderboard();
-            } else {
-                showEmptyState();
+            } finally {
+                isLoading = false;
             }
-
-        } catch (error) {
-            console.error('Error loading elite data:', error);
-            showError('Failed to load elite data. Using demo data for now.');
-
-            // Use mock data as fallback
-            const dashboardData = mockDashboardData;
-            const leaderboardData = mockLeaderboardData;
-
-            updateAllCharts(dashboardData, leaderboardData);
-            allProjects = leaderboardData.leaderboardProjects.sort((a, b) => b.requestCount - a.requestCount);
-            filteredProjects = [...allProjects];
-            updateElitePodium();
-            updatePagination();
-            updateEliteLeaderboard();
-        } finally {
-            isLoading = false;
-        }
-    }
-
-    // Update elite podium
-    function updateElitePodium() {
-        const topThree = allProjects.slice(0, 3);
-
-        if (topThree.length === 0) {
-            elitePodiumEl.innerHTML = `
-                    <div class="elite-empty-state">
-                        <h3>🚀 No Elite Projects Yet</h3>
-                        <p>Be the first to create an elite project!</p>
-                    </div>
-                `;
-            return;
         }
 
-        const podiumHTML = topThree.map((project, index) => {
-            const rank = index + 1;
-            const rankEmoji = getRankEmoji(rank);
-            const placeClass = `elite-podium-${getRankName(rank)}`;
+        // Update elite podium
+        function updateElitePodium() {
+            const topThree = allProjects.slice(0, 3);
 
-            return `
-                    <div class="elite-podium-place ${placeClass}">
-                        <span class="elite-podium-rank">${rankEmoji}</span>
-                        <h3 class="elite-podium-name">${project.projectName || project.name || 'Unnamed Project'}</h3>
-                        <div class="elite-podium-requests">${project.requestCount} requests</div>
-                        <div class="elite-podium-tech">
-                            <span class="elite-podium-tech-badge">${formatTechName(project.frontendType)}</span>
-                            <span class="elite-podium-tech-badge">${formatTechName(project.backendType)}</span>
-                            <span class="elite-podium-tech-badge">${formatTechName(project.databaseType)}</span>
+            if (topThree.length === 0) {
+                elitePodiumEl.innerHTML = `
+                        <div class="elite-empty-state">
+                            <h3>🚀 No Elite Projects Yet</h3>
+                            <p>Be the first to create an elite project!</p>
                         </div>
-                    </div>
-                `;
-        }).join('');
+                    `;
+                return;
+            }
 
-        elitePodiumEl.innerHTML = podiumHTML;
-    }
+            const podiumHTML = topThree.map((project, index) => {
+                const rank = index + 1;
+                const rankEmoji = getRankEmoji(rank);
+                const placeClass = `elite-podium-${getRankName(rank)}`;
 
-    // Update all charts
-    function updateAllCharts(dashboardData, leaderboardData) {
-        updateTechnologyChart(dashboardData);
-        updateTimelineChart(leaderboardData);
-        updateActivityChart();
-        updateTechPairingsChart(dashboardData);
-    }
+                return `
+                        <div class="elite-podium-place ${placeClass}">
+                            <span class="elite-podium-rank">${rankEmoji}</span>
+                            <h3 class="elite-podium-name">${project.projectName || project.name || 'Unnamed Project'}</h3>
+                            <div class="elite-podium-requests">${project.requestCount} requests</div>
+                            <div class="elite-podium-tech">
+                                <span class="elite-podium-tech-badge">${formatTechName(project.frontendType)}</span>
+                                <span class="elite-podium-tech-badge">${formatTechName(project.backendType)}</span>
+                                <span class="elite-podium-tech-badge">${formatTechName(project.databaseType)}</span>
+                            </div>
+                        </div>
+                    `;
+            }).join('');
 
-    // Update technology distribution chart
-    function updateTechnologyChart(dashboardData) {
-        const ctx = document.getElementById('technologyChart').getContext('2d');
-
-        if (charts.technology) {
-            charts.technology.destroy();
+            elitePodiumEl.innerHTML = podiumHTML;
         }
 
-        const chartData = [];
-        const colors = ['#3b82f6', '#0ea5e9', '#06b6d4', '#0891b2', '#0284c7', '#1d4ed8', '#2563eb'];
-        let colorIndex = 0;
+        // Update all charts
+        function updateAllCharts(dashboardData, leaderboardData) {
+            updateTechnologyChart(dashboardData);
+            updateTimelineChart(leaderboardData);
+            updateActivityChart();
+            updateTechPairingsChart(dashboardData);
+        }
 
-        // Add all technology data
-        Object.entries(dashboardData.topFrontendFrameworks).forEach(([tech, count]) => {
-            chartData.push({
-                label: formatTechName(tech),
-                data: count,
-                backgroundColor: colors[colorIndex % colors.length],
+        // Update technology distribution chart
+        function updateTechnologyChart(dashboardData) {
+            const ctx = document.getElementById('technologyChart').getContext('2d');
+
+            if (charts.technology) {
+                charts.technology.destroy();
+            }
+
+            const chartData = [];
+            const colors = ['#3b82f6', '#0ea5e9', '#06b6d4', '#0891b2', '#0284c7', '#1d4ed8', '#2563eb'];
+            let colorIndex = 0;
+
+            // Add all technology data
+            Object.entries(dashboardData.topFrontendFrameworks).forEach(([tech, count]) => {
+                chartData.push({
+                    label: formatTechName(tech),
+                    data: count,
+                    backgroundColor: colors[colorIndex % colors.length],
+                });
+                colorIndex++;
             });
-            colorIndex++;
-        });
 
-        Object.entries(dashboardData.topBackendFrameworks).forEach(([tech, count]) => {
-            chartData.push({
-                label: formatTechName(tech),
-                data: count,
-                backgroundColor: colors[colorIndex % colors.length],
+            Object.entries(dashboardData.topBackendFrameworks).forEach(([tech, count]) => {
+                chartData.push({
+                    label: formatTechName(tech),
+                    data: count,
+                    backgroundColor: colors[colorIndex % colors.length],
+                });
+                colorIndex++;
             });
-            colorIndex++;
-        });
 
-        Object.entries(dashboardData.topDatabases).forEach(([tech, count]) => {
-            chartData.push({
-                label: formatTechName(tech),
-                data: count,
-                backgroundColor: colors[colorIndex % colors.length],
+            Object.entries(dashboardData.topDatabases).forEach(([tech, count]) => {
+                chartData.push({
+                    label: formatTechName(tech),
+                    data: count,
+                    backgroundColor: colors[colorIndex % colors.length],
+                });
+                colorIndex++;
             });
-            colorIndex++;
-        });
 
-        charts.technology = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: chartData.map(item => item.label),
-                datasets: [{
-                    data: chartData.map(item => item.data),
-                    backgroundColor: chartData.map(item => item.backgroundColor),
-                    borderWidth: 2,
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            color: 'rgba(255, 255, 255, 0.8)',
-                            font: {size: 12, weight: '600'},
-                            padding: 15,
-                            usePointStyle: true,
+            charts.technology = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: chartData.map(item => item.label),
+                    datasets: [{
+                        data: chartData.map(item => item.data),
+                        backgroundColor: chartData.map(item => item.backgroundColor),
+                        borderWidth: 2,
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'rgba(255, 255, 255, 0.8)',
+                                font: {size: 12, weight: '600'},
+                                padding: 15,
+                                usePointStyle: true,
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            borderColor: 'rgba(59, 130, 246, 0.2)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
                         }
                     },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        titleColor: 'white',
-                        bodyColor: 'white',
-                        borderColor: 'rgba(59, 130, 246, 0.2)',
-                        borderWidth: 1,
-                        cornerRadius: 8,
-                    }
-                },
-                animation: {duration: 1500}
-            }
-        });
-    }
-
-    // Update timeline chart
-    function updateTimelineChart(leaderboardData) {
-        const ctx = document.getElementById('timelineChart').getContext('2d');
-
-        if (charts.timeline) {
-            charts.timeline.destroy();
+                    animation: {duration: 1500}
+                }
+            });
         }
 
-        const timelineData = leaderboardData.projectCreationTimeline || {};
-        const chartData = Object.entries(timelineData).map(([month, count]) => ({
-            x: month,
-            y: count
-        }));
+        // Update timeline chart
+        function updateTimelineChart(leaderboardData) {
+            const ctx = document.getElementById('timelineChart').getContext('2d');
 
-        charts.timeline = new Chart(ctx, {
-            type: 'line',
-            data: {
-                datasets: [{
-                    label: 'Projects Created',
-                    data: chartData,
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#3b82f6',
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2,
-                    pointRadius: 6,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: 'rgba(255, 255, 255, 0.8)',
-                            font: {size: 12, weight: '600'}
+            if (charts.timeline) {
+                charts.timeline.destroy();
+            }
+
+            const timelineData = leaderboardData.projectCreationTimeline || {};
+            const chartData = Object.entries(timelineData).map(([month, count]) => ({
+                x: month,
+                y: count
+            }));
+
+            charts.timeline = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'Projects Created',
+                        data: chartData,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#3b82f6',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'rgba(255, 255, 255, 0.8)',
+                                font: {size: 12, weight: '600'}
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            borderColor: 'rgba(59, 130, 246, 0.2)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
                         }
                     },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        titleColor: 'white',
-                        bodyColor: 'white',
-                        borderColor: 'rgba(59, 130, 246, 0.2)',
-                        borderWidth: 1,
-                        cornerRadius: 8,
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: {color: 'rgba(255, 255, 255, 0.7)'},
-                        grid: {color: 'rgba(59, 130, 246, 0.1)'}
-                    },
-                    y: {
-                        ticks: {color: 'rgba(255, 255, 255, 0.7)'},
-                        grid: {color: 'rgba(59, 130, 246, 0.1)'}
-                    }
-                },
-                animation: {duration: 1500}
-            }
-        });
-    }
-
-    // Update activity scores chart
-    function updateActivityChart() {
-        // Wait for projects to be loaded
-        if (!allProjects || allProjects.length === 0) {
-            setTimeout(() => updateActivityChart(), 100);
-            return;
-        }
-
-        const ctx = document.getElementById('activityChart').getContext('2d');
-
-        if (charts.activity) {
-            charts.activity.destroy();
-        }
-
-        const activityScores = {'S+': 0, 'S': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0};
-        allProjects.forEach(project => {
-            const score = getActivityScore(project.requestCount);
-            activityScores[score]++;
-        });
-
-        charts.activity = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: Object.keys(activityScores),
-                datasets: [{
-                    label: 'Number of Projects',
-                    data: Object.values(activityScores),
-                    backgroundColor: [
-                        '#1e40af', '#3b82f6', '#0ea5e9', '#06b6d4', '#0891b2', '#64748b'
-                    ],
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
-                    borderWidth: 1,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: 'rgba(255, 255, 255, 0.8)',
-                            font: {size: 12, weight: '600'}
+                    scales: {
+                        x: {
+                            ticks: {color: 'rgba(255, 255, 255, 0.7)'},
+                            grid: {color: 'rgba(59, 130, 246, 0.1)'}
+                        },
+                        y: {
+                            ticks: {color: 'rgba(255, 255, 255, 0.7)'},
+                            grid: {color: 'rgba(59, 130, 246, 0.1)'}
                         }
                     },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        titleColor: 'white',
-                        bodyColor: 'white',
-                        borderColor: 'rgba(59, 130, 246, 0.2)',
-                        borderWidth: 1,
-                        cornerRadius: 8,
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: {color: 'rgba(255, 255, 255, 0.7)'},
-                        grid: {color: 'rgba(59, 130, 246, 0.1)'}
-                    },
-                    y: {
-                        ticks: {color: 'rgba(255, 255, 255, 0.7)'},
-                        grid: {color: 'rgba(59, 130, 246, 0.1)'}
-                    }
-                },
-                animation: {duration: 1500}
+                    animation: {duration: 1500}
+                }
+            });
+        }
+
+        // Update activity scores chart
+        function updateActivityChart() {
+            // Wait for projects to be loaded
+            if (!allProjects || allProjects.length === 0) {
+                setTimeout(() => updateActivityChart(), 100);
+                return;
             }
-        });
-    }
 
-    // Update tech pairings chart (Fixed: using 'bar' instead of 'horizontalBar')
-    function updateTechPairingsChart(dashboardData) {
-        // Wait for projects to be loaded
-        if (!allProjects || allProjects.length === 0) {
-            setTimeout(() => updateTechPairingsChart(dashboardData), 100);
-            return;
-        }
+            const ctx = document.getElementById('activityChart').getContext('2d');
 
-        const ctx = document.getElementById('techPairingsChart').getContext('2d');
+            if (charts.activity) {
+                charts.activity.destroy();
+            }
 
-        if (charts.techPairings) {
-            charts.techPairings.destroy();
-        }
+            const activityScores = {'S+': 0, 'S': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0};
+            allProjects.forEach(project => {
+                const score = getActivityScore(project.requestCount);
+                activityScores[score]++;
+            });
 
-        // Create tech stack combinations
-        const techStacks = {};
-        allProjects.forEach(project => {
-            const stack = `${formatTechName(project.frontendType)} + ${formatTechName(project.backendType)}`;
-            techStacks[stack] = (techStacks[stack] || 0) + 1;
-        });
-
-        const sortedStacks = Object.entries(techStacks)
-            .sort(([, a], [, b]) => b - a)
-            .slice(0, 8);
-
-        charts.techPairings = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: sortedStacks.map(([stack]) => stack),
-                datasets: [{
-                    label: 'Projects Using Stack',
-                    data: sortedStacks.map(([, count]) => count),
-                    backgroundColor: '#3b82f6',
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
-                    borderWidth: 1,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                indexAxis: 'y', // This makes it horizontal
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: 'rgba(255, 255, 255, 0.8)',
-                            font: {size: 12, weight: '600'}
+            charts.activity = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(activityScores),
+                    datasets: [{
+                        label: 'Number of Projects',
+                        data: Object.values(activityScores),
+                        backgroundColor: [
+                            '#1e40af', '#3b82f6', '#0ea5e9', '#06b6d4', '#0891b2', '#64748b'
+                        ],
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: 1,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'rgba(255, 255, 255, 0.8)',
+                                font: {size: 12, weight: '600'}
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            borderColor: 'rgba(59, 130, 246, 0.2)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
                         }
                     },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        titleColor: 'white',
-                        bodyColor: 'white',
-                        borderColor: 'rgba(59, 130, 246, 0.2)',
-                        borderWidth: 1,
-                        cornerRadius: 8,
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: {color: 'rgba(255, 255, 255, 0.7)'},
-                        grid: {color: 'rgba(59, 130, 246, 0.1)'}
+                    scales: {
+                        x: {
+                            ticks: {color: 'rgba(255, 255, 255, 0.7)'},
+                            grid: {color: 'rgba(59, 130, 246, 0.1)'}
+                        },
+                        y: {
+                            ticks: {color: 'rgba(255, 255, 255, 0.7)'},
+                            grid: {color: 'rgba(59, 130, 246, 0.1)'}
+                        }
                     },
-                    y: {
-                        ticks: {color: 'rgba(255, 255, 255, 0.7)'},
-                        grid: {color: 'rgba(59, 130, 246, 0.1)'}
-                    }
+                    animation: {duration: 1500}
+                }
+            });
+        }
+
+        // Update tech pairings chart (Fixed: using 'bar' instead of 'horizontalBar')
+        function updateTechPairingsChart(dashboardData) {
+            // Wait for projects to be loaded
+            if (!allProjects || allProjects.length === 0) {
+                setTimeout(() => updateTechPairingsChart(dashboardData), 100);
+                return;
+            }
+
+            const ctx = document.getElementById('techPairingsChart').getContext('2d');
+
+            if (charts.techPairings) {
+                charts.techPairings.destroy();
+            }
+
+            // Create tech stack combinations
+            const techStacks = {};
+            allProjects.forEach(project => {
+                const stack = `${formatTechName(project.frontendType)} + ${formatTechName(project.backendType)}`;
+                techStacks[stack] = (techStacks[stack] || 0) + 1;
+            });
+
+            const sortedStacks = Object.entries(techStacks)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 8);
+
+            charts.techPairings = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedStacks.map(([stack]) => stack),
+                    datasets: [{
+                        label: 'Projects Using Stack',
+                        data: sortedStacks.map(([, count]) => count),
+                        backgroundColor: '#3b82f6',
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: 1,
+                    }]
                 },
-                animation: {duration: 1500}
-            }
-        });
-    }
-
-    // Update pagination
-    function updatePagination() {
-        totalPages = Math.ceil(filteredProjects.length / PROJECTS_PER_PAGE);
-
-        if (totalPages <= 1) {
-            paginationEl.innerHTML = '';
-            return;
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y', // This makes it horizontal
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'rgba(255, 255, 255, 0.8)',
+                                font: {size: 12, weight: '600'}
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            borderColor: 'rgba(59, 130, 246, 0.2)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {color: 'rgba(255, 255, 255, 0.7)'},
+                            grid: {color: 'rgba(59, 130, 246, 0.1)'}
+                        },
+                        y: {
+                            ticks: {color: 'rgba(255, 255, 255, 0.7)'},
+                            grid: {color: 'rgba(59, 130, 246, 0.1)'}
+                        }
+                    },
+                    animation: {duration: 1500}
+                }
+            });
         }
 
-        let paginationHTML = '';
+        // Update pagination
+        function updatePagination() {
+            totalPages = Math.ceil(filteredProjects.length / PROJECTS_PER_PAGE);
 
-        // Previous button
-        paginationHTML += `
-                <button class="elite-pagination-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">
-                    ← Previous
-                </button>
-            `;
-
-        // Page numbers
-        const startPage = Math.max(1, currentPage - 2);
-        const endPage = Math.min(totalPages, currentPage + 2);
-
-        if (startPage > 1) {
-            paginationHTML += `<button class="elite-pagination-btn" onclick="changePage(1)">1</button>`;
-            if (startPage > 2) {
-                paginationHTML += `<span class="elite-pagination-info">...</span>`;
+            if (totalPages <= 1) {
+                paginationEl.innerHTML = '';
+                return;
             }
-        }
 
-        for (let i = startPage; i <= endPage; i++) {
+            let paginationHTML = '';
+
+            // Previous button
             paginationHTML += `
-                    <button class="elite-pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
-                        ${i}
+                    <button class="elite-pagination-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">
+                        ← Previous
                     </button>
                 `;
-        }
 
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                paginationHTML += `<span class="elite-pagination-info">...</span>`;
+            // Page numbers
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+
+            if (startPage > 1) {
+                paginationHTML += `<button class="elite-pagination-btn" onclick="changePage(1)">1</button>`;
+                if (startPage > 2) {
+                    paginationHTML += `<span class="elite-pagination-info">...</span>`;
+                }
             }
-            paginationHTML += `<button class="elite-pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHTML += `
+                        <button class="elite-pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
+                            ${i}
+                        </button>
+                    `;
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    paginationHTML += `<span class="elite-pagination-info">...</span>`;
+                }
+                paginationHTML += `<button class="elite-pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+
+            // Next button
+            paginationHTML += `
+                    <button class="elite-pagination-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">
+                        Next →
+                    </button>
+                `;
+
+            // Page info
+            const startItem = (currentPage - 1) * PROJECTS_PER_PAGE + 1;
+            const endItem = Math.min(currentPage * PROJECTS_PER_PAGE, filteredProjects.length);
+            paginationHTML += `
+                    <span class="elite-pagination-info">
+                        Showing ${startItem}-${endItem} of ${filteredProjects.length} projects
+                    </span>
+                `;
+
+            paginationEl.innerHTML = paginationHTML;
         }
 
-        // Next button
-        paginationHTML += `
-                <button class="elite-pagination-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">
-                    Next →
-                </button>
-            `;
-
-        // Page info
-        const startItem = (currentPage - 1) * PROJECTS_PER_PAGE + 1;
-        const endItem = Math.min(currentPage * PROJECTS_PER_PAGE, filteredProjects.length);
-        paginationHTML += `
-                <span class="elite-pagination-info">
-                    Showing ${startItem}-${endItem} of ${filteredProjects.length} projects
-                </span>
-            `;
-
-        paginationEl.innerHTML = paginationHTML;
-    }
-
-    // Change page
-    function changePage(page) {
-        if (page < 1 || page > totalPages) return;
-        currentPage = page;
-        updatePagination();
-        updateEliteLeaderboard();
-    }
-
-    // Update elite leaderboard
-    function updateEliteLeaderboard() {
-        const startIndex = (currentPage - 1) * PROJECTS_PER_PAGE;
-        const endIndex = startIndex + PROJECTS_PER_PAGE;
-        const pageProjects = filteredProjects.slice(startIndex, endIndex);
-
-        if (pageProjects.length === 0) {
-            showEmptyState();
-            return;
+        // Change page
+        function changePage(page) {
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            updatePagination();
+            updateEliteLeaderboard();
         }
 
-        console.log('Updating elite leaderboard with', pageProjects.length, 'projects for page', currentPage);
+        // Update elite leaderboard
+        function updateEliteLeaderboard() {
+            const startIndex = (currentPage - 1) * PROJECTS_PER_PAGE;
+            const endIndex = startIndex + PROJECTS_PER_PAGE;
+            const pageProjects = filteredProjects.slice(startIndex, endIndex);
 
-        const leaderboardHTML = pageProjects.map((project, index) => {
-            const globalRank = startIndex + index + 1;
-            const projectId = getProjectId(project, allProjects.indexOf(project));
-            const projectName = project.projectName || project.name || 'Unnamed Elite Project';
-            const activityScore = getActivityScore(project.requestCount);
+            if (pageProjects.length === 0) {
+                showEmptyState();
+                return;
+            }
 
-            return `
-                    <div class="elite-project-card" data-project-id="${projectId}">
-                        <div class="elite-project-header">
-                            <div class="elite-rank-badge">
-                                #${globalRank}
+            console.log('Updating elite leaderboard with', pageProjects.length, 'projects for page', currentPage);
+
+            const leaderboardHTML = pageProjects.map((project, index) => {
+                const globalRank = startIndex + index + 1;
+                const projectId = getProjectId(project, allProjects.indexOf(project));
+                const projectName = project.projectName || project.name || 'Unnamed Elite Project';
+                const activityScore = getActivityScore(project.requestCount);
+
+                return `
+                        <div class="elite-project-card" data-project-id="${projectId}">
+                            <div class="elite-project-header">
+                                <div class="elite-rank-badge">
+                                    #${globalRank}
                             </div>
                             <div class="elite-project-info">
                                 <div class="elite-project-name">
@@ -1954,337 +2017,337 @@
                         </div>
                     </div>
                 `;
-        }).join('');
+            }).join('');
 
-        leaderboardGridEl.innerHTML = leaderboardHTML;
-        console.log('Elite leaderboard updated successfully');
-    }
-
-    // Helper functions
-    function getRankEmoji(rank) {
-        switch (rank) {
-            case 1:
-                return '🥇';
-            case 2:
-                return '🥈';
-            case 3:
-                return '🥉';
-            default:
-                return rank;
-        }
-    }
-
-    function getRankName(rank) {
-        switch (rank) {
-            case 1:
-                return 'first';
-            case 2:
-                return 'second';
-            case 3:
-                return 'third';
-            default:
-                return '';
-        }
-    }
-
-    function getActivityScore(requestCount) {
-        if (requestCount >= 1000) return 'S+';
-        if (requestCount >= 300) return 'S';
-        if (requestCount >= 100) return 'A';
-        if (requestCount >= 50) return 'B';
-        if (requestCount >= 10) return 'C';
-        return 'D';
-    }
-
-    function formatTechName(tech) {
-        if (!tech) return 'N/A';
-        return tech.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
-    }
-
-    function formatDate(dateString) {
-        if (!dateString) return 'Never';
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) return 'Invalid Date';
-
-        const now = new Date();
-        const diffTime = now - date;
-        const diffHours = diffTime / (1000 * 60 * 60);
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-        if (diffHours < 24) return 'Today';
-        if (diffDays === 0) return 'Today';
-        if (diffDays === 1) return 'Yesterday';
-        if (diffDays < 7) return `${diffDays}d ago`;
-        if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
-        return `${Math.floor(diffDays / 30)}m ago`;
-    }
-
-    // Search functionality
-    function handleSearch(event) {
-        const searchTerm = event.target.value.toLowerCase().trim();
-
-        if (searchTerm === '') {
-            filteredProjects = [...allProjects];
-        } else {
-            filteredProjects = allProjects.filter(project =>
-                (project.projectName || project.name || '').toLowerCase().includes(searchTerm) ||
-                (project.projectDescription || project.description || '').toLowerCase().includes(searchTerm) ||
-                project.frontendType.toLowerCase().includes(searchTerm) ||
-                project.backendType.toLowerCase().includes(searchTerm) ||
-                project.databaseType.toLowerCase().includes(searchTerm)
-            );
+            leaderboardGridEl.innerHTML = leaderboardHTML;
+            console.log('Elite leaderboard updated successfully');
         }
 
-        currentPage = 1; // Reset to first page
-        updatePagination();
-        updateEliteLeaderboard();
-    }
-
-    // Refresh functionality
-    async function handleRefresh() {
-        if (isLoading) return;
-
-        console.log('Refreshing elite data');
-        refreshTextEl.textContent = 'Refreshing...';
-        refreshIconEl.style.transform = 'rotate(360deg)';
-
-        await loadEliteData();
-
-        setTimeout(() => {
-            refreshTextEl.textContent = 'Refresh';
-            refreshIconEl.style.transform = 'rotate(0deg)';
-        }, 500);
-    }
-
-    // Modal functions
-    function toggleModal(modalId, isVisible) {
-        const modal = document.getElementById(modalId);
-        if (isVisible) {
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        } else {
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-    }
-
-    function openAddModal() {
-        document.getElementById('addProjectForm').reset();
-        toggleModal('addProjectModal', true);
-    }
-
-    function openEditModal(projectId) {
-        console.log('Opening Edit Modal for ID:', projectId);
-
-        if (!projectId || projectId === 'undefined') {
-            console.error('Invalid project ID provided:', projectId);
-            alert('Error: Invalid project ID');
-            return;
-        }
-
-        // Find project using the helper function
-        const project = findProjectById(projectId);
-        if (!project) {
-            console.error('Project not found for ID:', projectId);
-            console.log('Available projects:', allProjects.map((p, i) => ({
-                originalId: p.id,
-                projectId: p.projectId,
-                _id: p._id,
-                calculatedId: getProjectId(p, i),
-                name: p.projectName || p.name
-            })));
-            alert(`Error: Project not found with ID: ${projectId}`);
-            return;
-        }
-
-        console.log('Found project for editing:', project);
-
-        try {
-            // Populate form with correct field names
-            document.getElementById('editProjectId').value = getProjectId(project, allProjects.indexOf(project));
-            document.getElementById('editName').value = project.projectName || project.name || '';
-            document.getElementById('editDescription').value = project.projectDescription || project.description || '';
-            document.getElementById('editFrontendType').value = project.frontendType || '';
-            document.getElementById('editBackendType').value = project.backendType || '';
-            document.getElementById('editDatabaseType').value = project.databaseType || '';
-
-            console.log('Form populated successfully');
-
-            // Show modal
-            toggleModal('editProjectModal', true);
-        } catch (error) {
-            console.error('Error populating edit form:', error);
-            alert('Error opening edit modal: ' + error.message);
-        }
-    }
-
-    function openDeleteModal(projectId) {
-        if (confirm('Are you sure you want to delete this elite project? This action cannot be undone.')) {
-            handleDeleteProject(projectId);
-        }
-    }
-
-    // CRUD operations
-    async function handleAddProject(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const newProject = {
-            name: formData.get('name'),
-            description: formData.get('description'),
-            frontendType: formData.get('frontendType'),
-            backendType: formData.get('backendType'),
-            databaseType: formData.get('databaseType')
-        };
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/projects`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(newProject)
-            });
-
-            if (!response.ok) throw new Error('Failed to create project');
-
-            toggleModal('addProjectModal', false);
-            loadEliteData();
-        } catch (error) {
-            console.error('Error creating project:', error);
-            alert('Failed to create project. Please try again.');
-        }
-    }
-
-    async function handleEditProject(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const projectId = formData.get('id');
-        const updatedProject = {
-            name: formData.get('name'),
-            description: formData.get('description'),
-            frontendType: formData.get('frontendType'),
-            backendType: formData.get('backendType'),
-            databaseType: formData.get('databaseType')
-        };
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
-                method: 'PUT',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(updatedProject)
-            });
-
-            if (!response.ok) throw new Error('Failed to update project');
-
-            toggleModal('editProjectModal', false);
-            loadEliteData();
-        } catch (error) {
-            console.error('Error updating project:', error);
-            alert('Failed to update project. Please try again.');
-        }
-    }
-
-    async function handleDeleteProject(projectId) {
-        try {
-            const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
-                method: 'DELETE'
-            });
-
-            if (!response.ok) throw new Error('Failed to delete project');
-
-            loadEliteData();
-        } catch (error) {
-            console.error('Error deleting project:', error);
-            alert('Failed to delete project. Please try again.');
-        }
-    }
-
-    // Loading and error states
-    function showLoading() {
-        leaderboardGridEl.innerHTML = `
-                <div class="elite-loading">
-                    <div class="elite-spinner"></div>
-                    <p>Loading elite projects...</p>
-                </div>
-            `;
-        elitePodiumEl.innerHTML = `
-                <div class="elite-loading">
-                    <div class="elite-spinner"></div>
-                    <p>Loading elite royalty...</p>
-                </div>
-            `;
-    }
-
-    function showError(message) {
-        leaderboardGridEl.innerHTML = `
-                <div class="elite-empty-state">
-                    <h3>⚠️ Elite Error</h3>
-                    <p>${message}</p>
-                    <button class="elite-btn" onclick="loadEliteData()" style="margin-top: 2rem;">
-                        Try Again
-                    </button>
-                </div>
-            `;
-    }
-
-    function showEmptyState() {
-        leaderboardGridEl.innerHTML = `
-                <div class="elite-empty-state">
-                    <h3>🚀 No Elite Projects Found</h3>
-                    <p>No projects match your search criteria. Try adjusting your search or create a new elite project!</p>
-                    <button class="elite-btn elite-btn-success" onclick="openAddModal()" style="margin-top: 2rem;">
-                        <span>➕</span>
-                        Create Elite Project
-                    </button>
-                </div>
-            `;
-    }
-
-    // Make functions globally accessible
-    window.openEditModal = openEditModal;
-    window.openDeleteModal = openDeleteModal;
-    window.loadEliteData = loadEliteData;
-    window.openAddModal = openAddModal;
-    window.changePage = changePage;
-
-    // Add elite keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-        if (e.ctrlKey || e.metaKey) {
-            switch (e.key) {
-                case 'r':
-                    e.preventDefault();
-                    handleRefresh();
-                    break;
-                case 'f':
-                    e.preventDefault();
-                    searchInputEl.focus();
-                    break;
-                case 'n':
-                    e.preventDefault();
-                    openAddModal();
-                    break;
+        // Helper functions
+        function getRankEmoji(rank) {
+            switch (rank) {
+                case 1:
+                    return '🥇';
+                case 2:
+                    return '🥈';
+                case 3:
+                    return '🥉';
+                default:
+                    return rank;
             }
         }
 
-        if (e.key === 'Escape') {
-            searchInputEl.value = '';
-            handleSearch({target: {value: ''}});
-            searchInputEl.blur();
-            toggleModal('addProjectModal', false);
-            toggleModal('editProjectModal', false);
+        function getRankName(rank) {
+            switch (rank) {
+                case 1:
+                    return 'first';
+                case 2:
+                    return 'second';
+                case 3:
+                    return 'third';
+                default:
+                    return '';
+            }
         }
 
-        // Pagination shortcuts
-        if (e.key === 'ArrowLeft' && e.altKey) {
-            e.preventDefault();
-            changePage(currentPage - 1);
+        function getActivityScore(requestCount) {
+            if (requestCount >= 1000) return 'S+';
+            if (requestCount >= 300) return 'S';
+            if (requestCount >= 100) return 'A';
+            if (requestCount >= 50) return 'B';
+            if (requestCount >= 10) return 'C';
+            return 'D';
         }
-        if (e.key === 'ArrowRight' && e.altKey) {
-            e.preventDefault();
-            changePage(currentPage + 1);
-        }
-    });
 
-    console.log('🚀 Elite Leaderboard initialized successfully!');
-</script>
+        function formatTechName(tech) {
+            if (!tech) return 'N/A';
+            return tech.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Never';
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return 'Invalid Date';
+
+            const now = new Date();
+            const diffTime = now - date;
+            const diffHours = diffTime / (1000 * 60 * 60);
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffHours < 24) return 'Today';
+            if (diffDays === 0) return 'Today';
+            if (diffDays === 1) return 'Yesterday';
+            if (diffDays < 7) return `${diffDays}d ago`;
+            if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+            return `${Math.floor(diffDays / 30)}m ago`;
+        }
+
+        // Search functionality
+        function handleSearch(event) {
+            const searchTerm = event.target.value.toLowerCase().trim();
+
+            if (searchTerm === '') {
+                filteredProjects = [...allProjects];
+            } else {
+                filteredProjects = allProjects.filter(project =>
+                    (project.projectName || project.name || '').toLowerCase().includes(searchTerm) ||
+                    (project.projectDescription || project.description || '').toLowerCase().includes(searchTerm) ||
+                    project.frontendType.toLowerCase().includes(searchTerm) ||
+                    project.backendType.toLowerCase().includes(searchTerm) ||
+                    project.databaseType.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            currentPage = 1; // Reset to first page
+            updatePagination();
+            updateEliteLeaderboard();
+        }
+
+        // Refresh functionality
+        async function handleRefresh() {
+            if (isLoading) return;
+
+            console.log('Refreshing elite data');
+            refreshTextEl.textContent = 'Refreshing...';
+            refreshIconEl.style.transform = 'rotate(360deg)';
+
+            await loadEliteData();
+
+            setTimeout(() => {
+                refreshTextEl.textContent = 'Refresh';
+                refreshIconEl.style.transform = 'rotate(0deg)';
+            }, 500);
+        }
+
+        // Modal functions
+        function toggleModal(modalId, isVisible) {
+            const modal = document.getElementById(modalId);
+            if (isVisible) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function openAddModal() {
+            document.getElementById('addProjectForm').reset();
+            toggleModal('addProjectModal', true);
+        }
+
+        function openEditModal(projectId) {
+            console.log('Opening Edit Modal for ID:', projectId);
+
+            if (!projectId || projectId === 'undefined') {
+                console.error('Invalid project ID provided:', projectId);
+                alert('Error: Invalid project ID');
+                return;
+            }
+
+            // Find project using the helper function
+            const project = findProjectById(projectId);
+            if (!project) {
+                console.error('Project not found for ID:', projectId);
+                console.log('Available projects:', allProjects.map((p, i) => ({
+                    originalId: p.id,
+                    projectId: p.projectId,
+                    _id: p._id,
+                    calculatedId: getProjectId(p, i),
+                    name: p.projectName || p.name
+                })));
+                alert(`Error: Project not found with ID: ${projectId}`);
+                return;
+            }
+
+            console.log('Found project for editing:', project);
+
+            try {
+                // Populate form with correct field names
+                document.getElementById('editProjectId').value = getProjectId(project, allProjects.indexOf(project));
+                document.getElementById('editName').value = project.projectName || project.name || '';
+                document.getElementById('editDescription').value = project.projectDescription || project.description || '';
+                document.getElementById('editFrontendType').value = project.frontendType || '';
+                document.getElementById('editBackendType').value = project.backendType || '';
+                document.getElementById('editDatabaseType').value = project.databaseType || '';
+
+                console.log('Form populated successfully');
+
+                // Show modal
+                toggleModal('editProjectModal', true);
+            } catch (error) {
+                console.error('Error populating edit form:', error);
+                alert('Error opening edit modal: ' + error.message);
+            }
+        }
+
+        function openDeleteModal(projectId) {
+            if (confirm('Are you sure you want to delete this elite project? This action cannot be undone.')) {
+                handleDeleteProject(projectId);
+            }
+        }
+
+        // CRUD operations
+        async function handleAddProject(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const newProject = {
+                name: formData.get('name'),
+                description: formData.get('description'),
+                frontendType: formData.get('frontendType'),
+                backendType: formData.get('backendType'),
+                databaseType: formData.get('databaseType')
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/projects`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(newProject)
+                });
+
+                if (!response.ok) throw new Error('Failed to create project');
+
+                toggleModal('addProjectModal', false);
+                loadEliteData();
+            } catch (error) {
+                console.error('Error creating project:', error);
+                alert('Failed to create project. Please try again.');
+            }
+        }
+
+        async function handleEditProject(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const projectId = formData.get('id');
+            const updatedProject = {
+                name: formData.get('name'),
+                description: formData.get('description'),
+                frontendType: formData.get('frontendType'),
+                backendType: formData.get('backendType'),
+                databaseType: formData.get('databaseType')
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(updatedProject)
+                });
+
+                if (!response.ok) throw new Error('Failed to update project');
+
+                toggleModal('editProjectModal', false);
+                loadEliteData();
+            } catch (error) {
+                console.error('Error updating project:', error);
+                alert('Failed to update project. Please try again.');
+            }
+        }
+
+        async function handleDeleteProject(projectId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) throw new Error('Failed to delete project');
+
+                loadEliteData();
+            } catch (error) {
+                console.error('Error deleting project:', error);
+                alert('Failed to delete project. Please try again.');
+            }
+        }
+
+        // Loading and error states
+        function showLoading() {
+            leaderboardGridEl.innerHTML = `
+                    <div class="elite-loading">
+                        <div class="elite-spinner"></div>
+                        <p>Loading elite projects...</p>
+                    </div>
+                `;
+            elitePodiumEl.innerHTML = `
+                    <div class="elite-loading">
+                        <div class="elite-spinner"></div>
+                        <p>Loading elite royalty...</p>
+                    </div>
+                `;
+        }
+
+        function showError(message) {
+            leaderboardGridEl.innerHTML = `
+                    <div class="elite-empty-state">
+                        <h3>⚠️ Elite Error</h3>
+                        <p>${message}</p>
+                        <button class="elite-btn" onclick="loadEliteData()" style="margin-top: 2rem;">
+                            Try Again
+                        </button>
+                    </div>
+                `;
+        }
+
+        function showEmptyState() {
+            leaderboardGridEl.innerHTML = `
+                    <div class="elite-empty-state">
+                        <h3>🚀 No Elite Projects Found</h3>
+                        <p>No projects match your search criteria. Try adjusting your search or create a new elite project!</p>
+                        <button class="elite-btn elite-btn-success" onclick="openAddModal()" style="margin-top: 2rem;">
+                            <span>➕</span>
+                            Create Elite Project
+                        </button>
+                    </div>
+                `;
+        }
+
+        // Make functions globally accessible
+        window.openEditModal = openEditModal;
+        window.openDeleteModal = openDeleteModal;
+        window.loadEliteData = loadEliteData;
+        window.openAddModal = openAddModal;
+        window.changePage = changePage;
+
+        // Add elite keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case 'r':
+                        e.preventDefault();
+                        handleRefresh();
+                        break;
+                    case 'f':
+                        e.preventDefault();
+                        searchInputEl.focus();
+                        break;
+                    case 'n':
+                        e.preventDefault();
+                        openAddModal();
+                        break;
+                }
+            }
+
+            if (e.key === 'Escape') {
+                searchInputEl.value = '';
+                handleSearch({target: {value: ''}});
+                searchInputEl.blur();
+                toggleModal('addProjectModal', false);
+                toggleModal('editProjectModal', false);
+            }
+
+            // Pagination shortcuts
+            if (e.key === 'ArrowLeft' && e.altKey) {
+                e.preventDefault();
+                changePage(currentPage - 1);
+            }
+            if (e.key === 'ArrowRight' && e.altKey) {
+                e.preventDefault();
+                changePage(currentPage + 1);
+            }
+        });
+
+        console.log('🚀 Elite Leaderboard initialized successfully!');
+    </script>
 </body>
 </html>
 
