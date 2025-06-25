@@ -176,8 +176,6 @@ public class EntityExtractorService {
                 if (entityInfo.getName().equals("User")) {
                     entityInfo.addAttribute("username", "string");
                     entityInfo.addAttribute("email", "string");
-                } else {
-                    entityInfo.addAttribute("description", "string");
                 }
             }
         } catch (IOException e) {
