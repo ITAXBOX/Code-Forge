@@ -307,8 +307,29 @@ export default function Dashboard() {
   }
 
   const updateEntity = async () => {
-    if (!selectedEntity || !selectedEntityData?.id || !updateForm.name) {
-      setEntityError("Please fill in required fields")
+    // Remove the check for selectedEntityData?.id since it's already set and unchangeable
+    if (!selectedEntity) {
+      setEntityError("Please select an entity to update")
+      return
+    }
+
+    // Check if required fields are filled
+    const requiredFields = entities.find(e => e.name === selectedEntity)?.attributes
+      .filter(attr => attr.required && attr.name !== 'id') // Exclude ID from required fields check
+
+    let hasEmptyRequiredField = false
+
+    if (requiredFields && requiredFields.length > 0) {
+      for (const field of requiredFields) {
+        if (!updateForm[field.name]) {
+          hasEmptyRequiredField = true
+          break
+        }
+      }
+    }
+
+    if (hasEmptyRequiredField) {
+      setEntityError("Please fill in all required fields")
       return
     }
 
@@ -316,13 +337,19 @@ export default function Dashboard() {
     setEntityError("")
     setEntitySuccess("")
 
+    // Ensure ID is included from selectedEntityData but isn't changed by user
+    const dataToUpdate = {
+      ...updateForm,
+      id: selectedEntityData?.id // Make sure ID is set from the original data
+    }
+
     try {
-      const response = await fetch(`${getEntityEndpoint()}/${selectedEntityData.id}`, {
+      const response = await fetch(`${getEntityEndpoint()}/${selectedEntityData?.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updateForm),
+        body: JSON.stringify(dataToUpdate),
         credentials: "include",
       })
 
@@ -331,7 +358,8 @@ export default function Dashboard() {
         fetchEntityData() // Refresh the list
         setSelectedTab("list")
       } else {
-        setEntityError("Failed to update entity")
+        const errorData = await response.text()
+        setEntityError(errorData || "Failed to update entity")
       }
     } catch (error) {
       console.error("Update error:", error)
@@ -973,27 +1001,30 @@ export default function Dashboard() {
                         <div className="space-y-4">
                           {/* Dynamically generate form fields based on entity attributes */}
                           {selectedEntity && entities.find(e => e.name === selectedEntity)?.attributes.map((attr) => (
-                            <div key={attr.name} className="space-y-2">
-                              <Label htmlFor={`create-${attr.name}`}>{attr.name.charAt(0).toUpperCase() + attr.name.slice(1)} {attr.required && '*'}</Label>
-                              {attr.type === 'text' || attr.type === 'textarea' ? (
-                                <Textarea
-                                  id={`create-${attr.name}`}
-                                  placeholder={`Enter ${attr.name}`}
-                                  className="bg-white border-gray-300 min-h-[100px]"
-                                  value={createForm[attr.name] || ''}
-                                  onChange={(e) => setCreateForm({ ...createForm, [attr.name]: e.target.value })}
-                                />
-                              ) : (
-                                <Input
-                                  id={`create-${attr.name}`}
-                                  placeholder={`Enter ${attr.name}`}
-                                  className="bg-white border-gray-300"
-                                  value={createForm[attr.name] || ''}
-                                  onChange={(e) => setCreateForm({ ...createForm, [attr.name]: e.target.value })}
-                                  type={attr.type === 'number' ? 'number' : 'text'}
-                                />
-                              )}
-                            </div>
+                            // Skip the ID field in create form since it should be auto-generated
+                            attr.name !== 'id' && (
+                              <div key={attr.name} className="space-y-2">
+                                <Label htmlFor={`create-${attr.name}`}>{attr.name.charAt(0).toUpperCase() + attr.name.slice(1)} {attr.required && '*'}</Label>
+                                {attr.type === 'text' || attr.type === 'textarea' ? (
+                                  <Textarea
+                                    id={`create-${attr.name}`}
+                                    placeholder={`Enter ${attr.name}`}
+                                    className="bg-white border-gray-300 min-h-[100px]"
+                                    value={createForm[attr.name] || ''}
+                                    onChange={(e) => setCreateForm({ ...createForm, [attr.name]: e.target.value })}
+                                  />
+                                ) : (
+                                  <Input
+                                    id={`create-${attr.name}`}
+                                    placeholder={`Enter ${attr.name}`}
+                                    className="bg-white border-gray-300"
+                                    value={createForm[attr.name] || ''}
+                                    onChange={(e) => setCreateForm({ ...createForm, [attr.name]: e.target.value })}
+                                    type={attr.type === 'number' ? 'number' : 'text'}
+                                  />
+                                )}
+                              </div>
+                            )
                           ))}
                         </div>
 
@@ -1006,7 +1037,9 @@ export default function Dashboard() {
                                 const emptyForm = {};
                                 if (selectedEntity) {
                                   entities.find(e => e.name === selectedEntity)?.attributes.forEach(attr => {
-                                    emptyForm[attr.name] = '';
+                                    if (attr.name !== 'id') { // Skip id field in reset
+                                      emptyForm[attr.name] = '';
+                                    }
                                   });
                                 }
                                 setCreateForm(emptyForm as EntityData);
