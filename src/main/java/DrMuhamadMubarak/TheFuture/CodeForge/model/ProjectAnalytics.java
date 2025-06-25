@@ -37,7 +37,7 @@ public class ProjectAnalytics {
     @PrePersist
     protected void onCreate() {
         lastRequestedAt = LocalDateTime.now();
-        requestCount = 0;
+        requestCount = 1;
     }
 
     @PreUpdate
