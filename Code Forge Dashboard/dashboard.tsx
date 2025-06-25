@@ -1088,40 +1088,21 @@ export default function Dashboard() {
 
                             <Separator className="my-4 bg-gray-200" />
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              <div>
-                                <h4 className="text-sm font-medium text-gray-600 mb-2">Entity Details</h4>
-                                <div className="space-y-3">
-                                  {/* Display all entity attributes */}
-                                  {selectedEntity && entities.find(e => e.name === selectedEntity)?.attributes.map((attr) => (
-                                    <div key={attr.name} className="flex justify-between">
-                                      <span className="text-sm text-gray-500 capitalize">{attr.name}:</span>
-                                      <span className="text-sm text-gray-900">
-                                        {selectedEntityData[attr.name] !== undefined && selectedEntityData[attr.name] !== null
-                                          ? String(selectedEntityData[attr.name])
-                                          : `No ${attr.name}`}
-                                      </span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-
-                              <div>
-                                <h4 className="text-sm font-medium text-gray-600 mb-2">System Information</h4>
-                                <div className="space-y-3">
-                                  <div className="flex justify-between">
-                                    <span className="text-sm text-gray-500">ID:</span>
-                                    <span className="text-sm text-gray-900">{selectedEntityData.id}</span>
+                            {/* Single column with all entity details - System Information removed */}
+                            <div>
+                              <h4 className="text-sm font-medium text-gray-600 mb-2">Entity Details</h4>
+                              <div className="space-y-3">
+                                {/* Display all entity attributes */}
+                                {selectedEntity && entities.find(e => e.name === selectedEntity)?.attributes.map((attr) => (
+                                  <div key={attr.name} className="flex justify-between">
+                                    <span className="text-sm text-gray-500 capitalize">{attr.name}:</span>
+                                    <span className="text-sm text-gray-900">
+                                      {selectedEntityData[attr.name] !== undefined && selectedEntityData[attr.name] !== null
+                                        ? String(selectedEntityData[attr.name])
+                                        : `No ${attr.name}`}
+                                    </span>
                                   </div>
-                                  <div className="flex justify-between">
-                                    <span className="text-sm text-gray-500">Created:</span>
-                                    <span className="text-sm text-gray-900">{selectedEntityData.createdAt || 'N/A'}</span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span className="text-sm text-gray-500">Last Updated:</span>
-                                    <span className="text-sm text-gray-900">{selectedEntityData.updatedAt || 'N/A'}</span>
-                                  </div>
-                                </div>
+                                ))}
                               </div>
                             </div>
 
@@ -1161,39 +1142,31 @@ export default function Dashboard() {
                       {selectedEntityData ? (
                           <div className="bg-gray-50 rounded-lg border border-gray-200 p-6">
                             <div className="space-y-4">
-                              <div className="space-y-2">
-                                <Label htmlFor="update-id">ID</Label>
-                                <Input
-                                    id="update-id"
-                                    value={selectedEntityData.id}
-                                    className="bg-gray-100 border-gray-300"
-                                    disabled
-                                />
-                              </div>
-
-                              {/* Dynamically generate form fields based on entity attributes */}
-                              {selectedEntity && entities.find(e => e.name === selectedEntity)?.attributes.map((attr) => (
-                                <div key={attr.name} className="space-y-2">
-                                  <Label htmlFor={`update-${attr.name}`}>{attr.name.charAt(0).toUpperCase() + attr.name.slice(1)} {attr.required && '*'}</Label>
-                                  {attr.type === 'text' || attr.type === 'textarea' ? (
-                                    <Textarea
-                                      id={`update-${attr.name}`}
-                                      placeholder={`Enter ${attr.name}`}
-                                      className="bg-white border-gray-300 min-h-[100px]"
-                                      value={updateForm[attr.name] || ''}
-                                      onChange={(e) => setUpdateForm({ ...updateForm, [attr.name]: e.target.value })}
-                                    />
-                                  ) : (
-                                    <Input
-                                      id={`update-${attr.name}`}
-                                      placeholder={`Enter ${attr.name}`}
-                                      className="bg-white border-gray-300"
-                                      value={updateForm[attr.name] || ''}
-                                      onChange={(e) => setUpdateForm({ ...updateForm, [attr.name]: e.target.value })}
-                                      type={attr.type === 'number' ? 'number' : 'text'}
-                                    />
-                                  )}
-                                </div>
+                              {/* Dynamically generate form fields based on entity attributes, excluding ID field */}
+                              {selectedEntity && entities.find(e => e.name === selectedEntity)?.attributes
+                                .filter(attr => attr.name !== 'id') // Filter out the ID field completely
+                                .map((attr) => (
+                                  <div key={attr.name} className="space-y-2">
+                                    <Label htmlFor={`update-${attr.name}`}>{attr.name.charAt(0).toUpperCase() + attr.name.slice(1)} {attr.required && '*'}</Label>
+                                    {attr.type === 'text' || attr.type === 'textarea' ? (
+                                      <Textarea
+                                        id={`update-${attr.name}`}
+                                        placeholder={`Enter ${attr.name}`}
+                                        className="bg-white border-gray-300 min-h-[100px]"
+                                        value={updateForm[attr.name] || ''}
+                                        onChange={(e) => setUpdateForm({ ...updateForm, [attr.name]: e.target.value })}
+                                      />
+                                    ) : (
+                                      <Input
+                                        id={`update-${attr.name}`}
+                                        placeholder={`Enter ${attr.name}`}
+                                        className="bg-white border-gray-300"
+                                        value={updateForm[attr.name] || ''}
+                                        onChange={(e) => setUpdateForm({ ...updateForm, [attr.name]: e.target.value })}
+                                        type={attr.type === 'number' ? 'number' : 'text'}
+                                      />
+                                    )}
+                                  </div>
                               ))}
                             </div>
 
