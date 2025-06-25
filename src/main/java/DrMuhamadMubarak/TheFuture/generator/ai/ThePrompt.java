@@ -8,7 +8,7 @@ public class ThePrompt {
                  The list should be relevant to the domain and follow good database design principles.
             
                  Do NOT include "User" or "Role" in the list, as they will be added separately.
-                 Avoid including entities that represent people (e.g., "Author", "Student", "Customer") unless they have distinct properties
+                 Avoid including entities that represent people (e.g., "Author", "Student", "Customer", "Player") unless they have distinct properties
                  that cannot be represented by "User".
             
                  Additionally, avoid using entity names that are forbidden or problematic in backends and databases, such as:
