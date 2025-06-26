@@ -69,7 +69,7 @@ public class ProjectAnalyticsController {
         leaderboardData.put("podiumProjects", podiumProjectDTOs);
 
         // 2. Top 10 projects for complete leaderboard
-        List<ProjectAnalytics> leaderboardProjects = analyticsService.getTopProjects(10);
+        List<ProjectAnalytics> leaderboardProjects = analyticsService.getTopProjects(20);
         List<ProjectAnalyticsResponseDTO> leaderboardProjectDTOs = leaderboardProjects.stream()
             .map(ProjectAnalyticsResponseDTOBuilder::projectAnalyticsResponseDTObuilder)
             .toList();
@@ -114,16 +114,16 @@ public class ProjectAnalyticsController {
     public ResponseEntity<Map<String, Object>> getTechnologyDistribution() {
         Map<String, Object> chartData = new HashMap<>();
 
-        chartData.put("frontend", analyticsService.getTopFrontendFrameworks(10));
-        chartData.put("backend", analyticsService.getTopBackendFrameworks(10));
-        chartData.put("database", analyticsService.getTopDatabaseTypes(10));
+        chartData.put("frontend", analyticsService.getTopFrontendFrameworks(20));
+        chartData.put("backend", analyticsService.getTopBackendFrameworks(20));
+        chartData.put("database", analyticsService.getTopDatabaseTypes(20));
 
         return ResponseEntity.ok(chartData);
     }
 
     @GetMapping("/charts/tech-pairings")
     public ResponseEntity<List<Map<String, Object>>> getTechnologyPairings() {
-        return ResponseEntity.ok(analyticsService.getPopularTechnologyPairings(10));
+        return ResponseEntity.ok(analyticsService.getPopularTechnologyPairings(20));
     }
 
     @GetMapping("/charts/project-timeline")
