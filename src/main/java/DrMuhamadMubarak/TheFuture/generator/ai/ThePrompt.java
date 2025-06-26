@@ -15,6 +15,7 @@ public class ThePrompt {
                  - Reserved SQL keywords (e.g., "Order", "Group", "Table", "Match").
                  - Reserved programming language keywords (e.g., "Class", "Public", "Default").
                  - Names that are too generic or ambiguous (e.g., "Data", "Object", "Entity").
+                 - Names that are forbidden in Spring Boot (e.g., "Service", "Controller", "Repository").
             
                  Example Output:
                  ["Book", "Course", "Product"]
