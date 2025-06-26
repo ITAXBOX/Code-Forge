@@ -271,9 +271,42 @@ export default function Dashboard() {
   }
 
   const createEntity = async () => {
-    if (!selectedEntity || !createForm.name) {
+    if (!selectedEntity) {
+      setEntityError("Please select an entity first")
+      return
+    }
+
+    // Check required fields based on entity type
+    const entityDef = entities.find(e => e.name === selectedEntity);
+    if (!entityDef) {
+      setEntityError("Entity definition not found")
+      return
+    }
+
+    // Get required fields for this entity
+    const requiredFields = entityDef.attributes
+      .filter(attr => attr.name !== 'id' && attr.required)
+      .map(attr => attr.name);
+
+    // Special handling for User entity which always needs username, email, password
+    if (selectedEntity === "User") {
+      if (!createForm.username || !createForm.email || !createForm.password) {
+        setEntityError("Please fill in all required fields (username, email, password)")
+        return
+      }
+    }
+    // Special handling for entities that should have name
+    else if (requiredFields.includes('name') && !createForm.name) {
       setEntityError("Please fill in required fields")
       return
+    }
+    // Generic validation for any other required fields
+    else {
+      const missingFields = requiredFields.filter(field => !createForm[field]);
+      if (missingFields.length > 0) {
+        setEntityError(`Please fill in the following required fields: ${missingFields.join(', ')}`)
+        return
+      }
     }
 
     setIsEntityLoading(true)
@@ -292,7 +325,21 @@ export default function Dashboard() {
 
       if (response.ok) {
         setEntitySuccess(`${selectedEntity} created successfully!`)
-        setCreateForm({ name: "", description: "" })
+
+        // Reset form based on entity type
+        const emptyForm = {};
+        if (selectedEntity === "User") {
+          setCreateForm({ username: "", email: "", password: "" })
+        } else {
+          // Generate an empty form with all the field names for this entity
+          entityDef.attributes.forEach(attr => {
+            if (attr.name !== 'id') { // Skip id field in reset
+              emptyForm[attr.name] = '';
+            }
+          });
+          setCreateForm(emptyForm as EntityData);
+        }
+
         fetchEntityData() // Refresh the list
         setSelectedTab("list")
       } else {
