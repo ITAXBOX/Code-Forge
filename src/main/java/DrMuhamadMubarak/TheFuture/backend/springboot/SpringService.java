@@ -18,24 +18,52 @@ public class SpringService {
         String className = entityName + "Service";
         String fileName = projectName + "/src/main/java/com/example/" + projectName.toLowerCase() + "/services/" + className + ".java";
 
+        boolean isUserEntity = entityName.equalsIgnoreCase("User");
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             writer.write("package com.example." + projectName.toLowerCase() + ".services;\n\n");
             writer.write("import com.example." + projectName.toLowerCase() + ".models." + entityName + ";\n");
             writer.write("import com.example." + projectName.toLowerCase() + ".repositories." + entityName + "Repository;\n");
             writer.write("import jakarta.persistence.EntityNotFoundException;\n");
-            writer.write("import org.springframework.stereotype.Service;\n\n");
-            writer.write("import java.util.List;\n");
+            writer.write("import org.springframework.stereotype.Service;\n");
+
+            // Add BCrypt import for User entity
+            if (isUserEntity) {
+                writer.write("import org.springframework.security.crypto.password.PasswordEncoder;\n");
+            }
+
+            writer.write("\nimport java.util.List;\n");
             writer.write("import java.util.Optional;\n\n");
 
             writer.write("@Service\n");
             writer.write("public class " + className + " {\n\n");
 
             // Add Repository Field (constructor injection)
-            writer.write("    private final " + entityName + "Repository " + entityName.toLowerCase() + "Repository;\n\n");
+            writer.write("    private final " + entityName + "Repository " + entityName.toLowerCase() + "Repository;\n");
+
+            // Add PasswordEncoder field for User entity
+            if (isUserEntity) {
+                writer.write("    private final PasswordEncoder passwordEncoder;\n\n");
+            } else {
+                writer.write("\n");
+            }
 
             // Constructor for injection
-            writer.write("    public " + className + "(" + entityName + "Repository " + entityName.toLowerCase() + "Repository) {\n");
+            writer.write("    public " + className + "(" + entityName + "Repository " + entityName.toLowerCase() + "Repository");
+
+            // Add PasswordEncoder to constructor for User entity
+            if (isUserEntity) {
+                writer.write(", PasswordEncoder passwordEncoder");
+            }
+
+            writer.write(") {\n");
             writer.write("        this." + entityName.toLowerCase() + "Repository = " + entityName.toLowerCase() + "Repository;\n");
+
+            // Initialize PasswordEncoder for User entity
+            if (isUserEntity) {
+                writer.write("        this.passwordEncoder = passwordEncoder;\n");
+            }
+
             writer.write("    }\n\n");
 
             // Get All Method
@@ -45,6 +73,12 @@ public class SpringService {
 
             // Create Method
             writer.write("    public " + entityName + " create" + entityName + "(" + entityName + " " + entityName.toLowerCase() + ") {\n");
+
+            // Hash password for User entity
+            if (isUserEntity) {
+                writer.write("        " + entityName.toLowerCase() + ".setPassword(passwordEncoder.encode(" + entityName.toLowerCase() + ".getPassword()));\n");
+            }
+
             writer.write("        return " + entityName.toLowerCase() + "Repository.save(" + entityName.toLowerCase() + ");\n");
             writer.write("    }\n\n");
 
@@ -59,7 +93,14 @@ public class SpringService {
             writer.write("        if (optional" + entityName + ".isPresent()) {\n");
             writer.write("            " + entityName + " " + entityName.toLowerCase() + " = optional" + entityName + ".get();\n");
             for (AttributeDTO attribute : attributes) {
-                writer.write("            " + entityName.toLowerCase() + ".set" + capitalizeFirstLetter(attribute.getAttributeName()) + "(" + entityName.toLowerCase() + "Details.get" + capitalizeFirstLetter(attribute.getAttributeName()) + "());\n");
+                String attrName = attribute.getAttributeName();
+                if (isUserEntity && attrName.equalsIgnoreCase("password")) {
+                    writer.write("            if (" + entityName.toLowerCase() + "Details.getPassword() != null && !" + entityName.toLowerCase() + "Details.getPassword().isEmpty()) {\n");
+                    writer.write("                " + entityName.toLowerCase() + ".setPassword(passwordEncoder.encode(" + entityName.toLowerCase() + "Details.getPassword()));\n");
+                    writer.write("            }\n");
+                } else {
+                    writer.write("            " + entityName.toLowerCase() + ".set" + capitalizeFirstLetter(attrName) + "(" + entityName.toLowerCase() + "Details.get" + capitalizeFirstLetter(attrName) + "());\n");
+                }
             }
             writer.write("            return " + entityName.toLowerCase() + "Repository.save(" + entityName.toLowerCase() + ");\n");
             writer.write("        }\n");
