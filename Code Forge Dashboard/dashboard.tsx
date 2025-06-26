@@ -313,13 +313,33 @@ export default function Dashboard() {
     setEntityError("")
     setEntitySuccess("")
 
+    // Process form data before submission
+    const processedForm = { ...createForm };
+
+    // Handle date fields - convert date inputs to proper format for backend
+    if (entityDef.attributes) {
+      entityDef.attributes.forEach(attr => {
+        if (attr.type === 'Date' && processedForm[attr.name]) {
+          try {
+            // Ensure the date is in ISO format for backend
+            const dateValue = new Date(processedForm[attr.name]);
+            if (!isNaN(dateValue.getTime())) {
+              processedForm[attr.name] = dateValue.toISOString();
+            }
+          } catch (error) {
+            console.error(`Error formatting date field ${attr.name}:`, error);
+          }
+        }
+      });
+    }
+
     try {
       const response = await fetch(getEntityEndpoint(), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(createForm),
+        body: JSON.stringify(processedForm),
         credentials: "include",
       })
 
