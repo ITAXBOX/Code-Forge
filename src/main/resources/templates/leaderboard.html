@@ -2094,21 +2094,30 @@
 
         function formatDate(dateString) {
             if (!dateString) return 'Never';
+
             const date = new Date(dateString);
-            if (isNaN(date.getTime())) return 'Invalid Date';
-
             const now = new Date();
-            const diffTime = now - date;
-            const diffHours = diffTime / (1000 * 60 * 60);
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const diffMs = now - date;
 
-            if (diffHours < 24) return 'Today';
-            if (diffDays === 0) return 'Today';
-            if (diffDays === 1) return 'Yesterday';
-            if (diffDays < 7) return `${diffDays}d ago`;
-            if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
-            return `${Math.floor(diffDays / 30)}m ago`;
+            const seconds = Math.floor(diffMs / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            const weeks = Math.floor(days / 7);
+            const months = Math.floor(days / 30);
+
+            if (seconds < 60) return 'Just now';
+            if (minutes < 60) return `${minutes} min ago`;
+            if (hours < 24) return `${hours}h ago`;
+            if (days === 1) return 'Yesterday';
+            if (days < 7) return `${days}d ago`;
+            if (days < 30) return `${weeks}w ago`;
+            if (days < 365) return `${months}mo ago`;
+
+            const years = Math.floor(days / 365);
+            return `${years}y ago`;
         }
+
 
         // Search functionality
         function handleSearch(event) {
