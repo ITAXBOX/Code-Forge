@@ -1338,25 +1338,22 @@ export default function Dashboard() {
                       <div className="space-y-4">
                         {entities
                             .find((e) => e.name === selectedEntity)
-                            ?.endpoints.filter((e) => e.includes("/") && (e.includes("GET") || e.includes("POST") || e.includes("PUT") || e.includes("DELETE")))
-                            .map((endpoint, index) => {
-                              const [method, path] = endpoint.split(" ");
-                              const isGet = method === "GET";
-                              
-                              // Extract parameter names from path
-                              const pathParams = path.match(/\{([^}]+)\}/g)?.map(p => p.slice(1, -1)) || [];
-
-                              return (
-                                <CustomEndpointCard
-                                  key={index}
-                                  method={method}
-                                  path={path}
-                                  fullPath={getEntityEndpoint() + path}
-                                  pathParams={pathParams}
-                                  isGet={isGet}
-                                />
-                              );
-                            })}
+                            ?.behaviorEndpoints?.map((endpoint, index) => (
+                              <CustomEndpointCard
+                                key={index}
+                                method={endpoint.method}
+                                path={endpoint.path}
+                                fullPath={getEntityEndpoint() + endpoint.path}
+                                description={endpoint.description}
+                                parameters={endpoint.parameters}
+                              />
+                            ))}
+                        {(!entities.find((e) => e.name === selectedEntity)?.behaviorEndpoints ||
+                          entities.find((e) => e.name === selectedEntity)?.behaviorEndpoints?.length === 0) && (
+                          <div className="text-center text-gray-500 py-8">
+                            No behavior endpoints found for {selectedEntity}
+                          </div>
+                        )}
                       </div>
                     </TabsContent>
                   </Tabs>
@@ -1453,15 +1450,11 @@ function FeatureCard({ icon: Icon, title, description }) {
 }
 
 // Custom endpoint card component
-function CustomEndpointCard({ method, path, fullPath, pathParams, isGet }) {
+function CustomEndpointCard({ method, path, fullPath, description, parameters }) {
   const [customParams, setCustomParams] = useState<{[key: string]: string}>({});
   const [customResponse, setCustomResponse] = useState<any>(null);
   const [isCustomLoading, setIsCustomLoading] = useState(false);
   const [customError, setCustomError] = useState("");
-
-  // Extract endpoint information from the path
-  const endpointName = path.split('/').pop() || path;
-  const endpointDescription = generateEndpointDescription(endpointName, path, method);
 
   const handleCustomEndpointCall = async () => {
     setIsCustomLoading(true);
@@ -1475,49 +1468,86 @@ function CustomEndpointCard({ method, path, fullPath, pathParams, isGet }) {
         credentials: "include",
       };
 
-      // Handle parameters based on HTTP method
-      if (isGet) {
-        // For GET requests, add parameters as query string
+      // Separate path parameters from other parameters
+      const pathParams = parameters?.filter(p => p.javaType?.includes("PathVariable") ||
+                                              path.includes(`{${p.name}}`)) || [];
+      const queryParams = parameters?.filter(p => p.javaType?.includes("RequestParam") ||
+                                               (!p.javaType?.includes("PathVariable") &&
+                                                !p.javaType?.includes("RequestBody") &&
+                                                method === "GET")) || [];
+      const bodyParams = parameters?.filter(p => p.javaType?.includes("RequestBody") ||
+                                             (method !== "GET" &&
+                                              !p.javaType?.includes("PathVariable") &&
+                                              !p.javaType?.includes("RequestParam"))) || [];
+
+      // Replace path parameters in the URL
+      pathParams.forEach(param => {
+        if (customParams[param.name]) {
+          url = url.replace(`{${param.name}}`, encodeURIComponent(customParams[param.name]));
+        }
+      });
+
+      // Handle query parameters for GET requests
+      if (method === "GET" && queryParams.length > 0) {
         const params = new URLSearchParams();
-        Object.entries(customParams).forEach(([key, value]) => {
-          if (value.trim()) {
-            params.append(key, value);
+        queryParams.forEach(param => {
+          if (customParams[param.name] && customParams[param.name].trim()) {
+            params.append(param.name, customParams[param.name]);
           }
         });
         if (params.toString()) {
           url += "?" + params.toString();
         }
-      } else {
-        // For POST/PUT/DELETE requests, add parameters to body
-        if (Object.keys(customParams).length > 0) {
-          options.headers = {
-            "Content-Type": "application/json",
-          };
-          
-          // Handle body parameter specially - parse JSON if it exists
-          let bodyData = { ...customParams };
-          if (customParams.body) {
-            try {
-              const parsedBody = JSON.parse(customParams.body);
-              bodyData = { ...customParams, ...parsedBody };
-              delete bodyData.body; // Remove the raw body string
-            } catch (error) {
-              console.error("Invalid JSON in body:", error);
-              setCustomError("Invalid JSON in request body");
-              setIsCustomLoading(false);
-              return;
+      }
+
+      // Handle body parameters for non-GET requests
+      if (method !== "GET" && (bodyParams.length > 0 || Object.keys(customParams).length > 0)) {
+        options.headers = {
+          "Content-Type": "application/json",
+        };
+
+        // If there's a specific body parameter, use it; otherwise, use all non-path params
+        if (bodyParams.length > 0) {
+          const bodyData = {};
+          bodyParams.forEach(param => {
+            if (customParams[param.name]) {
+              try {
+                // Try to parse as JSON if it looks like JSON
+                if (customParams[param.name].startsWith('{') || customParams[param.name].startsWith('[')) {
+                  bodyData[param.name] = JSON.parse(customParams[param.name]);
+                } else {
+                  bodyData[param.name] = customParams[param.name];
+                }
+              } catch (error) {
+                bodyData[param.name] = customParams[param.name];
+              }
             }
-          }
-          
+          });
           options.body = JSON.stringify(bodyData);
+        } else {
+          // Use all parameters that aren't path parameters
+          const bodyData = {};
+          Object.entries(customParams).forEach(([key, value]) => {
+            if (!pathParams.find(p => p.name === key) && value.trim()) {
+              bodyData[key] = value;
+            }
+          });
+          if (Object.keys(bodyData).length > 0) {
+            options.body = JSON.stringify(bodyData);
+          }
         }
       }
 
       const response = await fetch(url, options);
 
       if (response.ok) {
-        const data = await response.json();
-        setCustomResponse(data);
+        try {
+          const data = await response.json();
+          setCustomResponse(data);
+        } catch (error) {
+          const text = await response.text();
+          setCustomResponse(text);
+        }
       } else {
         setCustomError(`HTTP ${response.status}: ${response.statusText}`);
       }
@@ -1529,152 +1559,23 @@ function CustomEndpointCard({ method, path, fullPath, pathParams, isGet }) {
     }
   };
 
-  // Generate endpoint description
-  function generateEndpointDescription(endpointName, path, method) {
-    let description = endpointName.replace(/([A-Z])/g, ' $1').toLowerCase();
-    
-    if (path.includes("search")) {
-      description += " - Search for specific entities based on criteria";
-    } else if (path.includes("featured")) {
-      description += " - Get featured or highlighted entities";
-    } else if (path.includes("process")) {
-      description += " - Process or execute an action on the entity";
-    } else if (path.includes("history")) {
-      description += " - Get historical data or activity log";
-    } else if (path.includes("verify")) {
-      description += " - Verify or validate the entity";
-    } else if (path.includes("refund")) {
-      description += " - Process a refund or reversal";
-    } else if (path.includes("discount")) {
-      description += " - Apply a discount or special pricing";
-    } else if (path.includes("low-stock")) {
-      description += " - Get items with low inventory levels";
-    } else if (path.includes("count")) {
-      description += " - Count or aggregate data";
-    } else if (path.includes("by")) {
-      description += " - Filter entities by specific criteria";
-    } else if (path.includes("add")) {
-      description += " - Add or associate data";
-    } else if (path.includes("remove")) {
-      description += " - Remove or disassociate data";
-    } else if (path.includes("update")) {
-      description += " - Update specific fields";
-    } else if (path.includes("create")) {
-      description += " - Create new entity with custom logic";
-    } else if (path.includes("delete")) {
-      description += " - Delete with custom logic";
+  // Get input type based on parameter type
+  function getInputType(param) {
+    if (param.type === "number" || param.javaType?.includes("Integer") ||
+        param.javaType?.includes("Long") || param.javaType?.includes("Double")) {
+      return "number";
+    } else if (param.type === "Date" || param.javaType?.includes("Date")) {
+      return "date";
+    } else if (param.type === "boolean" || param.javaType?.includes("Boolean")) {
+      return "checkbox";
+    } else if (param.name?.toLowerCase().includes("email")) {
+      return "email";
+    } else if (param.name?.toLowerCase().includes("password")) {
+      return "password";
     } else {
-      description += " - Custom behavior operation";
+      return "text";
     }
-    
-    return description;
   }
-
-  // Generate parameter fields based on path and method
-  function generateParameterFields() {
-    const fields = [];
-    
-    // Path parameters
-    pathParams.forEach((param) => {
-      fields.push({
-        name: param,
-        type: getParameterType(param),
-        required: true,
-        description: getParameterDescription(param),
-        inputType: getInputType(param),
-        placeholder: getParameterPlaceholder(param)
-      });
-    });
-    
-    // Query parameters for GET requests
-    if (isGet) {
-      if (path.includes("search") || path.includes("query")) {
-        fields.push({
-          name: "query",
-          type: "string",
-          required: false,
-          description: "Search query term",
-          inputType: "text",
-          placeholder: "Enter search term..."
-        });
-      }
-      
-      if (path.includes("limit") || path.includes("page")) {
-        fields.push({
-          name: "limit",
-          type: "number",
-          required: false,
-          description: "Maximum number of results",
-          inputType: "number",
-          placeholder: "10"
-        });
-      }
-      
-      if (path.includes("page") || path.includes("offset")) {
-        fields.push({
-          name: "page",
-          type: "number",
-          required: false,
-          description: "Page number for pagination",
-          inputType: "number",
-          placeholder: "0"
-        });
-      }
-    }
-    
-    // Body parameters for POST/PUT requests
-    if (!isGet) {
-      fields.push({
-        name: "body",
-        type: "object",
-        required: false,
-        description: "Request body data",
-        inputType: "json",
-        placeholder: '{"key": "value"}'
-      });
-    }
-    
-    return fields;
-  }
-
-  function getParameterType(paramName) {
-    if (paramName.includes("id") || paramName.includes("Id")) return "number";
-    if (paramName.includes("date") || paramName.includes("Date")) return "date";
-    if (paramName.includes("price") || paramName.includes("amount") || paramName.includes("discount")) return "number";
-    if (paramName.includes("status") || paramName.includes("name")) return "string";
-    return "string";
-  }
-
-  function getParameterDescription(paramName) {
-    if (paramName.includes("id") || paramName.includes("Id")) return "Entity identifier";
-    if (paramName.includes("date") || paramName.includes("Date")) return "Date value";
-    if (paramName.includes("price")) return "Price value";
-    if (paramName.includes("amount")) return "Amount value";
-    if (paramName.includes("discount")) return "Discount percentage";
-    if (paramName.includes("status")) return "Status value";
-    if (paramName.includes("name")) return "Name value";
-    return "Parameter value";
-  }
-
-  function getInputType(paramName) {
-    if (paramName.includes("id") || paramName.includes("Id")) return "number";
-    if (paramName.includes("date") || paramName.includes("Date")) return "date";
-    if (paramName.includes("price") || paramName.includes("amount") || paramName.includes("discount")) return "number";
-    return "text";
-  }
-
-  function getParameterPlaceholder(paramName) {
-    if (paramName.includes("id") || paramName.includes("Id")) return "Enter ID";
-    if (paramName.includes("date") || paramName.includes("Date")) return "YYYY-MM-DD";
-    if (paramName.includes("price")) return "0.00";
-    if (paramName.includes("amount")) return "0";
-    if (paramName.includes("discount")) return "0-100";
-    if (paramName.includes("status")) return "Enter status";
-    if (paramName.includes("name")) return "Enter name";
-    return `Enter ${paramName}`;
-  }
-
-  const parameterFields = generateParameterFields();
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
@@ -1698,7 +1599,7 @@ function CustomEndpointCard({ method, path, fullPath, pathParams, isGet }) {
               {fullPath}
             </span>
             <span className="text-xs text-gray-500">
-              {endpointDescription}
+              {description || "Custom behavior operation"}
             </span>
           </div>
         </div>
@@ -1708,44 +1609,36 @@ function CustomEndpointCard({ method, path, fullPath, pathParams, isGet }) {
           <div className="space-y-3">
             <h4 className="text-sm font-medium text-gray-600">Parameters</h4>
             <div className="space-y-3">
-              {parameterFields.map((field) => (
-                <div key={field.name} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-medium text-gray-600">
-                      {field.name} {field.required && <span className="text-red-500">*</span>}
-                    </label>
-                    <span className="text-xs text-gray-400">{field.type}</span>
+              {parameters && parameters.length > 0 ? (
+                parameters.map((param) => (
+                  <div key={param.name} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-medium text-gray-600">
+                        {param.name} {param.required && <span className="text-red-500">*</span>}
+                      </label>
+                      <span className="text-xs text-gray-400">{param.type}</span>
+                    </div>
+                    <p className="text-xs text-gray-500">{param.description}</p>
+
+                    {param.javaType?.includes("RequestBody") ? (
+                      <textarea
+                        placeholder={`Enter JSON for ${param.name}`}
+                        value={customParams[param.name] || ""}
+                        onChange={(e) => setCustomParams({...customParams, [param.name]: e.target.value})}
+                        className="text-xs p-2 border border-gray-300 rounded-md resize-none h-20 bg-gray-50 w-full"
+                      />
+                    ) : (
+                      <Input
+                        type={getInputType(param)}
+                        placeholder={`Enter ${param.name}`}
+                        value={customParams[param.name] || ""}
+                        onChange={(e) => setCustomParams({...customParams, [param.name]: e.target.value})}
+                        className="text-xs bg-gray-50"
+                      />
+                    )}
                   </div>
-                  <p className="text-xs text-gray-500">{field.description}</p>
-                  
-                  {field.inputType === "json" ? (
-                    <textarea
-                      placeholder={field.placeholder}
-                      value={customParams[field.name] || ""}
-                      onChange={(e) => setCustomParams({...customParams, [field.name]: e.target.value})}
-                      className="text-xs p-2 border border-gray-300 rounded-md resize-none h-20 bg-gray-50"
-                    />
-                  ) : field.inputType === "date" ? (
-                    <Input
-                      type="date"
-                      placeholder={field.placeholder}
-                      value={customParams[field.name] || ""}
-                      onChange={(e) => setCustomParams({...customParams, [field.name]: e.target.value})}
-                      className="text-xs bg-gray-50"
-                    />
-                  ) : (
-                    <Input
-                      type={field.inputType}
-                      placeholder={field.placeholder}
-                      value={customParams[field.name] || ""}
-                      onChange={(e) => setCustomParams({...customParams, [field.name]: e.target.value})}
-                      className="text-xs bg-gray-50"
-                    />
-                  )}
-                </div>
-              ))}
-              
-              {parameterFields.length === 0 && (
+                ))
+              ) : (
                 <div className="text-xs text-gray-500 italic">
                   No parameters required for this endpoint
                 </div>
@@ -1766,7 +1659,9 @@ function CustomEndpointCard({ method, path, fullPath, pathParams, isGet }) {
                 </pre>
               ) : customResponse ? (
                 <pre className="text-xs text-gray-700 font-mono">
-                  {JSON.stringify(customResponse, null, 2)}
+                  {typeof customResponse === 'string'
+                    ? customResponse
+                    : JSON.stringify(customResponse, null, 2)}
                 </pre>
               ) : (
                 <pre className="text-xs text-gray-500 font-mono">
