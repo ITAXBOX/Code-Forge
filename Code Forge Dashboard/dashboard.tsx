@@ -1343,7 +1343,7 @@ export default function Dashboard() {
                                 key={index}
                                 method={endpoint.method}
                                 path={endpoint.path}
-                                fullPath={getEntityEndpoint() + endpoint.path}
+                                fullPath={endpoint.path}
                                 description={endpoint.description}
                                 parameters={endpoint.parameters}
                               />
