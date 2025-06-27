@@ -211,11 +211,11 @@ public class NextjsFileService {
             }
             sb.append("      ],\n");
 
-            // Add endpoints
+            // Add only behavior endpoints (not CRUD endpoints)
             sb.append("      endpoints: [");
 
             List<String> formattedEndpoints = new ArrayList<>();
-            for (EndpointInfo endpoint : entity.getEndpoints()) {
+            for (EndpointInfo endpoint : entity.getBehaviorEndpoints()) {
                 String formatted = "\"" + endpoint.getMethod();
                 if (!endpoint.getPath().isEmpty()) {
                     formatted += " " + endpoint.getPath();
@@ -226,6 +226,41 @@ public class NextjsFileService {
 
             sb.append(String.join(", ", formattedEndpoints));
             sb.append("],\n");
+
+            // Add behavior endpoints with parameters for the custom tab
+            sb.append("      behaviorEndpoints: [\n");
+            for (int j = 0; j < entity.getBehaviorEndpoints().size(); j++) {
+                EndpointInfo endpoint = entity.getBehaviorEndpoints().get(j);
+                sb.append("        {\n");
+                sb.append("          method: \"").append(endpoint.getMethod()).append("\",\n");
+                sb.append("          path: \"").append(endpoint.getPath()).append("\",\n");
+                sb.append("          description: \"").append(endpoint.getDescription() != null ? endpoint.getDescription() : "").append("\",\n");
+
+                // Add parameters
+                sb.append("          parameters: [\n");
+                for (int k = 0; k < endpoint.getParameters().size(); k++) {
+                    EndpointInfo.ParameterInfo param = endpoint.getParameters().get(k);
+                    sb.append("            {\n");
+                    sb.append("              name: \"").append(param.name()).append("\",\n");
+                    sb.append("              type: \"").append(param.type()).append("\",\n");
+                    sb.append("              required: ").append(param.required()).append(",\n");
+                    sb.append("              description: \"").append(param.description()).append("\",\n");
+                    sb.append("              javaType: \"").append(param.javaType()).append("\"\n");
+                    sb.append("            }");
+                    if (k < endpoint.getParameters().size() - 1) {
+                        sb.append(",");
+                    }
+                    sb.append("\n");
+                }
+                sb.append("          ]\n");
+                sb.append("        }");
+                if (j < entity.getBehaviorEndpoints().size() - 1) {
+                    sb.append(",");
+                }
+                sb.append("\n");
+            }
+            sb.append("      ]\n");
+
             sb.append("    }");
 
             if (i < entities.size() - 1) {
