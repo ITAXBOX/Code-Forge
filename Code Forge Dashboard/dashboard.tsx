@@ -1333,113 +1333,30 @@ export default function Dashboard() {
                     </TabsContent>
 
                     <TabsContent value="custom" className="mt-0">
-                      <div className="text-sm text-gray-600 mb-4">Custom endpoints for {selectedEntity}</div>
+                      <div className="text-sm text-gray-600 mb-4">Behavior endpoints for {selectedEntity}</div>
 
                       <div className="space-y-4">
                         {entities
                             .find((e) => e.name === selectedEntity)
-                            ?.endpoints.filter((e) => e.includes("/"))
-                            .map((endpoint, index) => (
-                                <div
-                                    key={index}
-                                    className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm"
-                                >
-                                  <div className="border-b border-gray-200 bg-gray-50 p-4 flex justify-between items-center">
-                                    <div className="flex items-center space-x-3">
-                                      <Badge
-                                          className={
-                                            endpoint.startsWith("GET")
-                                                ? "bg-blue-100 text-blue-600 border-blue-200"
-                                                : "bg-green-100 text-green-600 border-green-200"
-                                          }
-                                      >
-                                        {endpoint.split(" ")[0]}
-                                      </Badge>
-                                      <span className="text-gray-900 font-mono text-sm">
-                                {getEntityEndpoint()}
-                                        {endpoint.split(" ")[1]}
-                              </span>
-                                    </div>
-                                  </div>
-                                  <div className="p-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                      <div className="space-y-3">
-                                        <h4 className="text-sm font-medium text-gray-600">Description</h4>
-                                        <p className="text-sm text-gray-900">
-                                          {endpoint.includes("search") && "Search for specific entities based on criteria"}
-                                          {endpoint.includes("featured") && "Get featured or highlighted entities"}
-                                          {endpoint.includes("process") && "Process or execute an action on the entity"}
-                                          {endpoint.includes("history") && "Get historical data or activity log"}
-                                          {endpoint.includes("verify") && "Verify or validate the entity"}
-                                          {endpoint.includes("refund") && "Process a refund or reversal"}
-                                          {endpoint.includes("discount") && "Apply a discount or special pricing"}
-                                          {endpoint.includes("low-stock") && "Get items with low inventory levels"}
-                                        </p>
+                            ?.endpoints.filter((e) => e.includes("/") && (e.includes("GET") || e.includes("POST") || e.includes("PUT") || e.includes("DELETE")))
+                            .map((endpoint, index) => {
+                              const [method, path] = endpoint.split(" ");
+                              const isGet = method === "GET";
+                              
+                              // Extract parameter names from path
+                              const pathParams = path.match(/\{([^}]+)\}/g)?.map(p => p.slice(1, -1)) || [];
 
-                                        <h4 className="text-sm font-medium text-gray-600 mt-4">Parameters</h4>
-                                        <div className="bg-gray-50 rounded-md border border-gray-300 p-3">
-                                          <code className="text-xs text-gray-700 font-mono">
-                                            {endpoint.includes("search") && "?query=string&limit=10&offset=0"}
-                                            {endpoint.includes("featured") && "?limit=5&category=string"}
-                                            {endpoint.includes("process") && '{ "status": "processing" }'}
-                                            {endpoint.includes("history") && "?from=date&to=date"}
-                                            {endpoint.includes("verify") && "?token=string"}
-                                            {endpoint.includes("refund") && '{ "amount": number, "reason": "string" }'}
-                                            {endpoint.includes("discount") && '{ "percentage": number, "code": "string" }'}
-                                            {endpoint.includes("low-stock") && "?threshold=10"}
-                                          </code>
-                                        </div>
-                                      </div>
-
-                                      <div className="space-y-3">
-                                        <h4 className="text-sm font-medium text-gray-600">Response</h4>
-                                        <div className="bg-gray-50 rounded-md border border-gray-300 p-3 h-[200px] overflow-auto">
-                                  <pre className="text-xs text-gray-700 font-mono">
-                                    {endpoint.includes("GET")
-                                        ? JSON.stringify(
-                                            {
-                                              data: [
-                                                {
-                                                  id: 1,
-                                                  name: `${selectedEntity} 1`,
-                                                },
-                                                {
-                                                  id: 2,
-                                                  name: `${selectedEntity} 2`,
-                                                },
-                                              ],
-                                              meta: {
-                                                total: 24,
-                                                page: 1,
-                                                limit: 10,
-                                              },
-                                            },
-                                            null,
-                                            2,
-                                        )
-                                        : JSON.stringify(
-                                            {
-                                              success: true,
-                                              message: "Operation completed successfully",
-                                              data: {
-                                                id: 1,
-                                                name: `${selectedEntity} 1`,
-                                              },
-                                            },
-                                            null,
-                                            2,
-                                        )}
-                                  </pre>
-                                        </div>
-
-                                        <div className="flex justify-end mt-4">
-                                          <Button className="bg-gradient-to-r from-cyan-500 to-blue-600">Test Endpoint</Button>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                            ))}
+                              return (
+                                <CustomEndpointCard
+                                  key={index}
+                                  method={method}
+                                  path={path}
+                                  fullPath={getEntityEndpoint() + path}
+                                  pathParams={pathParams}
+                                  isGet={isGet}
+                                />
+                              );
+                            })}
                       </div>
                     </TabsContent>
                   </Tabs>
@@ -1533,4 +1450,350 @@ function FeatureCard({ icon: Icon, title, description }) {
         <p className="text-sm text-gray-600">{description}</p>
       </div>
   )
+}
+
+// Custom endpoint card component
+function CustomEndpointCard({ method, path, fullPath, pathParams, isGet }) {
+  const [customParams, setCustomParams] = useState<{[key: string]: string}>({});
+  const [customResponse, setCustomResponse] = useState<any>(null);
+  const [isCustomLoading, setIsCustomLoading] = useState(false);
+  const [customError, setCustomError] = useState("");
+
+  // Extract endpoint information from the path
+  const endpointName = path.split('/').pop() || path;
+  const endpointDescription = generateEndpointDescription(endpointName, path, method);
+
+  const handleCustomEndpointCall = async () => {
+    setIsCustomLoading(true);
+    setCustomError("");
+    setCustomResponse(null);
+
+    try {
+      let url = fullPath;
+      let options: RequestInit = {
+        method: method,
+        credentials: "include",
+      };
+
+      // Handle parameters based on HTTP method
+      if (isGet) {
+        // For GET requests, add parameters as query string
+        const params = new URLSearchParams();
+        Object.entries(customParams).forEach(([key, value]) => {
+          if (value.trim()) {
+            params.append(key, value);
+          }
+        });
+        if (params.toString()) {
+          url += "?" + params.toString();
+        }
+      } else {
+        // For POST/PUT/DELETE requests, add parameters to body
+        if (Object.keys(customParams).length > 0) {
+          options.headers = {
+            "Content-Type": "application/json",
+          };
+          
+          // Handle body parameter specially - parse JSON if it exists
+          let bodyData = { ...customParams };
+          if (customParams.body) {
+            try {
+              const parsedBody = JSON.parse(customParams.body);
+              bodyData = { ...customParams, ...parsedBody };
+              delete bodyData.body; // Remove the raw body string
+            } catch (error) {
+              console.error("Invalid JSON in body:", error);
+              setCustomError("Invalid JSON in request body");
+              setIsCustomLoading(false);
+              return;
+            }
+          }
+          
+          options.body = JSON.stringify(bodyData);
+        }
+      }
+
+      const response = await fetch(url, options);
+
+      if (response.ok) {
+        const data = await response.json();
+        setCustomResponse(data);
+      } else {
+        setCustomError(`HTTP ${response.status}: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error("Custom endpoint error:", error);
+      setCustomError("Failed to connect to the server");
+    } finally {
+      setIsCustomLoading(false);
+    }
+  };
+
+  // Generate endpoint description
+  function generateEndpointDescription(endpointName, path, method) {
+    let description = endpointName.replace(/([A-Z])/g, ' $1').toLowerCase();
+    
+    if (path.includes("search")) {
+      description += " - Search for specific entities based on criteria";
+    } else if (path.includes("featured")) {
+      description += " - Get featured or highlighted entities";
+    } else if (path.includes("process")) {
+      description += " - Process or execute an action on the entity";
+    } else if (path.includes("history")) {
+      description += " - Get historical data or activity log";
+    } else if (path.includes("verify")) {
+      description += " - Verify or validate the entity";
+    } else if (path.includes("refund")) {
+      description += " - Process a refund or reversal";
+    } else if (path.includes("discount")) {
+      description += " - Apply a discount or special pricing";
+    } else if (path.includes("low-stock")) {
+      description += " - Get items with low inventory levels";
+    } else if (path.includes("count")) {
+      description += " - Count or aggregate data";
+    } else if (path.includes("by")) {
+      description += " - Filter entities by specific criteria";
+    } else if (path.includes("add")) {
+      description += " - Add or associate data";
+    } else if (path.includes("remove")) {
+      description += " - Remove or disassociate data";
+    } else if (path.includes("update")) {
+      description += " - Update specific fields";
+    } else if (path.includes("create")) {
+      description += " - Create new entity with custom logic";
+    } else if (path.includes("delete")) {
+      description += " - Delete with custom logic";
+    } else {
+      description += " - Custom behavior operation";
+    }
+    
+    return description;
+  }
+
+  // Generate parameter fields based on path and method
+  function generateParameterFields() {
+    const fields = [];
+    
+    // Path parameters
+    pathParams.forEach((param) => {
+      fields.push({
+        name: param,
+        type: getParameterType(param),
+        required: true,
+        description: getParameterDescription(param),
+        inputType: getInputType(param),
+        placeholder: getParameterPlaceholder(param)
+      });
+    });
+    
+    // Query parameters for GET requests
+    if (isGet) {
+      if (path.includes("search") || path.includes("query")) {
+        fields.push({
+          name: "query",
+          type: "string",
+          required: false,
+          description: "Search query term",
+          inputType: "text",
+          placeholder: "Enter search term..."
+        });
+      }
+      
+      if (path.includes("limit") || path.includes("page")) {
+        fields.push({
+          name: "limit",
+          type: "number",
+          required: false,
+          description: "Maximum number of results",
+          inputType: "number",
+          placeholder: "10"
+        });
+      }
+      
+      if (path.includes("page") || path.includes("offset")) {
+        fields.push({
+          name: "page",
+          type: "number",
+          required: false,
+          description: "Page number for pagination",
+          inputType: "number",
+          placeholder: "0"
+        });
+      }
+    }
+    
+    // Body parameters for POST/PUT requests
+    if (!isGet) {
+      fields.push({
+        name: "body",
+        type: "object",
+        required: false,
+        description: "Request body data",
+        inputType: "json",
+        placeholder: '{"key": "value"}'
+      });
+    }
+    
+    return fields;
+  }
+
+  function getParameterType(paramName) {
+    if (paramName.includes("id") || paramName.includes("Id")) return "number";
+    if (paramName.includes("date") || paramName.includes("Date")) return "date";
+    if (paramName.includes("price") || paramName.includes("amount") || paramName.includes("discount")) return "number";
+    if (paramName.includes("status") || paramName.includes("name")) return "string";
+    return "string";
+  }
+
+  function getParameterDescription(paramName) {
+    if (paramName.includes("id") || paramName.includes("Id")) return "Entity identifier";
+    if (paramName.includes("date") || paramName.includes("Date")) return "Date value";
+    if (paramName.includes("price")) return "Price value";
+    if (paramName.includes("amount")) return "Amount value";
+    if (paramName.includes("discount")) return "Discount percentage";
+    if (paramName.includes("status")) return "Status value";
+    if (paramName.includes("name")) return "Name value";
+    return "Parameter value";
+  }
+
+  function getInputType(paramName) {
+    if (paramName.includes("id") || paramName.includes("Id")) return "number";
+    if (paramName.includes("date") || paramName.includes("Date")) return "date";
+    if (paramName.includes("price") || paramName.includes("amount") || paramName.includes("discount")) return "number";
+    return "text";
+  }
+
+  function getParameterPlaceholder(paramName) {
+    if (paramName.includes("id") || paramName.includes("Id")) return "Enter ID";
+    if (paramName.includes("date") || paramName.includes("Date")) return "YYYY-MM-DD";
+    if (paramName.includes("price")) return "0.00";
+    if (paramName.includes("amount")) return "0";
+    if (paramName.includes("discount")) return "0-100";
+    if (paramName.includes("status")) return "Enter status";
+    if (paramName.includes("name")) return "Enter name";
+    return `Enter ${paramName}`;
+  }
+
+  const parameterFields = generateParameterFields();
+
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+      <div className="border-b border-gray-200 bg-gray-50 p-4 flex justify-between items-center">
+        <div className="flex items-center space-x-3">
+          <Badge
+              className={
+                method === "GET"
+                    ? "bg-blue-100 text-blue-600 border-blue-200"
+                    : method === "POST"
+                    ? "bg-green-100 text-green-600 border-green-200"
+                    : method === "PUT"
+                    ? "bg-yellow-100 text-yellow-600 border-yellow-200"
+                    : "bg-red-100 text-red-600 border-red-200"
+              }
+          >
+            {method}
+          </Badge>
+          <div className="flex flex-col">
+            <span className="text-gray-900 font-mono text-sm">
+              {fullPath}
+            </span>
+            <span className="text-xs text-gray-500">
+              {endpointDescription}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div className="p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-3">
+            <h4 className="text-sm font-medium text-gray-600">Parameters</h4>
+            <div className="space-y-3">
+              {parameterFields.map((field) => (
+                <div key={field.name} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-medium text-gray-600">
+                      {field.name} {field.required && <span className="text-red-500">*</span>}
+                    </label>
+                    <span className="text-xs text-gray-400">{field.type}</span>
+                  </div>
+                  <p className="text-xs text-gray-500">{field.description}</p>
+                  
+                  {field.inputType === "json" ? (
+                    <textarea
+                      placeholder={field.placeholder}
+                      value={customParams[field.name] || ""}
+                      onChange={(e) => setCustomParams({...customParams, [field.name]: e.target.value})}
+                      className="text-xs p-2 border border-gray-300 rounded-md resize-none h-20 bg-gray-50"
+                    />
+                  ) : field.inputType === "date" ? (
+                    <Input
+                      type="date"
+                      placeholder={field.placeholder}
+                      value={customParams[field.name] || ""}
+                      onChange={(e) => setCustomParams({...customParams, [field.name]: e.target.value})}
+                      className="text-xs bg-gray-50"
+                    />
+                  ) : (
+                    <Input
+                      type={field.inputType}
+                      placeholder={field.placeholder}
+                      value={customParams[field.name] || ""}
+                      onChange={(e) => setCustomParams({...customParams, [field.name]: e.target.value})}
+                      className="text-xs bg-gray-50"
+                    />
+                  )}
+                </div>
+              ))}
+              
+              {parameterFields.length === 0 && (
+                <div className="text-xs text-gray-500 italic">
+                  No parameters required for this endpoint
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <h4 className="text-sm font-medium text-gray-600">Response</h4>
+            <div className="bg-gray-50 rounded-md border border-gray-300 p-3 h-[200px] overflow-auto">
+              {isCustomLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-cyan-600"></div>
+                </div>
+              ) : customError ? (
+                <pre className="text-xs text-red-600 font-mono">
+                  {customError}
+                </pre>
+              ) : customResponse ? (
+                <pre className="text-xs text-gray-700 font-mono">
+                  {JSON.stringify(customResponse, null, 2)}
+                </pre>
+              ) : (
+                <pre className="text-xs text-gray-500 font-mono">
+                  Click "Test Endpoint" to see the response
+                </pre>
+              )}
+            </div>
+
+            <div className="flex justify-end mt-4">
+              <Button 
+                className="bg-gradient-to-r from-cyan-500 to-blue-600"
+                onClick={handleCustomEndpointCall}
+                disabled={isCustomLoading}
+              >
+                {isCustomLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Testing...
+                  </>
+                ) : (
+                  "Test Endpoint"
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
