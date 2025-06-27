@@ -282,21 +282,29 @@ public class EntityExtractorService {
      * Extracts behavior controller endpoints and adds them to the entity info
      */
     private void extractBehaviorControllerEndpoints(File projectDir, EntityInfo entityInfo) {
+        String currentHttpMethod = null;
+        String currentPath = null;
+
         try {
             File behaviorControllersDir = new File(projectDir, "behaviorcontrollers");
-            if (!behaviorControllersDir.exists()) return;
+            if (!behaviorControllersDir.exists()) {
+                System.out.println("No behaviorcontrollers directory found for: " + entityInfo.getName());
+                return;
+            }
 
             File behaviorControllerFile = new File(behaviorControllersDir, entityInfo.getName() + "BehaviorController.java");
-            if (!behaviorControllerFile.exists()) return;
+            if (!behaviorControllerFile.exists()) {
+                System.out.println("No behavior controller file found for: " + entityInfo.getName());
+                return;
+            }
+
+            System.out.println("Processing behavior controller: " + behaviorControllerFile.getAbsolutePath());
 
             try (BufferedReader reader = new BufferedReader(new FileReader(behaviorControllerFile))) {
                 String line;
                 String baseEndpoint = "/api/" + entityInfo.getName().toLowerCase() + "s";
-                String currentMethod = null;
-                String currentPath = null;
-                String currentReturnType = null;
-                String currentParams = null;
-                String currentHttpMethod = null;
+                List<String> methodLines = new ArrayList<>();
+                boolean inMethodSignature = false;
 
                 while ((line = reader.readLine()) != null) {
                     line = line.trim();
@@ -316,43 +324,150 @@ public class EntityExtractorService {
                             else if (line.startsWith("@PostMapping")) currentHttpMethod = "POST";
                             else if (line.startsWith("@PutMapping")) currentHttpMethod = "PUT";
                             else if (line.startsWith("@DeleteMapping")) currentHttpMethod = "DELETE";
+
+                            System.out.println("Found endpoint: " + currentHttpMethod + " " + currentPath);
                         }
                         continue;
                     }
                     
-                    // Look for method signature
+                    // Look for method signature after finding an annotation
                     if (currentPath != null && currentHttpMethod != null && line.startsWith("public ")) {
-                        Pattern methodPattern = Pattern.compile("public\\s+([\\w<>,\\s]+)\\s+(\\w+)\\s*\\(([^)]*)\\)");
-                        Matcher methodMatcher = methodPattern.matcher(line);
-                        if (methodMatcher.find()) {
-                            currentReturnType = methodMatcher.group(1).trim();
-                            currentMethod = methodMatcher.group(2).trim();
-                            currentParams = methodMatcher.group(3).trim();
-                            
-                            // Create endpoint info
-                            EndpointInfo endpointInfo = new EndpointInfo(currentHttpMethod, baseEndpoint + currentPath, true);
-                            
-                            // Generate meaningful description based on method name and path
-                            String description = generateEndpointDescription(currentMethod, currentPath, currentHttpMethod);
-                            endpointInfo.setDescription(description);
-                            
-                            // Extract parameters with proper type information
-                            extractParametersFromSignature(currentParams, endpointInfo);
-                            
-                            entityInfo.addBehaviorEndpoint(endpointInfo);
-                            
-                            // Reset for next endpoint
-                            currentPath = null;
-                            currentMethod = null;
-                            currentReturnType = null;
-                            currentParams = null;
+                        methodLines.clear();
+                        methodLines.add(line);
+                        inMethodSignature = true;
+
+                        // Check if method signature is complete on this line
+                        if (line.contains(")") && line.contains("{")) {
+                            processCompleteMethodSignature(methodLines, currentHttpMethod, baseEndpoint + currentPath, entityInfo);
                             currentHttpMethod = null;
+                            currentPath = null;
+                        }
+                        continue;
+                    }
+
+                    // Continue collecting method signature lines if we're in the middle of one
+                    if (inMethodSignature) {
+                        methodLines.add(line);
+
+                        // Check if we've reached the end of the method signature
+                        if (line.contains(")") && (line.contains("{") || line.trim().equals(")"))) {
+                            processCompleteMethodSignature(methodLines, currentHttpMethod, baseEndpoint + currentPath, entityInfo);
+                            currentHttpMethod = null;
+                            currentPath = null;
+                            inMethodSignature = false;
                         }
                     }
                 }
+
+                System.out.println("Found " + entityInfo.getBehaviorEndpoints().size() + " behavior endpoints for " + entityInfo.getName());
             }
         } catch (IOException e) {
             System.err.println("Error reading behavior controller file: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Processes a complete method signature and creates endpoint info
+     */
+    private void processCompleteMethodSignature(List<String> methodLines, String httpMethod, String fullPath, EntityInfo entityInfo) {
+        // Combine all method lines into a single string
+        String completeSignature = String.join(" ", methodLines);
+
+        // Extract method name and parameters
+        Pattern methodPattern = Pattern.compile("public\\s+([\\w<>,\\s\\[\\]]+)\\s+(\\w+)\\s*\\(([^)]*)\\)");
+        Matcher methodMatcher = methodPattern.matcher(completeSignature);
+
+        if (methodMatcher.find()) {
+            String returnType = methodMatcher.group(1).trim();
+            String methodName = methodMatcher.group(2).trim();
+            String parameters = methodMatcher.group(3).trim();
+
+            System.out.println("Processing method: " + methodName + " with params: " + parameters);
+
+            // Create endpoint info
+            EndpointInfo endpointInfo = new EndpointInfo(httpMethod, fullPath, true);
+
+            // Generate meaningful description
+            String description = generateEndpointDescription(methodName, fullPath, httpMethod);
+            endpointInfo.setDescription(description);
+
+            // Extract parameters with proper type information
+            extractParametersFromSignature(parameters, endpointInfo, fullPath);
+
+            entityInfo.addBehaviorEndpoint(endpointInfo);
+
+            System.out.println("Added behavior endpoint: " + httpMethod + " " + fullPath + " with " + endpointInfo.getParameters().size() + " parameters");
+        } else {
+            System.out.println("Could not parse method signature: " + completeSignature);
+        }
+    }
+
+    /**
+     * Extracts parameter information from method signature
+     */
+    private void extractParametersFromSignature(String params, EndpointInfo endpointInfo, String fullPath) {
+        if (params == null || params.trim().isEmpty()) {
+            System.out.println("No parameters found for endpoint: " + fullPath);
+            return;
+        }
+
+        // Split parameters by comma, handling generics and annotations
+        List<String> paramList = splitParameters(params);
+
+        System.out.println("Processing " + paramList.size() + " parameters for endpoint: " + fullPath);
+
+        for (String param : paramList) {
+            param = param.trim();
+            if (param.isEmpty()) continue;
+
+            System.out.println("Processing parameter: " + param);
+
+            // Parse parameter with annotations: @PathVariable/@RequestParam/@RequestBody type name
+            Pattern paramPattern = Pattern.compile("(?:(@\\w+(?:\\([^)]*\\))?))\\s*([\\w<>,\\s\\[\\]]+)\\s+(\\w+)");
+            Matcher matcher = paramPattern.matcher(param);
+
+            if (matcher.find()) {
+                String annotation = matcher.group(1);
+                String type = matcher.group(2).trim();
+                String name = matcher.group(3).trim();
+
+                System.out.println("Found parameter - Annotation: " + annotation + ", Type: " + type + ", Name: " + name);
+
+                boolean required = true;
+                String parameterType = "text"; // Default input type
+
+                // Determine parameter type and requirements based on annotation
+                if (annotation != null) {
+                    if (annotation.contains("@PathVariable")) {
+                        parameterType = "path";
+                        required = true;
+                    } else if (annotation.contains("@RequestParam")) {
+                        parameterType = "query";
+                        required = !annotation.contains("required=false") && !annotation.contains("required = false");
+                    } else if (annotation.contains("@RequestBody")) {
+                        parameterType = "body";
+                        required = true;
+                    }
+                }
+
+                // Map Java types to appropriate input types
+                String inputType = getInputTypeFromJavaType(type);
+                String tsType = mapJavaTypeToTypeScript(type);
+
+                // Generate parameter description
+                String description = generateParameterDescription(name, type, annotation);
+
+                // Create enhanced parameter info
+                EndpointInfo.ParameterInfo paramInfo = new EndpointInfo.ParameterInfo(
+                    name, tsType, required, description, type
+                );
+
+                endpointInfo.addParameter(paramInfo);
+
+                System.out.println("Added parameter: " + name + " (" + tsType + ") - " + description);
+            } else {
+                System.out.println("Could not parse parameter: " + param);
+            }
         }
     }
 
@@ -361,10 +476,10 @@ public class EntityExtractorService {
      */
     private String generateEndpointDescription(String methodName, String path, String httpMethod) {
         StringBuilder description = new StringBuilder();
-        
+
         // Add method name as the main action
         description.append(methodName.replaceAll("([a-z])([A-Z])", "$1 $2").toLowerCase());
-        
+
         // Add context based on path
         if (path.contains("search")) {
             description.append(" - Search for specific entities based on criteria");
@@ -399,43 +514,8 @@ public class EntityExtractorService {
         } else {
             description.append(" - Custom behavior operation");
         }
-        
+
         return description.toString();
-    }
-
-    /**
-     * Extracts parameter information from method signature
-     */
-    private void extractParametersFromSignature(String params, EndpointInfo endpointInfo) {
-        if (params == null || params.trim().isEmpty()) return;
-
-        // Split parameters by comma, handling generics
-        List<String> paramList = splitParameters(params);
-        
-        for (String param : paramList) {
-            param = param.trim();
-            if (param.isEmpty()) continue;
-
-            // Parse parameter: @PathVariable/@RequestParam type name
-            Pattern paramPattern = Pattern.compile("(@PathVariable|@RequestParam)?\\s*([\\w<>,\\s]+)\\s+(\\w+)");
-            Matcher matcher = paramPattern.matcher(param);
-            
-            if (matcher.find()) {
-                String annotation = matcher.group(1);
-                String type = matcher.group(2).trim();
-                String name = matcher.group(3).trim();
-                
-                boolean required = annotation == null || !annotation.contains("required=false");
-                String tsType = mapJavaTypeToTypeScript(type);
-                
-                // Generate parameter description based on name and type
-                String description = generateParameterDescription(name, type, annotation);
-                
-                // Create enhanced parameter info
-                EndpointInfo.ParameterInfo paramInfo = new EndpointInfo.ParameterInfo(name, tsType, required, description, type);
-                endpointInfo.addParameter(paramInfo);
-            }
-        }
     }
 
     /**
@@ -443,18 +523,20 @@ public class EntityExtractorService {
      */
     private String generateParameterDescription(String paramName, String javaType, String annotation) {
         StringBuilder description = new StringBuilder();
-        
+
         // Add parameter type context
         if (annotation != null) {
             if (annotation.contains("@PathVariable")) {
                 description.append("Path variable - ");
             } else if (annotation.contains("@RequestParam")) {
                 description.append("Query parameter - ");
+            } else if (annotation.contains("@RequestBody")) {
+                description.append("Request body - ");
             } else {
                 description.append("Parameter - ");
             }
         }
-        
+
         // Add description based on parameter name
         if (paramName.equalsIgnoreCase("id")) {
             description.append("Entity identifier");
@@ -478,20 +560,8 @@ public class EntityExtractorService {
             description.append("Username");
         } else if (paramName.equalsIgnoreCase("password")) {
             description.append("Password");
-        } else if (paramName.equalsIgnoreCase("category") || paramName.equalsIgnoreCase("categoryId")) {
-            description.append("Category identifier");
-        } else if (paramName.equalsIgnoreCase("product") || paramName.equalsIgnoreCase("productId")) {
-            description.append("Product identifier");
-        } else if (paramName.equalsIgnoreCase("user") || paramName.equalsIgnoreCase("userId")) {
-            description.append("User identifier");
-        } else if (paramName.equalsIgnoreCase("promotion") || paramName.equalsIgnoreCase("promotionId")) {
-            description.append("Promotion identifier");
-        } else if (paramName.equalsIgnoreCase("review") || paramName.equalsIgnoreCase("reviewId")) {
-            description.append("Review identifier");
-        } else if (paramName.equalsIgnoreCase("role") || paramName.equalsIgnoreCase("roleId")) {
-            description.append("Role identifier");
-        } else if (paramName.equalsIgnoreCase("inventory") || paramName.equalsIgnoreCase("inventoryId")) {
-            description.append("Inventory identifier");
+        } else if (paramName.toLowerCase().contains("id")) {
+            description.append(paramName.replace("Id", "").replace("id", "") + " identifier");
         } else {
             // Generic description based on type
             if (javaType.contains("String")) {
@@ -508,8 +578,34 @@ public class EntityExtractorService {
                 description.append("Data value");
             }
         }
-        
+
         return description.toString();
+    }
+
+    /**
+     * Determines the appropriate input type for frontend based on Java type
+     */
+    private String getInputTypeFromJavaType(String javaType) {
+        // Remove generics and array brackets for basic type checking
+        String baseType = javaType.replaceAll("[<>\\[\\],\\s]", "").toLowerCase();
+
+        if (baseType.contains("int") || baseType.contains("long") ||
+            baseType.contains("double") || baseType.contains("float") ||
+            baseType.contains("bigdecimal") || baseType.contains("number")) {
+            return "number";
+        } else if (baseType.contains("date") || baseType.contains("time")) {
+            return "date";
+        } else if (baseType.contains("bool")) {
+            return "checkbox";
+        } else if (baseType.contains("email")) {
+            return "email";
+        } else if (baseType.contains("password")) {
+            return "password";
+        } else if (baseType.contains("url") || baseType.contains("uri")) {
+            return "url";
+        } else {
+            return "text";
+        }
     }
 
     /**
