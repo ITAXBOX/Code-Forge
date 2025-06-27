@@ -13,6 +13,7 @@ import java.util.List;
 public class EntityInfo {
     private final String name;
     private final List<EndpointInfo> endpoints;
+    private final List<EndpointInfo> behaviorEndpoints; // Separate list for behavior endpoints
     @Setter
     private String baseEndpoint;
 
@@ -22,6 +23,7 @@ public class EntityInfo {
     public EntityInfo(String name) {
         this.name = name;
         this.endpoints = new ArrayList<>();
+        this.behaviorEndpoints = new ArrayList<>(); // Initialize behavior endpoints list
         this.attributes = new ArrayList<>();
         this.baseEndpoint = "/api/" + name.toLowerCase() + "s";
     }
@@ -31,11 +33,22 @@ public class EntityInfo {
     }
 
     public void addEndpoint(String method, String path, boolean isCustomBehavior) {
-        endpoints.add(new EndpointInfo(method, path, isCustomBehavior));
+        if (isCustomBehavior) {
+            behaviorEndpoints.add(new EndpointInfo(method, path, true));
+        } else {
+            endpoints.add(new EndpointInfo(method, path, false));
+        }
     }
 
     public void addBehaviorEndpoint(EndpointInfo endpointInfo) {
-        endpoints.add(endpointInfo);
+        behaviorEndpoints.add(endpointInfo);
+    }
+
+    // Get all endpoints (CRUD + behavior) for backward compatibility
+    public List<EndpointInfo> getAllEndpoints() {
+        List<EndpointInfo> allEndpoints = new ArrayList<>(endpoints);
+        allEndpoints.addAll(behaviorEndpoints);
+        return allEndpoints;
     }
 
     // New method to add an attribute
