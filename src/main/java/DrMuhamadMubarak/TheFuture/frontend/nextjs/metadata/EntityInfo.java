@@ -34,6 +34,10 @@ public class EntityInfo {
         endpoints.add(new EndpointInfo(method, path, isCustomBehavior));
     }
 
+    public void addBehaviorEndpoint(EndpointInfo endpointInfo) {
+        endpoints.add(endpointInfo);
+    }
+
     // New method to add an attribute
     public void addAttribute(String name, String type) {
         attributes.add(new EntityAttributeInfo(name, type));
