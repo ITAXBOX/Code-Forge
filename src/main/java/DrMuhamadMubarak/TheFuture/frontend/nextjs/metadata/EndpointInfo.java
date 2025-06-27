@@ -25,7 +25,16 @@ public class EndpointInfo {
         this.isCustomBehavior = isCustomBehavior;
         this.parameters = new ArrayList<>();
     }
-        public record ParameterInfo(String name, String type, boolean required) {
+
+    public void addParameter(String name, String type, boolean required) {
+        parameters.add(new ParameterInfo(name, type, required, "", ""));
+    }
+
+    public void addParameter(ParameterInfo parameterInfo) {
+        parameters.add(parameterInfo);
+    }
+
+    public record ParameterInfo(String name, String type, boolean required, String description, String javaType) {
 
     }
 }
