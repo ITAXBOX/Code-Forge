@@ -1343,7 +1343,7 @@ export default function Dashboard() {
                                 key={index}
                                 method={endpoint.method}
                                 path={endpoint.path}
-                                fullPath={endpoint.path}
+                                fullPath={`http://localhost:8081${endpoint.path}`}
                                 description={endpoint.description}
                                 parameters={endpoint.parameters}
                               />

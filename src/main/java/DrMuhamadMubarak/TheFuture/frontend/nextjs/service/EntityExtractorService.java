@@ -338,7 +338,7 @@ public class EntityExtractorService {
 
                         // Check if method signature is complete on this line
                         if (line.contains(")") && line.contains("{")) {
-                            processCompleteMethodSignature(methodLines, currentHttpMethod, baseEndpoint + currentPath, entityInfo);
+                            processCompleteMethodSignature(methodLines, currentHttpMethod, baseEndpoint.substring(0, baseEndpoint.length() - 1) + currentPath, entityInfo);
                             currentHttpMethod = null;
                             currentPath = null;
                         }
@@ -351,7 +351,7 @@ public class EntityExtractorService {
 
                         // Check if we've reached the end of the method signature
                         if (line.contains(")") && (line.contains("{") || line.trim().equals(")"))) {
-                            processCompleteMethodSignature(methodLines, currentHttpMethod, baseEndpoint + currentPath, entityInfo);
+                            processCompleteMethodSignature(methodLines, currentHttpMethod, baseEndpoint.substring(0, baseEndpoint.length() - 1) + currentPath, entityInfo);
                             currentHttpMethod = null;
                             currentPath = null;
                             inMethodSignature = false;
