@@ -38,6 +38,9 @@ public class EntityExtractorService {
                     // Extract behavior controller endpoints
                     extractBehaviorControllerEndpoints(projectDir, entityInfo);
                     
+                    // Add parameters for standard endpoints that are missing them
+                    addStandardEndpointParameters(entityInfo);
+
                     entities.add(entityInfo);
                 }
             }
@@ -378,7 +381,6 @@ public class EntityExtractorService {
         Matcher methodMatcher = methodPattern.matcher(completeSignature);
 
         if (methodMatcher.find()) {
-            String returnType = methodMatcher.group(1).trim();
             String methodName = methodMatcher.group(2).trim();
             String parameters = methodMatcher.group(3).trim();
 
@@ -388,7 +390,7 @@ public class EntityExtractorService {
             EndpointInfo endpointInfo = new EndpointInfo(httpMethod, fullPath, true);
 
             // Generate meaningful description
-            String description = generateEndpointDescription(methodName, fullPath, httpMethod);
+            String description = generateEndpointDescription(methodName);
             endpointInfo.setDescription(description);
 
             // Extract parameters with proper type information
@@ -403,239 +405,185 @@ public class EntityExtractorService {
     }
 
     /**
+     * Generates a meaningful description for an endpoint based on method name and path
+     */
+    private String generateEndpointDescription(String methodName) {
+        // Convert camelCase method name to readable description
+        String description = methodName.replaceAll("([a-z])([A-Z])", "$1 $2").toLowerCase();
+
+        // Add context based on method name patterns
+        if (methodName.toLowerCase().contains("create")) {
+            description += " - Create new entity with custom logic";
+        } else if (methodName.toLowerCase().contains("update")) {
+            description += " - Custom behavior operation";
+        } else if (methodName.toLowerCase().contains("delete")) {
+            description += " - Delete with custom logic";
+        } else if (methodName.toLowerCase().contains("find") || methodName.toLowerCase().contains("get")) {
+            description += " - Filter entities by specific criteria";
+        } else if (methodName.toLowerCase().contains("count")) {
+            description += " - Count or aggregate data";
+        } else {
+            description += " - Custom behavior operation";
+        }
+
+        return description;
+    }
+
+    /**
      * Extracts parameter information from method signature
      */
-    private void extractParametersFromSignature(String params, EndpointInfo endpointInfo, String fullPath) {
-        if (params == null || params.trim().isEmpty()) {
-            System.out.println("No parameters found for endpoint: " + fullPath);
+    private void extractParametersFromSignature(String parametersString, EndpointInfo endpointInfo, String fullPath) {
+        if (parametersString.trim().isEmpty()) {
             return;
         }
 
-        // Split parameters by comma, handling generics and annotations
-        List<String> paramList = splitParameters(params);
+        // Split parameters by comma, but be careful of generic types
+        String[] paramParts = splitParameters(parametersString);
 
-        System.out.println("Processing " + paramList.size() + " parameters for endpoint: " + fullPath);
-
-        for (String param : paramList) {
+        for (String param : paramParts) {
             param = param.trim();
             if (param.isEmpty()) continue;
 
-            System.out.println("Processing parameter: " + param);
+            // Parse parameter with annotations
+            String paramType = "";
+            String paramName = "";
+            String javaType = "";
+            boolean isRequired = true;
+            String description = "";
 
-            // Parse parameter with annotations: @PathVariable/@RequestParam/@RequestBody type name
-            Pattern paramPattern = Pattern.compile("(?:(@\\w+(?:\\([^)]*\\))?))\\s*([\\w<>,\\s\\[\\]]+)\\s+(\\w+)");
-            Matcher matcher = paramPattern.matcher(param);
+            // Handle different parameter types
+            if (param.contains("@PathVariable")) {
+                // Extract path variable info
+                Pattern pathVarPattern = Pattern.compile("@PathVariable(?:\\(\"([^\"]+)\"\\))?\\s+(\\w+)\\s+(\\w+)");
+                Matcher pathVarMatcher = pathVarPattern.matcher(param);
+                if (pathVarMatcher.find()) {
+                    javaType = pathVarMatcher.group(2);
+                    paramName = pathVarMatcher.group(3);
+                    paramType = mapJavaTypeToTypeScript(javaType);
+                    description = "Path variable - " + getTypeDescription(javaType, paramName);
 
-            if (matcher.find()) {
-                String annotation = matcher.group(1);
-                String type = matcher.group(2).trim();
-                String name = matcher.group(3).trim();
-
-                System.out.println("Found parameter - Annotation: " + annotation + ", Type: " + type + ", Name: " + name);
-
-                boolean required = true;
-                String parameterType = "text"; // Default input type
-
-                // Determine parameter type and requirements based on annotation
-                if (annotation != null) {
-                    if (annotation.contains("@PathVariable")) {
-                        parameterType = "path";
-                        required = true;
-                    } else if (annotation.contains("@RequestParam")) {
-                        parameterType = "query";
-                        required = !annotation.contains("required=false") && !annotation.contains("required = false");
-                    } else if (annotation.contains("@RequestBody")) {
-                        parameterType = "body";
-                        required = true;
-                    }
+                    endpointInfo.addParameter(new EndpointInfo.ParameterInfo(paramName, paramType, isRequired, description, javaType));
                 }
+            } else if (param.contains("@RequestParam")) {
+                // Extract request parameter info
+                Pattern reqParamPattern = Pattern.compile("@RequestParam(?:\\(\"([^\"]+)\"\\))?\\s+(\\w+)\\s+(\\w+)");
+                Matcher reqParamMatcher = reqParamPattern.matcher(param);
+                if (reqParamMatcher.find()) {
+                    javaType = reqParamMatcher.group(2);
+                    paramName = reqParamMatcher.group(3);
+                    paramType = mapJavaTypeToTypeScript(javaType);
+                    description = "Query parameter - " + getTypeDescription(javaType, paramName);
 
-                // Map Java types to appropriate input types
-                String inputType = getInputTypeFromJavaType(type);
-                String tsType = mapJavaTypeToTypeScript(type);
+                    endpointInfo.addParameter(new EndpointInfo.ParameterInfo(paramName, paramType, isRequired, description, javaType));
+                }
+            } else if (param.contains("@RequestBody")) {
+                // Extract request body info
+                Pattern reqBodyPattern = Pattern.compile("@RequestBody\\s+(\\w+)\\s+(\\w+)");
+                Matcher reqBodyMatcher = reqBodyPattern.matcher(param);
+                if (reqBodyMatcher.find()) {
+                    javaType = reqBodyMatcher.group(1);
+                    paramName = reqBodyMatcher.group(2);
 
-                // Generate parameter description
-                String description = generateParameterDescription(name, type, annotation);
+                    paramType = "object";
+                    description = "Request body - Entity data";
 
-                // Create enhanced parameter info
-                EndpointInfo.ParameterInfo paramInfo = new EndpointInfo.ParameterInfo(
-                    name, tsType, required, description, type
-                );
-
-                endpointInfo.addParameter(paramInfo);
-
-                System.out.println("Added parameter: " + name + " (" + tsType + ") - " + description);
+                    endpointInfo.addParameter(new EndpointInfo.ParameterInfo(paramName, paramType, isRequired, description, javaType));
+                }
             } else {
-                System.out.println("Could not parse parameter: " + param);
+                // Handle parameters without explicit annotations (assume based on position and path)
+                Pattern simpleParamPattern = Pattern.compile("(\\w+)\\s+(\\w+)");
+                Matcher simpleParamMatcher = simpleParamPattern.matcher(param);
+                if (simpleParamMatcher.find()) {
+                    javaType = simpleParamMatcher.group(1);
+                    paramName = simpleParamMatcher.group(2);
+
+                    paramType = mapJavaTypeToTypeScript(javaType);
+
+                    // Determine if it's a path variable by checking if the path contains the parameter
+                    if (fullPath.contains("{" + paramName + "}")) {
+                        description = "Path variable - " + getTypeDescription(javaType, paramName);
+                    } else {
+                        description = "Query parameter - " + getTypeDescription(javaType, paramName);
+                    }
+
+                    endpointInfo.addParameter(new EndpointInfo.ParameterInfo(paramName, paramType, isRequired, description, javaType));
+                }
             }
         }
     }
 
     /**
-     * Generates a meaningful description for the endpoint based on method name and path
+     * Splits parameter string by comma, handling generic types correctly
      */
-    private String generateEndpointDescription(String methodName, String path, String httpMethod) {
-        StringBuilder description = new StringBuilder();
-
-        // Add method name as the main action
-        description.append(methodName.replaceAll("([a-z])([A-Z])", "$1 $2").toLowerCase());
-
-        // Add context based on path
-        if (path.contains("search")) {
-            description.append(" - Search for specific entities based on criteria");
-        } else if (path.contains("featured")) {
-            description.append(" - Get featured or highlighted entities");
-        } else if (path.contains("process")) {
-            description.append(" - Process or execute an action on the entity");
-        } else if (path.contains("history")) {
-            description.append(" - Get historical data or activity log");
-        } else if (path.contains("verify")) {
-            description.append(" - Verify or validate the entity");
-        } else if (path.contains("refund")) {
-            description.append(" - Process a refund or reversal");
-        } else if (path.contains("discount")) {
-            description.append(" - Apply a discount or special pricing");
-        } else if (path.contains("low-stock")) {
-            description.append(" - Get items with low inventory levels");
-        } else if (path.contains("count")) {
-            description.append(" - Count or aggregate data");
-        } else if (path.contains("by")) {
-            description.append(" - Filter entities by specific criteria");
-        } else if (path.contains("add")) {
-            description.append(" - Add or associate data");
-        } else if (path.contains("remove")) {
-            description.append(" - Remove or disassociate data");
-        } else if (path.contains("update")) {
-            description.append(" - Update specific fields");
-        } else if (path.contains("create")) {
-            description.append(" - Create new entity with custom logic");
-        } else if (path.contains("delete")) {
-            description.append(" - Delete with custom logic");
-        } else {
-            description.append(" - Custom behavior operation");
-        }
-
-        return description.toString();
-    }
-
-    /**
-     * Generates a description for a parameter based on its name and type
-     */
-    private String generateParameterDescription(String paramName, String javaType, String annotation) {
-        StringBuilder description = new StringBuilder();
-
-        // Add parameter type context
-        if (annotation != null) {
-            if (annotation.contains("@PathVariable")) {
-                description.append("Path variable - ");
-            } else if (annotation.contains("@RequestParam")) {
-                description.append("Query parameter - ");
-            } else if (annotation.contains("@RequestBody")) {
-                description.append("Request body - ");
-            } else {
-                description.append("Parameter - ");
-            }
-        }
-
-        // Add description based on parameter name
-        if (paramName.equalsIgnoreCase("id")) {
-            description.append("Entity identifier");
-        } else if (paramName.equalsIgnoreCase("name")) {
-            description.append("Entity name");
-        } else if (paramName.equalsIgnoreCase("query") || paramName.equalsIgnoreCase("search")) {
-            description.append("Search query term");
-        } else if (paramName.equalsIgnoreCase("limit")) {
-            description.append("Maximum number of results");
-        } else if (paramName.equalsIgnoreCase("offset") || paramName.equalsIgnoreCase("page")) {
-            description.append("Pagination offset");
-        } else if (paramName.equalsIgnoreCase("status")) {
-            description.append("Status value");
-        } else if (paramName.equalsIgnoreCase("date") || paramName.equalsIgnoreCase("startDate") || paramName.equalsIgnoreCase("endDate")) {
-            description.append("Date value");
-        } else if (paramName.equalsIgnoreCase("amount") || paramName.equalsIgnoreCase("price") || paramName.equalsIgnoreCase("discount")) {
-            description.append("Numeric value");
-        } else if (paramName.equalsIgnoreCase("email")) {
-            description.append("Email address");
-        } else if (paramName.equalsIgnoreCase("username")) {
-            description.append("Username");
-        } else if (paramName.equalsIgnoreCase("password")) {
-            description.append("Password");
-        } else if (paramName.toLowerCase().contains("id")) {
-            description.append(paramName.replace("Id", "").replace("id", "") + " identifier");
-        } else {
-            // Generic description based on type
-            if (javaType.contains("String")) {
-                description.append("Text value");
-            } else if (javaType.contains("Integer") || javaType.contains("Long") || javaType.contains("int") || javaType.contains("long")) {
-                description.append("Integer value");
-            } else if (javaType.contains("Double") || javaType.contains("Float") || javaType.contains("double") || javaType.contains("float")) {
-                description.append("Decimal value");
-            } else if (javaType.contains("Boolean") || javaType.contains("boolean")) {
-                description.append("Boolean value");
-            } else if (javaType.contains("Date") || javaType.contains("LocalDate") || javaType.contains("LocalDateTime")) {
-                description.append("Date/time value");
-            } else {
-                description.append("Data value");
-            }
-        }
-
-        return description.toString();
-    }
-
-    /**
-     * Determines the appropriate input type for frontend based on Java type
-     */
-    private String getInputTypeFromJavaType(String javaType) {
-        // Remove generics and array brackets for basic type checking
-        String baseType = javaType.replaceAll("[<>\\[\\],\\s]", "").toLowerCase();
-
-        if (baseType.contains("int") || baseType.contains("long") ||
-            baseType.contains("double") || baseType.contains("float") ||
-            baseType.contains("bigdecimal") || baseType.contains("number")) {
-            return "number";
-        } else if (baseType.contains("date") || baseType.contains("time")) {
-            return "date";
-        } else if (baseType.contains("bool")) {
-            return "checkbox";
-        } else if (baseType.contains("email")) {
-            return "email";
-        } else if (baseType.contains("password")) {
-            return "password";
-        } else if (baseType.contains("url") || baseType.contains("uri")) {
-            return "url";
-        } else {
-            return "text";
-        }
-    }
-
-    /**
-     * Splits parameters by comma, handling generics
-     */
-    private List<String> splitParameters(String params) {
-        List<String> result = new ArrayList<>();
-        if (params == null || params.trim().isEmpty()) {
-            return result;
-        }
-
+    private String[] splitParameters(String parametersString) {
+        List<String> params = new ArrayList<>();
         int depth = 0;
         StringBuilder current = new StringBuilder();
 
-        for (char c : params.toCharArray()) {
-            if (c == '<') depth++;
-            if (c == '>') depth--;
-
-            if (c == ',' && depth == 0) {
-                result.add(current.toString().trim());
+        for (char c : parametersString.toCharArray()) {
+            if (c == '<') {
+                depth++;
+            } else if (c == '>') {
+                depth--;
+            } else if (c == ',' && depth == 0) {
+                params.add(current.toString());
                 current = new StringBuilder();
-            } else {
-                current.append(c);
+                continue;
             }
+            current.append(c);
         }
 
         if (!current.isEmpty()) {
-            result.add(current.toString().trim());
+            params.add(current.toString());
         }
 
-        return result;
+        return params.toArray(new String[0]);
+    }
+
+    /**
+     * Gets a human-readable description for a parameter type
+     */
+    private String getTypeDescription(String javaType, String paramName) {
+        return switch (javaType) {
+            case "Long", "Integer", "int", "long" -> {
+                if (paramName.toLowerCase().contains("id")) {
+                    yield paramName.replace("Id", "").toLowerCase() + " identifier";
+                }
+                yield "Integer value";
+            }
+            case "Double", "Float", "double", "float" -> "Decimal value";
+            case "String" -> {
+                if (paramName.toLowerCase().contains("name")) {
+                    yield "Entity name";
+                } else if (paramName.toLowerCase().contains("email")) {
+                    yield "Email address";
+                } else if (paramName.toLowerCase().contains("password")) {
+                    yield "Password";
+                } else if (paramName.toLowerCase().contains("username")) {
+                    yield "Username";
+                } else {
+                    yield "Text value";
+                }
+            }
+            case "Boolean", "boolean" -> "Boolean value";
+            case "Date", "LocalDate", "LocalDateTime" -> "Date value";
+            default -> "Entity identifier";
+        };
+    }
+
+    /**
+     * Adds parameters for standard CRUD endpoints
+     */
+    private void addStandardEndpointParameters(EntityInfo entityInfo) {
+        // Add parameters for standard CRUD endpoints that have path variables
+        for (EndpointInfo endpoint : entityInfo.getBehaviorEndpoints()) {
+            String path = endpoint.getPath();
+
+            // Handle standard GET by ID endpoint
+            if (endpoint.getMethod().equals("GET") && path.endsWith("/{id}") && endpoint.getParameters().isEmpty()) {
+                endpoint.addParameter("id", "number", true);
+                endpoint.getParameters().getFirst().setDescription("Path variable - Entity identifier");
+            }
+        }
     }
 }

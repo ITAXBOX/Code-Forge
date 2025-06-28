@@ -1469,30 +1469,48 @@ function CustomEndpointCard({ method, path, fullPath, description, parameters })
       };
 
       // Separate path parameters from other parameters
-      const pathParams = parameters?.filter(p => p.javaType?.includes("PathVariable") ||
+      const pathParams = parameters?.filter(p => p.description?.includes("Path variable") ||
                                               path.includes(`{${p.name}}`)) || [];
-      const queryParams = parameters?.filter(p => p.javaType?.includes("RequestParam") ||
-                                               (!p.javaType?.includes("PathVariable") &&
-                                                !p.javaType?.includes("RequestBody") &&
-                                                method === "GET")) || [];
-      const bodyParams = parameters?.filter(p => p.javaType?.includes("RequestBody") ||
+      const queryParams = parameters?.filter(p => p.description?.includes("Query parameter") ||
+                                               (method === "GET" && !p.description?.includes("Path variable") &&
+                                                !p.description?.includes("Request body"))) || [];
+      const bodyParams = parameters?.filter(p => p.description?.includes("Request body") ||
                                              (method !== "GET" &&
-                                              !p.javaType?.includes("PathVariable") &&
-                                              !p.javaType?.includes("RequestParam"))) || [];
+                                              !p.description?.includes("Path variable") &&
+                                              !p.description?.includes("Query parameter"))) || [];
 
       // Replace path parameters in the URL
       pathParams.forEach(param => {
         if (customParams[param.name]) {
-          url = url.replace(`{${param.name}}`, encodeURIComponent(customParams[param.name]));
+          // Convert parameter value based on its type
+          let convertedValue = convertParameterValue(customParams[param.name], param.type, param.javaType);
+          url = url.replace(`{${param.name}}`, encodeURIComponent(convertedValue));
         }
       });
 
-      // Handle query parameters for GET requests
+      // Handle query parameters for GET requests or specific parameter types
       if (method === "GET" && queryParams.length > 0) {
         const params = new URLSearchParams();
         queryParams.forEach(param => {
           if (customParams[param.name] && customParams[param.name].trim()) {
-            params.append(param.name, customParams[param.name]);
+            // Convert parameter value based on its type
+            let convertedValue = convertParameterValue(customParams[param.name], param.type, param.javaType);
+            params.append(param.name, convertedValue);
+          }
+        });
+        if (params.toString()) {
+          url += "?" + params.toString();
+        }
+      }
+
+      // Handle non-GET requests with query parameters (for endpoints that use @RequestParam)
+      if (method !== "GET" && queryParams.length > 0) {
+        const params = new URLSearchParams();
+        queryParams.forEach(param => {
+          if (customParams[param.name] && customParams[param.name].trim()) {
+            // Convert parameter value based on its type
+            let convertedValue = convertParameterValue(customParams[param.name], param.type, param.javaType);
+            params.append(param.name, convertedValue);
           }
         });
         if (params.toString()) {
@@ -1501,7 +1519,7 @@ function CustomEndpointCard({ method, path, fullPath, description, parameters })
       }
 
       // Handle body parameters for non-GET requests
-      if (method !== "GET" && (bodyParams.length > 0 || Object.keys(customParams).length > 0)) {
+      if (method !== "GET" && bodyParams.length > 0) {
         options.headers = {
           "Content-Type": "application/json",
         };
@@ -1516,7 +1534,8 @@ function CustomEndpointCard({ method, path, fullPath, description, parameters })
                 if (customParams[param.name].startsWith('{') || customParams[param.name].startsWith('[')) {
                   bodyData[param.name] = JSON.parse(customParams[param.name]);
                 } else {
-                  bodyData[param.name] = customParams[param.name];
+                  // Convert parameter value based on its type
+                  bodyData[param.name] = convertParameterValue(customParams[param.name], param.type, param.javaType);
                 }
               } catch (error) {
                 bodyData[param.name] = customParams[param.name];
@@ -1524,17 +1543,6 @@ function CustomEndpointCard({ method, path, fullPath, description, parameters })
             }
           });
           options.body = JSON.stringify(bodyData);
-        } else {
-          // Use all parameters that aren't path parameters
-          const bodyData = {};
-          Object.entries(customParams).forEach(([key, value]) => {
-            if (!pathParams.find(p => p.name === key) && value.trim()) {
-              bodyData[key] = value;
-            }
-          });
-          if (Object.keys(bodyData).length > 0) {
-            options.body = JSON.stringify(bodyData);
-          }
         }
       }
 
@@ -1559,13 +1567,52 @@ function CustomEndpointCard({ method, path, fullPath, description, parameters })
     }
   };
 
+  // Convert parameter value based on its type and Java type
+  function convertParameterValue(value: string, tsType: string, javaType: string): any {
+    if (!value || value.trim() === '') return value;
+
+    // Handle based on TypeScript type first
+    switch (tsType) {
+      case "number":
+        // Check Java type for more specific conversion
+        if (javaType?.includes("Integer") || javaType?.includes("int")) {
+          const intValue = parseInt(value, 10);
+          return isNaN(intValue) ? value : intValue;
+        } else if (javaType?.includes("Long") || javaType?.includes("long")) {
+          const longValue = parseInt(value, 10);
+          return isNaN(longValue) ? value : longValue;
+        } else if (javaType?.includes("Double") || javaType?.includes("double") ||
+                   javaType?.includes("Float") || javaType?.includes("float")) {
+          const floatValue = parseFloat(value);
+          return isNaN(floatValue) ? value : floatValue;
+        } else {
+          // Default number conversion
+          const numValue = Number(value);
+          return isNaN(numValue) ? value : numValue;
+        }
+
+      case "boolean":
+        return value.toLowerCase() === 'true' || value === '1';
+
+      case "Date":
+        try {
+          return new Date(value).toISOString();
+        } catch (error) {
+          return value;
+        }
+
+      default:
+        return value;
+    }
+  }
+
   // Get input type based on parameter type
   function getInputType(param) {
     if (param.type === "number" || param.javaType?.includes("Integer") ||
         param.javaType?.includes("Long") || param.javaType?.includes("Double")) {
       return "number";
     } else if (param.type === "Date" || param.javaType?.includes("Date")) {
-      return "date";
+      return "datetime-local";
     } else if (param.type === "boolean" || param.javaType?.includes("Boolean")) {
       return "checkbox";
     } else if (param.name?.toLowerCase().includes("email")) {
@@ -1620,7 +1667,7 @@ function CustomEndpointCard({ method, path, fullPath, description, parameters })
                     </div>
                     <p className="text-xs text-gray-500">{param.description}</p>
 
-                    {param.javaType?.includes("RequestBody") ? (
+                    {param.description?.includes("Request body") ? (
                       <textarea
                         placeholder={`Enter JSON for ${param.name}`}
                         value={customParams[param.name] || ""}

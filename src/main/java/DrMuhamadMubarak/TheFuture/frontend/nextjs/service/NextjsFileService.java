@@ -241,11 +241,11 @@ public class NextjsFileService {
                 for (int k = 0; k < endpoint.getParameters().size(); k++) {
                     EndpointInfo.ParameterInfo param = endpoint.getParameters().get(k);
                     sb.append("            {\n");
-                    sb.append("              name: \"").append(param.name()).append("\",\n");
-                    sb.append("              type: \"").append(param.type()).append("\",\n");
-                    sb.append("              required: ").append(param.required()).append(",\n");
-                    sb.append("              description: \"").append(param.description()).append("\",\n");
-                    sb.append("              javaType: \"").append(param.javaType()).append("\"\n");
+                    sb.append("              name: \"").append(param.getName()).append("\",\n");
+                    sb.append("              type: \"").append(param.getType()).append("\",\n");
+                    sb.append("              required: ").append(param.isRequired()).append(",\n");
+                    sb.append("              description: \"").append(param.getDescription()).append("\",\n");
+                    sb.append("              javaType: \"").append(param.getJavaType()).append("\"\n");
                     sb.append("            }");
                     if (k < endpoint.getParameters().size() - 1) {
                         sb.append(",");

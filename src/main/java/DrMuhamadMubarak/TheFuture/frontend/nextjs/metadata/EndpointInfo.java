@@ -1,5 +1,6 @@
 package DrMuhamadMubarak.TheFuture.frontend.nextjs.metadata;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,7 +35,14 @@ public class EndpointInfo {
         parameters.add(parameterInfo);
     }
 
-    public record ParameterInfo(String name, String type, boolean required, String description, String javaType) {
-
+    @AllArgsConstructor
+    @Setter
+    @Getter
+    public static class ParameterInfo {
+        private String name;
+        private String type;
+        private boolean required;
+        private String description;
+        private String javaType;
     }
 }
