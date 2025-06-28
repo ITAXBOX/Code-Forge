@@ -1792,10 +1792,20 @@
                 activityScores[score]++;
             });
 
+            // Create enhanced labels with weight indicators
+            const enhancedLabels = [
+                'S+ ⭐ (1000+)',
+                'S 🔥 (300-999)',
+                'A 💎 (100-299)',
+                'B ⚡ (50-99)',
+                'C 📈 (10-49)',
+                'D 🌱 (0-9)'
+            ];
+
             charts.activity = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: Object.keys(activityScores),
+                    labels: enhancedLabels,
                     datasets: [{
                         label: 'Number of Projects',
                         data: Object.values(activityScores),
@@ -1823,11 +1833,30 @@
                             borderColor: 'rgba(59, 130, 246, 0.2)',
                             borderWidth: 1,
                             cornerRadius: 8,
+                            callbacks: {
+                                title: function(context) {
+                                    const labels = [
+                                        'Legendary Tier (S+) - 1000+ requests',
+                                        'Elite Tier (S) - 300-999 requests',
+                                        'Premium Tier (A) - 100-299 requests',
+                                        'Active Tier (B) - 50-99 requests',
+                                        'Growing Tier (C) - 10-49 requests',
+                                        'Starter Tier (D) - 0-9 requests'
+                                    ];
+                                    return labels[context[0].dataIndex];
+                                },
+                                label: function(context) {
+                                    return `Projects: ${context.parsed.y}`;
+                                }
+                            }
                         }
                     },
                     scales: {
                         x: {
-                            ticks: {color: 'rgba(255, 255, 255, 0.7)'},
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                font: {size: 10, weight: '600'}
+                            },
                             grid: {color: 'rgba(59, 130, 246, 0.1)'}
                         },
                         y: {
