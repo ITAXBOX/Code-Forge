@@ -54,6 +54,8 @@ public class SpringAIRepository {
             "findByPhone",
             "findByIdentifier",
             "findByCode",
+            "findByName",
+            "findById",
             "findOneBy(.*)"
     );
 
@@ -225,16 +227,9 @@ public class SpringAIRepository {
 
         // Check if method matches any of the single entity method patterns
         for (String pattern : SINGLE_ENTITY_METHOD_PATTERNS) {
-            if (methodName.matches(pattern.replace("(.*)", ".*"))) {
+            if (methodName.matches(pattern.replace("(.*)", ".*")) || methodName.equals(pattern)) {
                 return "Optional<" + entityName + ">";
             }
-        }
-
-        // Methods that return an entity from a relationship often return a List
-        if (methodName.startsWith("findBy") && !methodName.startsWith("findById") &&
-            !methodName.contains("Username") && !methodName.contains("Email")) {
-            // These methods typically return lists when the parameter is singular
-            return "List<" + entityName + ">";
         }
 
         // Direct method prefix matching
@@ -251,8 +246,10 @@ public class SpringAIRepository {
             }
         }
 
-        // Generic inference
-        if (methodName.startsWith("findAll")) {
+        // Methods that return an entity from a relationship often return a List
+        // But only if they haven't been caught by the single entity patterns above
+        if (methodName.startsWith("findBy") && !methodName.startsWith("findById")) {
+            // These methods typically return lists when the parameter is not a unique identifier
             return "List<" + entityName + ">";
         }
 
