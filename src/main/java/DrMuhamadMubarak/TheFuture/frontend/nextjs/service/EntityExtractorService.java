@@ -445,11 +445,11 @@ public class EntityExtractorService {
             if (param.isEmpty()) continue;
 
             // Parse parameter with annotations
-            String paramType = "";
-            String paramName = "";
-            String javaType = "";
+            String paramType;
+            String paramName;
+            String javaType;
             boolean isRequired = true;
-            String description = "";
+            String description;
 
             // Handle different parameter types
             if (param.contains("@PathVariable")) {
