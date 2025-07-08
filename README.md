@@ -600,36 +600,6 @@ The generator uses customizable templates for code generation. You can modify te
 - `src/main/java/DrMuhamadMubarak/TheFuture/backend/springboot/`
 - `Code Forge Dashboard/` for frontend templates
 
-## 🐛 Troubleshooting
-
-### **Common Issues**
-
-#### **Port Already in Use**
-```bash
-# Kill process using port 8080
-lsof -ti:8080 | xargs kill -9
-```
-
-#### **Database Connection Issues**
-- Verify database is running
-- Check connection URL and credentials
-- Ensure database exists
-
-#### **Maven Build Issues**
-```bash
-# Clean and rebuild
-mvn clean install -U
-```
-
-#### **Frontend Build Issues**
-```bash
-# Clear npm cache
-npm cache clean --force
-# Reinstall dependencies
-rm -rf node_modules package-lock.json
-npm install
-```
-
 ## 🤝 Contributing
 
 We welcome contributions! Please follow these steps:
