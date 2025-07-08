@@ -10,6 +10,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static DrMuhamadMubarak.TheFuture.backend.springboot.SpringAIRepositoryUtils.getStrings;
+
 public class SpringBehaviorController {
     private static final String CONTROLLER_TEMPLATE = """
             package com.example.%s.behaviorcontrollers;
@@ -158,23 +160,7 @@ public class SpringBehaviorController {
         int depth = 0;
         StringBuilder current = new StringBuilder();
 
-        for (char c : params.toCharArray()) {
-            if (c == '<') depth++;
-            if (c == '>') depth--;
-
-            if (c == ',' && depth == 0) {
-                result.add(current.toString().trim());
-                current = new StringBuilder();
-            } else {
-                current.append(c);
-            }
-        }
-
-        if (!current.isEmpty()) {
-            result.add(current.toString().trim());
-        }
-
-        return result;
+        return getStrings(params, result, depth, current);
     }
 
     private static String mapMethodToPath(String methodName) {
