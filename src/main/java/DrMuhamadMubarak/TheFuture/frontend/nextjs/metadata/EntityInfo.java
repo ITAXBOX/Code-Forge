@@ -44,13 +44,6 @@ public class EntityInfo {
         behaviorEndpoints.add(endpointInfo);
     }
 
-    // Get all endpoints (CRUD + behavior) for backward compatibility
-    public List<EndpointInfo> getAllEndpoints() {
-        List<EndpointInfo> allEndpoints = new ArrayList<>(endpoints);
-        allEndpoints.addAll(behaviorEndpoints);
-        return allEndpoints;
-    }
-
     // New method to add an attribute
     public void addAttribute(String name, String type) {
         attributes.add(new EntityAttributeInfo(name, type));
