@@ -99,7 +99,7 @@ public class NextjsFileService {
             System.out.println("Found mock entities marker in the template");
 
             // Pattern for empty entities array
-            String emptyEntitiesPattern = "  // Mock entities data\\s+const entities = \\[ \\]";
+            String emptyEntitiesPattern = " {2}// Mock entities data\\s+const entities = \\[ ]";
 
             // Check if we have the empty entities array
             if (dashboardTemplate.matches("(?s).*" + emptyEntitiesPattern + ".*")) {
@@ -108,7 +108,7 @@ public class NextjsFileService {
                 System.out.println("Replaced empty entities array with actual entities");
             } else {
                 // Try to match with any content inside brackets
-                String anyContentEntitiesPattern = "(?s)  // Mock entities data\\s+const entities = \\[.*?\\]";
+                String anyContentEntitiesPattern = "(?s) {2}// Mock entities data\\s+const entities = \\[.*?]";
                 String updatedTemplate = dashboardTemplate.replaceAll(anyContentEntitiesPattern, replacement);
 
                 // Check if replacement worked
