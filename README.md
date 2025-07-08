@@ -1,6 +1,6 @@
 # 🚀 Code Forge - The Future of Project Generation
 
-**Code Forge** is a revolutionary full-stack project generator that transforms your ideas into production-ready code in minutes. Built with Spring Boot and featuring a sleek web interface, it automatically generates complete applications with backend APIs, frontend interfaces, and database configurations.
+**Code Forge** is a revolutionary full-stack project generator that transforms your ideas into production-ready code in a minute. Built with Spring Boot and featuring a sleek web interface, it automatically generates complete applications with backend APIs, frontend interfaces, and database configurations.
 
 ![Java](https://img.shields.io/badge/Java-22-orange?style=for-the-badge&logo=java)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.2-brightgreen?style=for-the-badge&logo=springboot)
@@ -9,10 +9,10 @@
 
 ## 🌟 Features
 
-### 🎯 **Multi-Stack Code Generation**
+### 🎯 **Stack Code Generation**
 - **Backend**: Spring Boot with JPA/Hibernate
-- **Frontend**: Next.js, React, Vue, Angular
-- **Database**: MySQL, PostgreSQL, MongoDB, SQLite
+- **Frontend**: Next.js
+- **Database**: MySQL
 - **Security**: Spring Security with JWT authentication
 - **API**: RESTful endpoints with CRUD operations
 
@@ -179,13 +179,13 @@ Open your browser and navigate to `http://localhost:8080`
 ### 1. **Project Configuration**
 - Navigate to the home page and click "Start Your Journey"
 - Choose your technology stack:
-  - **Frontend**: Next.js, React, Vue, or Angular
+  - **Frontend**: Next.js (more coming soon)
   - **Backend**: Spring Boot (more coming soon)
-  - **Database**: MySQL, PostgreSQL, MongoDB, or SQLite
+  - **Database**: MySQL (more coming soon)
 - Enter your project name
 
 ### 2. **Entity Definition**
-Choose between two methods:
+Choose between the three methods:
 
 #### **Interactive Method:**
 - Define entities one by one using the web interface
@@ -244,12 +244,6 @@ The system automatically generates:
 - **Pages**: List, create, edit, delete pages
 - **Routing**: Navigation configuration
 - **State Management**: Context or store setup
-
-#### **Project Structure:**
-- **Maven/Gradle**: Build configuration
-- **Docker**: Containerization files
-- **Documentation**: API documentation and README
-- **Tests**: Unit and integration tests
 
 ## 🎨 Generated Code Examples
 
@@ -599,123 +593,12 @@ public class SecurityConfig {
 - Response compression
 - Rate limiting
 
-## 🧪 Testing
-
-### **Generated Test Structure**
-```
-src/test/java/
-├── controller/           # Controller tests
-├── service/             # Service tests
-├── repository/          # Repository tests
-└── integration/         # Integration tests
-```
-
-### **Test Examples**
-```java
-@SpringBootTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class UserServiceTest {
-    
-    @Autowired
-    private UserService userService;
-    
-    @Test
-    void testCreateUser() {
-        User user = new User();
-        user.setUsername("testuser");
-        user.setEmail("test@example.com");
-        
-        User savedUser = userService.createUser(user);
-        
-        assertThat(savedUser.getId()).isNotNull();
-        assertThat(savedUser.getUsername()).isEqualTo("testuser");
-    }
-}
-```
-
-## 🚀 Deployment
-
-### **Docker Support**
-Generated projects include Docker configuration:
-
-```dockerfile
-FROM openjdk:22-jdk-slim
-
-WORKDIR /app
-
-COPY target/*.jar app.jar
-
-EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "app.jar"]
-```
-
-### **Docker Compose**
-```yaml
-version: '3.8'
-services:
-  app:
-    build: .
-    ports:
-      - "8080:8080"
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
-    depends_on:
-      - database
-      
-  database:
-    image: mysql:8.0
-    environment:
-      MYSQL_DATABASE: ${PROJECT_NAME}
-      MYSQL_ROOT_PASSWORD: password
-    ports:
-      - "3306:3306"
-```
-
 ## 🔧 Customization
 
 ### **Template Customization**
 The generator uses customizable templates for code generation. You can modify templates in:
 - `src/main/java/DrMuhamadMubarak/TheFuture/backend/springboot/`
 - `Code Forge Dashboard/` for frontend templates
-
-### **Adding New Framework Support**
-To add support for new frameworks:
-
-1. Create new package under `backend/` or `frontend/`
-2. Implement generator classes
-3. Add enum values to framework types
-4. Update the service layer
-
-### **Custom Behaviors**
-Add custom methods and behaviors to generated entities:
-```java
-// Custom behavior example
-public class UserService {
-    // Generated CRUD methods...
-    
-    // Custom behavior
-    public List<User> findActiveUsers() {
-        return userRepository.findByActiveTrue();
-    }
-}
-```
-
-## 📈 Monitoring and Metrics
-
-Generated projects include:
-
-### **Actuator Endpoints**
-- `/actuator/health` - Application health
-- `/actuator/metrics` - Application metrics
-- `/actuator/info` - Application information
-
-### **Logging Configuration**
-```properties
-logging.level.com.example=${PROJECT_NAME}=DEBUG
-logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %msg%n
-logging.pattern.file=%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
-```
 
 ## 🐛 Troubleshooting
 
@@ -769,7 +652,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👨‍💻 Author
 
-**Dr. Muhamad Mubarak**
+**Ali Itawi**
 - GitHub: [@ITAXBOX](https://github.com/ITAXBOX)
 - Email: aliitawi7@gmail.com
 
@@ -788,28 +671,6 @@ If you encounter any issues or have questions:
 2. **Search existing issues** on GitHub
 3. **Create a new issue** with detailed information
 4. **Visit our support page** at `/resources/support`
-
-## 🔄 Version History
-
-- **v1.0.0** - Initial release with Spring Boot + Next.js support
-- **v1.1.0** - Added relationship support and JSON import
-- **v1.2.0** - Enhanced security and authentication features
-- **v1.3.0** - Added Docker support and deployment configurations
-
-## 🚀 Roadmap
-
-### **Upcoming Features**
-- [ ] Support for Django and Flask backends
-- [ ] GraphQL API generation
-- [ ] Microservices architecture support
-- [ ] Kubernetes deployment configurations
-- [ ] Real-time features with WebSockets
-- [ ] Advanced caching strategies
-- [ ] API documentation generation
-- [ ] Database migration tools
-- [ ] Performance monitoring integration
-- [ ] Multi-tenant architecture support
-
 ---
 
 **Code Forge** - *Transforming Ideas into Code, One Click at a Time* 🚀
