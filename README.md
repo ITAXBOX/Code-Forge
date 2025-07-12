@@ -1,4 +1,4 @@
-# CodeForge | The AI Framework for Rapid App Generation
+# 🏆Code Forge: AI-Powered Full-Stack App Generator
 
 <div align="center">
 
