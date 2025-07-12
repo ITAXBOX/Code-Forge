@@ -211,7 +211,8 @@ Watch Code Forge in action as it generates a complete Samsung e-commerce platfor
 
 ### Step 4: Generated Backend API
 ![Demo 4](docs/demo/demo_4_backend_output.png)
-* Complete Spring Boot backend with RESTful APIs, security, and documentation*
+
+*Complete Spring Boot backend with RESTful APIs, security, and documentation*
 
 ### Step 5: Dynamic Frontend Creation
 ![Demo 5](docs/demo/demo_5_frontend_output.gif)
